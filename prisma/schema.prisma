@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Participant {
+  id               String   @id @default(cuid())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  email            String   @unique
+  twtUser          String
+  yumeshipName     String
+  oshiName         String
+  relationshipType String
+  fandomYume       String
+  contentType      String
+  languageReceive  String
+  fandomGive       String
+  yumeTypeGive     String
+  yumeDocuLink     String
+  yumeTypeReceive  String?
+  languageGive     String?
+  notes            String?
+  avoidList        String?
+  folderLink       String?
+
+  givingMatches    Match[]  @relation("giver")
+  receivingMatches Match[]  @relation("receiver")
+}
+
+model MatchRun {
+  id                String   @id @default(cuid())
+  createdAt         DateTime @default(now())
+  seed              Int?
+  totalParticipants Int
+  matchedPairs      Int
+  matches           Match[]
+}
+
+model Match {
+  id         String      @id @default(cuid())
+  matchRunId String
+  matchRun   MatchRun    @relation(fields: [matchRunId], references: [id], onDelete: Cascade)
+  giverId    String
+  giver      Participant @relation("giver", fields: [giverId], references: [id])
+  receiverId String
+  receiver   Participant @relation("receiver", fields: [receiverId], references: [id])
+
+  @@unique([matchRunId, giverId])
+}

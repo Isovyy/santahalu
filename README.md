@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Santahalu Secret Santa
 
-## Getting Started
+Webapp replacing the Google Forms + Sheet + Apps Script workflow for the
+YumeFess "Santahalu" Secret Santa event: a public registration form, an
+admin area to run the matching algorithm, and CSV export of results.
 
-First, run the development server:
+- `/` — public registration form
+- `/admin` — password-protected dashboard: participant count, run matching (with
+  optional seed), history of past runs
+- `/admin/results/[runId]` — matched pairs, unmatched list, CSV downloads
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Drive folder creation/renaming and access enforcement (the old
+`makeFolder.gs` / `enforcedAccess.gs` / `scriptAccess.gs` / `rename.gs`)
+are **not** part of this app yet — the `results_all.csv` export uses the same
+column layout those scripts expect (`receiver_folder_link`, `giver_email`,
+etc.), so they can still be run against the export if needed. Manual pairing
+and post-hoc reassignment (`manual_matches` / `reshuffle.gs`) are also not
+built yet — every "Run Matching" click auto-matches the full current
+participant list and keeps the previous run's results intact as history.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Next.js (App Router) + TypeScript + Tailwind, Prisma ORM against PostgreSQL,
+a single shared admin password for auth (signed cookie session).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Local setup
 
-## Learn More
+1. Copy `.env` and set:
+   - `DATABASE_URL` — a Postgres connection string (see below)
+   - `ADMIN_PASSWORD` — the password you'll use to log into `/admin`
+   - `SESSION_SECRET` — any long random string
+2. `npm install`
+3. `npx prisma migrate dev` — creates the schema
+4. `npm run dev` — http://localhost:3000
 
-To learn more about Next.js, take a look at the following resources:
+### Getting a Postgres database
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+This was scaffolded against a **temporary** database (created via
+`npx create-db`) that auto-deletes after 24 hours — it was only for building
+and testing this app, don't rely on it for real registrations. For real use,
+pick one of:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Neon** (neon.tech) — free tier, serverless Postgres, pairs well with Vercel.
+- **Supabase** — free tier Postgres, also gives you a dashboard.
+- **Prisma Postgres** — run `npx create-db create --ttl <duration>` for a
+  temporary one, or sign up at console.prisma.io to claim a permanent one.
 
-## Deploy on Vercel
+Whichever you pick, put its connection string in `DATABASE_URL` and rerun
+`npx prisma migrate deploy` (or `migrate dev` locally) against it.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deploying (Vercel)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Push this repo to GitHub.
+2. Import it in Vercel.
+3. Set the environment variables (`DATABASE_URL`, `ADMIN_PASSWORD`,
+   `SESSION_SECRET`) in the Vercel project settings — use a real/permanent
+   Postgres database here, not the temporary dev one.
+4. Add `npx prisma migrate deploy` as part of the build (e.g. as a Vercel
+   "Build Command" override: `npx prisma migrate deploy && npm run build`,
+   or run it manually once against the production `DATABASE_URL` before first
+   deploy).
+5. Deploy.
+
+## Tests
+
+`npm test` runs unit tests for the matching engine (`lib/matching.ts`),
+covering the same-oshi block, fandom/language/yume-type wildcard rules, and
+determinism under a fixed seed.
