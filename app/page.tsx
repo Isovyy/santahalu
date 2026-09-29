@@ -686,7 +686,6 @@ export default function RegisterPage() {
             type="text"
             required
             className={inputClass}
-            placeholder="Nama yumeshipmu"
             value={form.yumeshipName}
             onChange={(e) => update("yumeshipName", e.target.value)}
           />
@@ -714,7 +713,6 @@ export default function RegisterPage() {
               type="text"
               required
               className={inputClass + " mt-2"}
-              placeholder="Tulis fandommu"
               value={form.fandomYumeOther}
               onChange={(e) => update("fandomYumeOther", e.target.value)}
             />
@@ -726,7 +724,6 @@ export default function RegisterPage() {
             type="text"
             required
             className={inputClass}
-            placeholder="Nama karakter canon"
             list="oshi-suggestions"
             autoComplete="off"
             value={form.oshiName}
