@@ -686,7 +686,6 @@ export default function RegisterPage() {
             type="text"
             required
             className={inputClass}
-            placeholder="Nama yumeshipmu"
             value={form.yumeshipName}
             onChange={(e) => update("yumeshipName", e.target.value)}
           />
@@ -726,7 +725,6 @@ export default function RegisterPage() {
             type="text"
             required
             className={inputClass}
-            placeholder="Nama karakter canon"
             list="oshi-suggestions"
             autoComplete="off"
             value={form.oshiName}
