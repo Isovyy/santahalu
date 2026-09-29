@@ -14,13 +14,16 @@ model Participant {
   oshiName         String
   relationshipType String
   fandomYume       String
-  contentType      String
-  languageReceive  String
+  contentTypeArt          Boolean @default(false)
+  contentTypeWriting      Boolean @default(false)
+  languageReceiveIndonesia Boolean @default(false)
+  languageReceiveEnglish   Boolean @default(false)
   fandomGive       String
   yumeTypeGive     String
   yumeDocuLink     String
   yumeTypeReceive  String?
-  languageGive     String?
+  languageGiveIndonesia    Boolean @default(false)
+  languageGiveEnglish      Boolean @default(false)
   notes            String?
   folderLink       String?
   avoidList        String?
