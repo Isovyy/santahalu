@@ -30,7 +30,7 @@ a single shared admin password for auth (signed cookie session).
    - `ADMIN_PASSWORD` — the password you'll use to log into `/admin`
    - `SESSION_SECRET` — any long random string
 2. `npm install`
-3. `npx prisma migrate dev` — creates the schema
+3. `npx prisma db init` — applies the contract (`prisma/contract.prisma`) to the database
 4. `npm run dev` — http://localhost:3000
 
 ### Getting a Postgres database
@@ -46,19 +46,19 @@ pick one of:
   temporary one, or sign up at console.prisma.io to claim a permanent one.
 
 Whichever you pick, put its connection string in `DATABASE_URL` and rerun
-`npx prisma migrate deploy` (or `migrate dev` locally) against it.
+`npx prisma db init` (first time) or `npx prisma db verify` (schema already
+applied, just confirming it matches) against it.
 
 ## Deploying (Vercel)
 
 1. Push this repo to GitHub.
 2. Import it in Vercel.
 3. Set the environment variables (`DATABASE_URL`, `ADMIN_PASSWORD`,
-   `SESSION_SECRET`) in the Vercel project settings — use a real/permanent
-   Postgres database here, not the temporary dev one.
-4. Add `npx prisma migrate deploy` as part of the build (e.g. as a Vercel
-   "Build Command" override: `npx prisma migrate deploy && npm run build`,
-   or run it manually once against the production `DATABASE_URL` before first
-   deploy).
+   `SESSION_SECRET`) in the Vercel project settings.
+4. Run `npx prisma contract emit && npx prisma db init` once against the
+   production `DATABASE_URL` before first deploy (or fold it into the Vercel
+   "Build Command": `npx prisma contract emit && npx prisma db init && npm run build`
+   — `db init` is safe to re-run, it no-ops once the schema already matches).
 5. Deploy.
 
 ## Tests

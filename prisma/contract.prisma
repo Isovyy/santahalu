@@ -1,0 +1,56 @@
+// use prisma-8
+
+// Ported by hand from prisma/schema.prisma (Prisma ORM 7). Table names are kept
+// via @@map so the storage layout is unchanged.
+
+model Participant {
+  id               String   @id @default(cuid(2))
+  createdAt        temporal.createdAt()
+  updatedAt        temporal.updatedAt()
+
+  email            String   @unique
+  twtUser          String
+  yumeshipName     String
+  oshiName         String
+  relationshipType String
+  fandomYume       String
+  contentType      String
+  languageReceive  String
+  fandomGive       String
+  yumeTypeGive     String
+  yumeDocuLink     String
+  yumeTypeReceive  String?
+  languageGive     String?
+  notes            String?
+  folderLink       String?
+  avoidList        String?
+
+  givingMatches    Match[]  @relation("giver")
+  receivingMatches Match[]  @relation("receiver")
+
+  @@map("Participant")
+}
+
+model MatchRun {
+  id                String   @id @default(cuid(2))
+  createdAt         temporal.createdAt()
+  seed              Int?
+  totalParticipants Int
+  matchedPairs      Int
+  matches           Match[]
+
+  @@map("MatchRun")
+}
+
+model Match {
+  id         String      @id @default(cuid(2))
+  matchRunId String
+  matchRun   MatchRun    @relation(fields: [matchRunId], references: [id], onDelete: Cascade)
+  giverId    String
+  giver      Participant @relation("giver", fields: [giverId], references: [id])
+  receiverId String
+  receiver   Participant @relation("receiver", fields: [receiverId], references: [id])
+
+  @@unique([matchRunId, giverId])
+  @@map("Match")
+}

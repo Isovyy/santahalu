@@ -5,7 +5,6 @@ import { FormEvent, useMemo, useState } from "react";
 import { OSHI_DATA } from "@/lib/oshi-data";
 
 const RELATIONSHIP_OPTIONS = ["Romantic", "Platonic", "Queerplatonic"];
-const YUME_TYPE_RECEIVE_OPTIONS = ["HL", "GL", "BL"];
 const CONTENT_TYPE_OPTIONS = ["Art", "Writing"];
 const LANGUAGE_OPTIONS = ["Indonesia", "English"];
 const OTHER = "Yang lain";
@@ -38,7 +37,7 @@ const FANDOM_YUME_OPTIONS = [
   "Zenless Zone Zero",
 ];
 
-// One shared list so a receiver's fandom always matches a giver's accepted fandom exactly.
+// One shared list so a receiver's fandom always matches a giver's accepted fandom 
 const FANDOM_ALL = Array.from(
   new Set([
     ...FANDOM_YUME_OPTIONS,
@@ -73,8 +72,6 @@ interface FormState {
   yumeshipName: string;
   oshiName: string;
   relationshipType: string;
-  yumeTypeReceiveOption: string;
-  yumeTypeReceiveOther: string;
   fandomYumeOption: string;
   fandomYumeOther: string;
   contentType: string[];
@@ -93,8 +90,6 @@ const initialState: FormState = {
   yumeshipName: "",
   oshiName: "",
   relationshipType: "",
-  yumeTypeReceiveOption: "",
-  yumeTypeReceiveOther: "",
   fandomYumeOption: "",
   fandomYumeOther: "",
   contentType: [],
@@ -117,13 +112,13 @@ function Field({
   children,
 }: {
   label: string;
-  hint?: string;
+  hint?: React.ReactNode;
   required?: boolean;
   children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-1">
-      <span className="block text-sm font-medium text-gray-700">
+    <div className="space-y-2 rounded-lg border border-teal-100 bg-white p-6 shadow-sm">
+      <span className="block text-[15px] font-medium text-gray-800">
         {label}
         {required && <span className="text-red-400"> *</span>}
       </span>
@@ -154,27 +149,29 @@ function RadioGroup({
   onOtherChange?: (v: string) => void;
 }) {
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {options.map((opt) => (
-        <label key={opt} className="flex items-center gap-2 text-sm text-gray-700">
+        <label key={opt} className="flex items-center gap-3 text-sm text-gray-700">
           <input
             type="radio"
             name={name}
             value={opt}
             checked={value === opt}
             onChange={(e) => onChange(e.target.value)}
+            className="h-4 w-4 accent-teal-500"
           />
           {opt}
         </label>
       ))}
       {withOther && (
-        <label className="flex items-center gap-2 text-sm text-gray-700">
+        <label className="flex items-center gap-3 text-sm text-gray-700">
           <input
             type="radio"
             name={name}
             value={OTHER}
             checked={value === OTHER}
             onChange={(e) => onChange(e.target.value)}
+            className="h-4 w-4 accent-teal-500"
           />
           {OTHER}
           {value === OTHER && (
@@ -191,7 +188,7 @@ function RadioGroup({
   );
 }
 
-// "|" and ";" delimit the stored value, so they can't appear inside a name.
+// "|" and ";" delimit the stored value so they cant appear inside a name
 function cleanAvoidText(s: string): string {
   return s.replace(/[|;]/g, " ").replace(/\s+/g, " ").trim();
 }
@@ -232,14 +229,14 @@ function AvoidListInput({
           {values.map((v, i) => (
             <li
               key={`${v.fandom}:${v.character}`}
-              className="flex items-center gap-1 rounded-full border border-red-200 bg-red-50 py-1 pl-3 pr-1 text-sm text-red-500"
+              className="flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 py-1 pl-3 pr-1 text-sm text-emerald-600"
             >
-              {v.character} <span className="text-red-300">({v.fandom})</span>
+              {v.character} <span className="text-emerald-400">({v.fandom})</span>
               <button
                 type="button"
                 aria-label={`Hapus ${v.character}`}
                 onClick={() => onChange(values.filter((_, j) => j !== i))}
-                className="flex h-5 w-5 items-center justify-center rounded-full hover:bg-red-100"
+                className="flex h-5 w-5 items-center justify-center rounded-full hover:bg-emerald-100"
               >
                 ×
               </button>
@@ -334,8 +331,13 @@ function FandomMultiSelect({
 
   return (
     <div className="space-y-3">
-      <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-        <input type="checkbox" checked={any} onChange={(e) => toggleAny(e.target.checked)} />
+      <label className="flex items-center gap-3 text-sm font-medium text-gray-700">
+        <input
+          type="checkbox"
+          checked={any}
+          onChange={(e) => toggleAny(e.target.checked)}
+          className="h-4 w-4 accent-teal-500"
+        />
         {ANY_FANDOM}
       </label>
 
@@ -448,11 +450,12 @@ function CheckboxGroup({
   return (
     <div className="grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-3">
       {options.map((opt) => (
-        <label key={opt} className="flex items-center gap-2 text-sm text-gray-700">
+        <label key={opt} className="flex items-center gap-3 text-sm text-gray-700">
           <input
             type="checkbox"
             checked={values.includes(opt)}
             onChange={() => onChange(toggle(values, opt))}
+            className="h-4 w-4 accent-teal-500"
           />
           {opt}
         </label>
@@ -481,16 +484,17 @@ export default function RegisterPage() {
     setStatus("submitting");
     setError(null);
 
-    const yumeTypeReceive =
-      form.yumeTypeReceiveOption === OTHER
-        ? form.yumeTypeReceiveOther.trim()
-        : form.yumeTypeReceiveOption;
-
     const fandomYume =
       form.fandomYumeOption === OTHER ? form.fandomYumeOther.trim() : form.fandomYumeOption;
 
     if (form.fandomGive.length === 0) {
       setError("Pilih minimal satu fandom yang diterima (atau centang 'Apa saja').");
+      setStatus("error");
+      return;
+    }
+
+    if (form.contentType.includes("Writing") && form.languageGive.length === 0) {
+      setError("Pilih minimal satu bahasa yang bersedia kamu tulis.");
       setStatus("error");
       return;
     }
@@ -502,7 +506,6 @@ export default function RegisterPage() {
       yumeshipName: form.yumeshipName,
       oshiName: form.oshiName,
       relationshipType: form.relationshipType,
-      yumeTypeReceive,
       fandomYume,
       contentType: form.contentType.join(", "),
       languageReceive: form.languageReceive.join(", "),
@@ -555,15 +558,19 @@ export default function RegisterPage() {
 
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-10">
-      <div className="mb-8 text-center">
-        <div className="mb-3 flex justify-center">
-          <Image src="/yumefess-icon.png" alt="Yumefess" width={80} height={80} />
+      <div className="space-y-4">
+      <div className="overflow-hidden rounded-lg border border-teal-100 bg-white shadow-sm">
+        <div className="h-2 bg-teal-400" />
+        <div className="p-6 text-center">
+          <div className="mb-3 flex justify-center">
+            <Image src="/yumefess-icon.png" alt="Yumefess" width={72} height={72} />
+          </div>
+          <h1 className="mb-1 text-3xl font-bold text-teal-500">Secret Santa 2026</h1>
+          <p className="text-sm text-gray-400">Santahalu registration</p>
         </div>
-        <h1 className="mb-1 text-3xl font-bold text-teal-500">Secret Santa 2025</h1>
-        <p className="text-sm text-gray-400">Santahalu registration</p>
       </div>
 
-      <section className="mt-6 space-y-3 rounded-2xl border border-teal-100 bg-white shadow-sm p-5 text-sm text-gray-500">
+      <section className="space-y-3 rounded-lg border border-teal-100 bg-white shadow-sm p-6 text-sm text-gray-500">
         <h2 className="text-base font-medium text-gray-700">
           #SantaHalu: Secret Santa EVENT RULES
         </h2>
@@ -610,7 +617,7 @@ export default function RegisterPage() {
             Setiap peserta diharapkan bertanggungjawab dan mengerti terhadap event Secret Santa
             ini. Karena penerima Secret Santa digacha, maka writer bisa saja mendapat art, dan
             sebaliknya. Bagaimanapun, Secret Santa akan dicocokkan sesuai fandom dan oshi. Kami
-            akan mengusahakan untuk tidak memasangkan yang oshinya sama.
+            tidak akan  memasangkan yang oshinya sama.
           </p>
         </div>
 
@@ -620,17 +627,16 @@ export default function RegisterPage() {
         </p>
 
         <p>
-          Pertanyaan, kritik, dan saran lebih lanjut bisa disampaikan melalui: @FATUIUWU /{" "}
-          ryuka.izumi@gmail.com
+          Pertanyaan, kritik, dan saran lebih lanjut bisa disampaikan melalui: @FATUIUWU
         </p>
       </section>
 
-      <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-        <label className="flex items-start gap-2 rounded-2xl border border-teal-100 bg-white shadow-sm p-4 text-sm text-gray-700">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <label className="flex items-start gap-3 rounded-lg border border-teal-100 bg-white shadow-sm p-6 text-sm text-gray-700">
           <input
             type="checkbox"
             required
-            className="mt-1"
+            className="mt-1 h-4 w-4 accent-teal-500"
             checked={form.consent}
             onChange={(e) => update("consent", e.target.checked)}
           />
@@ -654,6 +660,7 @@ export default function RegisterPage() {
             type="email"
             required
             className={inputClass}
+            placeholder="nama@email.com"
             value={form.email}
             onChange={(e) => update("email", e.target.value)}
           />
@@ -668,6 +675,7 @@ export default function RegisterPage() {
             type="text"
             required
             className={inputClass}
+            placeholder="@username"
             value={form.twtUser}
             onChange={(e) => update("twtUser", e.target.value)}
           />
@@ -678,6 +686,7 @@ export default function RegisterPage() {
             type="text"
             required
             className={inputClass}
+            placeholder="Nama yumeshipmu"
             value={form.yumeshipName}
             onChange={(e) => update("yumeshipName", e.target.value)}
           />
@@ -717,6 +726,7 @@ export default function RegisterPage() {
             type="text"
             required
             className={inputClass}
+            placeholder="Nama karakter canon"
             list="oshi-suggestions"
             autoComplete="off"
             value={form.oshiName}
@@ -738,23 +748,14 @@ export default function RegisterPage() {
           />
         </Field>
 
-        <Field label="Yumeship type" hint="Bila Romantic/Queerplatonic">
-          <RadioGroup
-            name="yumeTypeReceive"
-            options={YUME_TYPE_RECEIVE_OPTIONS}
-            value={form.yumeTypeReceiveOption}
-            onChange={(v) => update("yumeTypeReceiveOption", v)}
-            withOther
-            otherValue={form.yumeTypeReceiveOther}
-            onOtherChange={(v) => update("yumeTypeReceiveOther", v)}
-          />
-        </Field>
-
         <Field label="Karya yang diberi berupa" required hint="Centang semua yang termasuk">
           <CheckboxGroup
             options={CONTENT_TYPE_OPTIONS}
             values={form.contentType}
-            onChange={(v) => update("contentType", v)}
+            onChange={(v) => {
+              update("contentType", v);
+              if (!v.includes("Writing")) update("languageGive", []);
+            }}
           />
         </Field>
 
@@ -770,16 +771,19 @@ export default function RegisterPage() {
           />
         </Field>
 
-        <Field
-          label="Bahasa yang bersedia kamu tulis"
-          hint="Jika writing, centang semua yang termasuk"
-        >
-          <CheckboxGroup
-            options={LANGUAGE_OPTIONS}
-            values={form.languageGive}
-            onChange={(v) => update("languageGive", v)}
-          />
-        </Field>
+        {form.contentType.includes("Writing") && (
+          <Field
+            label="Bahasa yang bersedia kamu tulis"
+            required
+            hint="Centang semua yang termasuk"
+          >
+            <CheckboxGroup
+              options={LANGUAGE_OPTIONS}
+              values={form.languageGive}
+              onChange={(v) => update("languageGive", v)}
+            />
+          </Field>
+        )}
 
         <Field
           label="Fandom yang diterima"
@@ -795,7 +799,20 @@ export default function RegisterPage() {
         <Field
           label="Dokumen Yumeship"
           required
-          hint="Tempel link ke Google Doc/Drive yang berisi referensi yumeshipmu (bukan upload file)"
+          hint={
+            <>
+              Tempel link ke Google Doc/Drive yang berisi referensi yumeshipmu. Tidak wajib menggunakan template yang disediakan. 
+              Template (bila butuh): {" "}
+              <a
+                href="https://docs.google.com/document/d/1o5zuy5-cCCsJ0nJ8IBzfa9jEFkJChwtgqhYvLltMZxg/edit?tab=t.0"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-teal-500 hover:underline"
+              >
+                Template
+              </a>
+            </>
+          }
         >
           <input
             type="url"
@@ -821,21 +838,34 @@ export default function RegisterPage() {
           <textarea
             className={inputClass}
             rows={4}
+            placeholder="Opsional"
             value={form.notes}
             onChange={(e) => update("notes", e.target.value)}
           />
         </Field>
 
-        {error && <p className="text-sm text-red-400">{error}</p>}
+        {error && <p className="px-2 text-sm text-red-400">{error}</p>}
 
-        <button
-          type="submit"
-          disabled={status === "submitting"}
-          className="w-full rounded-lg bg-teal-400 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-500 active:bg-teal-600 disabled:opacity-50"
-        >
-          {status === "submitting" ? "Mengirim..." : "Daftar"}
-        </button>
+        <div className="flex items-center justify-between gap-4 px-2">
+          <button
+            type="submit"
+            disabled={status === "submitting"}
+            className="rounded-full bg-teal-400 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-500 active:bg-teal-600 disabled:opacity-50"
+          >
+            {status === "submitting" ? "Mengirim..." : "Daftar"}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (window.confirm("Kosongkan semua isian formulir?")) setForm(initialState);
+            }}
+            className="text-sm font-medium text-teal-600 hover:underline"
+          >
+            Kosongkan formulir
+          </button>
+        </div>
       </form>
+      </div>
     </main>
   );
 }

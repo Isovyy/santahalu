@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/db";
+import { db } from "@/lib/db";
 
 // Column order mirrors the original Apps Script `Results_All` sheet output
 // (createAllSheet's orderedCols) so any existing downstream tooling that
@@ -108,19 +108,12 @@ function sortKey(giverTwt: string, receiverTwt: string): string {
 }
 
 export async function getMatchRunResults(runId: string) {
-  const run = await prisma.matchRun.findUnique({
-    where: { id: runId },
-    include: {
-      matches: {
-        include: { giver: true, receiver: true },
-      },
-    },
-  });
+  const run = await db.orm.public.MatchRun
+    .include("matches", (m) => m.include("giver").include("receiver"))
+    .first({ id: runId });
   if (!run) return null;
 
-  const participants = await prisma.participant.findMany({
-    orderBy: { twtUser: "asc" },
-  });
+  const participants = await db.orm.public.Participant.orderBy((p) => p.twtUser.asc()).all();
 
   const receiverToGiver = new Map<string, (typeof run.matches)[number]["giver"]>();
   run.matches.forEach((m) => receiverToGiver.set(m.receiverId, m.giver));

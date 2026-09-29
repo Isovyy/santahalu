@@ -10,13 +10,13 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@prisma/adapter-pg": "^7.9.1",
-    "@prisma/client": "^7.9.1",
+    "@prisma/orm-postgres": "^8.0.0-rc.13",
     "jose": "^6.2.8",
     "next": "16.3.1",
-    "prisma": "^7.9.1",
+    "prisma": "^8.0.0-rc.17",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "temporal-polyfill": "^1.0.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

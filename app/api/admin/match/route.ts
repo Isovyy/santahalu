@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { db } from "@/lib/db";
 import { matchParticipants } from "@/lib/matching";
 
 export async function POST(req: NextRequest) {
@@ -18,9 +18,7 @@ export async function POST(req: NextRequest) {
         ? Number(rawSeed)
         : null;
 
-  const participants = await prisma.participant.findMany({
-    orderBy: { createdAt: "asc" },
-  });
+  const participants = await db.orm.public.Participant.orderBy((p) => p.createdAt.asc()).all();
 
   if (participants.length < 2) {
     return NextResponse.json(
@@ -31,18 +29,17 @@ export async function POST(req: NextRequest) {
 
   const { matches, stats } = matchParticipants(participants, seed ?? undefined);
 
-  const run = await prisma.matchRun.create({
-    data: {
-      seed,
-      totalParticipants: stats.totalParticipants,
-      matchedPairs: stats.matchedPairs,
-      matches: {
-        create: matches.map(([giverIdx, receiverIdx]) => ({
+  const run = await db.orm.public.MatchRun.create({
+    seed,
+    totalParticipants: stats.totalParticipants,
+    matchedPairs: stats.matchedPairs,
+    matches: (m) =>
+      m.create(
+        matches.map(([giverIdx, receiverIdx]) => ({
           giverId: participants[giverIdx].id,
           receiverId: participants[receiverIdx].id,
         })),
-      },
-    },
+      ),
   });
 
   return NextResponse.json({ ok: true, runId: run.id, stats });

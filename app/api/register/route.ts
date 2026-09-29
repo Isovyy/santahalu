@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { db } from "@/lib/db";
 
-// Mirrors the required (*) questions on the source Google Form — yumeTypeReceive,
-// languageGive, and notes are optional there too, so they're left out here.
-// yumeTypeGive is no longer asked on the form; it defaults to "All" (see below).
 const REQUIRED_FIELDS = [
   "email",
   "twtUser",
@@ -42,6 +39,14 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // languageGive is only required when the participant offers Writing.
+  if (str(body.contentType).includes("Writing") && !str(body.languageGive)) {
+    return NextResponse.json(
+      { error: "Missing required field: languageGive" },
+      { status: 400 }
+    );
+  }
+
   const email = str(body.email).toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
@@ -66,10 +71,10 @@ export async function POST(req: NextRequest) {
     avoidList: str(body.avoidList).slice(0, 2000) || null,
   };
 
-  const participant = await prisma.participant.upsert({
-    where: { email },
+  const participant = await db.orm.public.Participant.upsert({
     create: data,
     update: data,
+    conflictOn: { email },
   });
 
   return NextResponse.json({ ok: true, id: participant.id });
