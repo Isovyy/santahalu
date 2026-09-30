@@ -52,32 +52,71 @@ export default async function ResultsPage({
       </div>
 
       <h2 className="mt-10 text-lg font-medium text-gray-800">Matched pairs</h2>
+      <p className="mt-1 text-xs text-gray-400">
+        &quot;Status&quot; re-checks each pairing against current data — a ⚠ means someone edited
+        their response (oshi, fandom, language, or avoid list) after being matched, and this
+        pairing may no longer make sense. The other columns show the values matching was based on,
+        as giver &rarr; receiver, so you can eyeball why a pairing happened.
+      </p>
       <div className="mt-3 overflow-x-auto rounded-2xl border border-teal-100 bg-white shadow-sm">
         <table className="min-w-full divide-y divide-teal-100 text-sm">
           <thead className="bg-teal-50 text-teal-600">
             <tr>
+              <Th>Status</Th>
               <Th>Giver</Th>
               <Th>Giver email</Th>
               <Th>Receiver</Th>
               <Th>Receiver email</Th>
               <Th>Yumeship</Th>
+              <Th>Oshi</Th>
               <Th>Fandom</Th>
+              <Th>Language</Th>
+              <Th>Yume type</Th>
+              <Th>Giver&apos;s avoid list</Th>
             </tr>
           </thead>
           <tbody className="divide-y divide-teal-100">
             {matchedRows.map((row, i) => (
               <tr key={i} className="text-gray-600">
+                <Td>
+                  {row.stillValid ? (
+                    <span title="Still matches the current data for both participants" className="text-lg text-green-500">
+                      ✅
+                    </span>
+                  ) : (
+                    <span
+                      title="No longer matches — someone likely edited their response after this run"
+                      className="text-lg text-amber-500"
+                    >
+                      ⚠
+                    </span>
+                  )}
+                </Td>
                 <Td>{row.giver_twt_user}</Td>
                 <Td>{row.giver_email}</Td>
                 <Td>{row.receiver_twt_user}</Td>
                 <Td>{row.receiver_email}</Td>
                 <Td>{row.receiver_yumeship_name}</Td>
-                <Td>{row.receiver_fandom_yume}</Td>
+                <Td>
+                  {row.giver_oshi_name} &rarr; {row.receiver_oshi_name}
+                </Td>
+                <Td>
+                  {row.giver_fandom_give} &rarr; {row.receiver_fandom_yume}
+                </Td>
+                <Td>
+                  {row.giver_language_give || "-"} &rarr; {row.receiver_language_receive || "-"}
+                </Td>
+                <Td>
+                  {row.giver_yume_type_give || "-"} &rarr; {row.receiver_yume_type_receive || "-"}
+                </Td>
+                <Td className="max-w-[16rem] truncate" title={row.giver_avoid_list}>
+                  {row.giver_avoid_list || "-"}
+                </Td>
               </tr>
             ))}
             {matchedRows.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-gray-400">
+                <td colSpan={11} className="px-4 py-6 text-center text-gray-400">
                   No matched pairs.
                 </td>
               </tr>
@@ -135,6 +174,18 @@ function Th({ children }: { children: React.ReactNode }) {
   return <th className="px-4 py-2 text-left font-medium">{children}</th>;
 }
 
-function Td({ children }: { children: React.ReactNode }) {
-  return <td className="px-4 py-2">{children}</td>;
+function Td({
+  children,
+  className,
+  title,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  title?: string;
+}) {
+  return (
+    <td className={`px-4 py-2 ${className ?? ""}`} title={title}>
+      {children}
+    </td>
+  );
 }

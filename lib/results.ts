@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { canGiveTo, type MatchParticipant } from "@/lib/matching";
 
 // Column order mirrors the original Apps Script `Results_All` sheet output
 // (createAllSheet's orderedCols) so any existing downstream tooling that
@@ -118,7 +119,9 @@ export async function getMatchRunResults(runId: string) {
   const receiverToGiver = new Map<string, (typeof run.matches)[number]["giver"]>();
   run.matches.forEach((m) => receiverToGiver.set(m.receiverId, m.giver));
 
-  const rows = participants.map((participant) => {
+  type ResultRow = Record<(typeof ALL_COLUMNS)[number], string> & { stillValid: boolean | null };
+
+  const rows: ResultRow[] = participants.map((participant) => {
     const giver = receiverToGiver.get(participant.id);
     const receiverFields = fieldMap(participant);
     const giverFields = giver ? fieldMap(giver) : null;
@@ -133,7 +136,16 @@ export async function getMatchRunResults(runId: string) {
         row[col] = receiverFields[key] ?? "";
       }
     }
-    return row;
+
+    // Re-checks the pairing against each side's *current* data (not the
+    // frozen state at match time) — surfaces a match gone stale because
+    // someone edited their response (oshi, fandom, avoid list, etc.)
+    // after being matched. null = this participant wasn't matched at all.
+    const stillValid = giver
+      ? canGiveTo(giver as MatchParticipant, participant as MatchParticipant)
+      : null;
+
+    return { ...row, stillValid } as ResultRow;
   });
 
   rows.sort((a, b) => {

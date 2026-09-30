@@ -41,6 +41,30 @@ describe("canGiveTo", () => {
     expect(canGiveTo(giver, receiver)).toBe(true);
   });
 
+  it("'apa saja' fandom wildcard does not override a specific avoid entry", () => {
+    const giver = participant({
+      id: "g",
+      fandomGive: "Apa saja",
+      avoidList: "Isagi Yoichi | Blue Lock",
+    });
+    const avoided = participant({ id: "r", oshiName: "Isagi Yoichi", fandomYume: "Blue Lock" });
+    const anyoneElse = participant({ id: "r2", oshiName: "Someone Else", fandomYume: "Blue Lock" });
+    expect(canGiveTo(giver, avoided)).toBe(false);
+    expect(canGiveTo(giver, anyoneElse)).toBe(true);
+  });
+
+  it("'apa saja' fandom wildcard does not override a whole-fandom avoid ('all except')", () => {
+    const giver = participant({
+      id: "g",
+      fandomGive: "Apa saja",
+      avoidList: `${AVOID_WHOLE_FANDOM} | Blue Lock`,
+    });
+    const inExcludedFandom = participant({ id: "r", oshiName: "Whoever", fandomYume: "Blue Lock" });
+    const inOtherFandom = participant({ id: "r2", oshiName: "Someone Else", fandomYume: "Some Other Fandom" });
+    expect(canGiveTo(giver, inExcludedFandom)).toBe(false);
+    expect(canGiveTo(giver, inOtherFandom)).toBe(true);
+  });
+
   it("does not block same character name in a different fandom", () => {
     const giver = participant({ id: "g", avoidList: "Sora | Kingdom Hearts" });
     const receiver = participant({ id: "r", oshiName: "Sora", fandomYume: "Fandom A" });
