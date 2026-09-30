@@ -114,6 +114,7 @@ export default function SendMatchEmails({
                 />
               </th>
               <th className="px-4 py-2 text-left font-medium">Giver</th>
+              <th className="px-4 py-2 text-left font-medium">Email giver</th>
               <th className="px-4 py-2 text-left font-medium">Untuk (receiver)</th>
               <th className="px-4 py-2 text-left font-medium">Fandom &amp; oshi</th>
               <th className="px-4 py-2 text-left font-medium">Yume type</th>
@@ -136,6 +137,7 @@ export default function SendMatchEmails({
                     />
                   </td>
                   <td className="px-4 py-2">{row.giverTwt}</td>
+                  <td className="px-4 py-2">{row.giverEmail}</td>
                   <td className="px-4 py-2">{row.receiverTwt}</td>
                   <td className="px-4 py-2">
                     {row.receiverFandomYume} &middot; {row.receiverOshiName}
@@ -166,7 +168,7 @@ export default function SendMatchEmails({
             })}
             {rows.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-6 text-center text-gray-400">
+                <td colSpan={8} className="px-4 py-6 text-center text-gray-400">
                   Tidak ada pasangan pada hasil matching ini.
                 </td>
               </tr>

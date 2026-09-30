@@ -114,6 +114,7 @@ export default function SendFolderEmails({
                 />
               </th>
               <th className="px-4 py-2 text-left font-medium">Giver</th>
+              <th className="px-4 py-2 text-left font-medium">Email giver</th>
               <th className="px-4 py-2 text-left font-medium">Untuk (receiver)</th>
               <th className="px-4 py-2 text-left font-medium">Folder link</th>
               <th className="px-4 py-2 text-left font-medium">Status</th>
@@ -135,6 +136,7 @@ export default function SendFolderEmails({
                     />
                   </td>
                   <td className="px-4 py-2">{row.giverTwt}</td>
+                  <td className="px-4 py-2">{row.giverEmail}</td>
                   <td className="px-4 py-2">{row.receiverTwt}</td>
                   <td className="px-4 py-2">
                     {hasFolder ? (
@@ -164,7 +166,7 @@ export default function SendFolderEmails({
             })}
             {rows.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-gray-400">
+                <td colSpan={6} className="px-4 py-6 text-center text-gray-400">
                   Tidak ada pasangan pada hasil matching ini.
                 </td>
               </tr>

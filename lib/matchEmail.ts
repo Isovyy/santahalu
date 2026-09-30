@@ -1,6 +1,6 @@
 import type { NotifyRow } from "@/lib/notify";
 
-export const MATCH_EMAIL_SUBJECT = "Your Santahalu Match!";
+export const MATCH_EMAIL_SUBJECT = "Your Santahalu26 Match!";
 
 // Who participants should ping with questions — update here each event.
 const ADMIN_CONTACT_HANDLE = "@FATUIUWU";

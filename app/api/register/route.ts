@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { generateEditCode, hashEditCode } from "@/lib/editCode";
+import { sendEmail } from "@/lib/email";
+import { REGISTRATION_EMAIL_SUBJECT, registrationEmailHtml } from "@/lib/registrationEmail";
 
 const REQUIRED_FIELDS = [
   "email",
@@ -125,6 +127,18 @@ export async function POST(req: NextRequest) {
     ...data,
     editCodeHash: hashEditCode(editCode),
   });
+
+  // Backup to the on-screen one-time display — best-effort, never blocks
+  // registration if Gmail is down or misconfigured.
+  try {
+    await sendEmail({
+      to: email,
+      subject: REGISTRATION_EMAIL_SUBJECT,
+      html: registrationEmailHtml(data.twtUser, editCode),
+    });
+  } catch (err) {
+    console.error("registration email failed", participant.id, err);
+  }
 
   return NextResponse.json({ ok: true, id: participant.id, editCode });
 }
