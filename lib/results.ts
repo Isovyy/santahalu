@@ -38,6 +38,8 @@ export const ALL_COLUMNS = [
   "receiver_avoid_list",
 ] as const;
 
+export type ResultRow = Record<(typeof ALL_COLUMNS)[number], string> & { stillValid: boolean | null };
+
 export const UNMATCHED_COLUMNS = [
   "email",
   "twt_user",
@@ -118,8 +120,6 @@ export async function getMatchRunResults(runId: string) {
 
   const receiverToGiver = new Map<string, (typeof run.matches)[number]["giver"]>();
   run.matches.forEach((m) => receiverToGiver.set(m.receiverId, m.giver));
-
-  type ResultRow = Record<(typeof ALL_COLUMNS)[number], string> & { stillValid: boolean | null };
 
   const rows: ResultRow[] = participants.map((participant) => {
     const giver = receiverToGiver.get(participant.id);
