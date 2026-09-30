@@ -642,6 +642,8 @@ function TableTab({ rows, onOpen }: { rows: ParticipantRow[]; onOpen: (id: strin
 
 /* Flagged */
 
+const FLAGGED_PAGE_SIZE = 35;
+
 function FlaggedTab({
   flagged,
   onOpen,
@@ -649,6 +651,14 @@ function FlaggedTab({
   flagged: { row: ParticipantRow; issues: FlaggedIssue[] }[];
   onOpen: (id: string) => void;
 }) {
+  const [page, setPage] = useState(1);
+  const pageCount = Math.max(1, Math.ceil(flagged.length / FLAGGED_PAGE_SIZE));
+  const clampedPage = Math.min(page, pageCount);
+  const pageItems = flagged.slice(
+    (clampedPage - 1) * FLAGGED_PAGE_SIZE,
+    clampedPage * FLAGGED_PAGE_SIZE,
+  );
+
   if (flagged.length === 0) {
     return (
       <p className="rounded-2xl border border-teal-100 bg-white p-8 text-center text-sm text-gray-400 shadow-sm">
@@ -659,18 +669,44 @@ function FlaggedTab({
 
   return (
     <div className="space-y-3">
-      <p className="text-sm text-gray-500">
-        {flagged.length} peserta menulis fandom yang tidak ada di daftar (bisa jadi typo, atau memang fandom baru).
-      </p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-gray-500">
+          {flagged.length} peserta menulis fandom yang tidak ada di daftar (bisa jadi typo, atau memang fandom baru).
+        </p>
+        {pageCount > 1 && (
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <button
+              type="button"
+              disabled={clampedPage === 1}
+              onClick={() => setPage(clampedPage - 1)}
+              className="rounded-lg border border-teal-200 bg-white px-3 py-1.5 hover:bg-teal-50 disabled:opacity-40"
+            >
+              &lsaquo; Sebelumnya
+            </button>
+            <span>
+              Halaman {clampedPage} dari {pageCount}
+            </span>
+            <button
+              type="button"
+              disabled={clampedPage === pageCount}
+              onClick={() => setPage(clampedPage + 1)}
+              className="rounded-lg border border-teal-200 bg-white px-3 py-1.5 hover:bg-teal-50 disabled:opacity-40"
+            >
+              Berikutnya &rsaquo;
+            </button>
+          </div>
+        )}
+      </div>
       <ul className="divide-y divide-teal-100 rounded-2xl border border-teal-100 bg-white shadow-sm">
-        {flagged.map(({ row, issues }) => (
+        {pageItems.map(({ row, issues }) => (
           <li key={row.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
-            <div>
+            <div className="min-w-0">
               <p className="text-sm font-medium text-gray-800">{row.twtUser || row.email}</p>
               <ul className="mt-1 space-y-1">
                 {issues.map((issue, i) => (
-                  <li key={i} className="text-sm text-gray-600">
-                    {issue.field}: <span className="font-medium text-amber-600">{issue.value}</span>
+                  <li key={i} className="break-words text-sm text-gray-600">
+                    {issue.field}:{" "}
+                    <span className="break-words font-medium text-amber-600">{issue.value}</span>
                   </li>
                 ))}
               </ul>
