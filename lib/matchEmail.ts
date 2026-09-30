@@ -32,8 +32,7 @@ terjadi reshuffle pasangan dan akan diumumkan sekitar pertengahan hingga akhir m
 tergantung situasi dan kondisi.</p>
 <p>Bila ada kesalahan dari pihak kami (mendapat doubles/fandom tidak sesuai, dll) mohon
 langsung lapor melalui link dibawah.</p>
-<p>Silahkan konfirmasi di link berikut:<br />
-<a href="${escapeHtml(confirmUrl)}">Konfirmasi Ulang di Sini</a></p>
+<p>Konfirmasi ulang di link ini: <a href="${escapeHtml(confirmUrl)}">${escapeHtml(confirmUrl)}</a></p>
 <p>Jika ada pertanyaan atau perkara silahkan menghubungi ${escapeHtml(ADMIN_CONTACT_HANDLE)}.</p>
 <p>Happy gifting! \u{1F496}</p>
 `.trim();

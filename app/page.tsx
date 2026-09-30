@@ -18,6 +18,7 @@ import {
   FandomMultiSelect,
   FandomSingleSelect,
   OshiNameSelect,
+  normalizeTwitterHandle,
 } from "./RegisterFields";
 
 interface FormState {
@@ -411,7 +412,7 @@ export default function RegisterPage() {
             className={inputClass}
             placeholder="@username"
             value={form.twtUser}
-            onChange={(e) => update("twtUser", e.target.value)}
+            onChange={(e) => update("twtUser", normalizeTwitterHandle(e.target.value))}
           />
         </Field>
 

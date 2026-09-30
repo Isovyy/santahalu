@@ -16,6 +16,7 @@ import {
   AvoidListInput,
   FandomMultiSelect,
   FandomSingleSelect,
+  normalizeTwitterHandle,
 } from "@/app/RegisterFields";
 
 export default function EditParticipantForm({
@@ -105,7 +106,7 @@ export default function EditParticipantForm({
           required
           className={inputClass}
           value={twtUser}
-          onChange={(e) => setTwtUser(e.target.value)}
+          onChange={(e) => setTwtUser(normalizeTwitterHandle(e.target.value))}
         />
       </Field>
 

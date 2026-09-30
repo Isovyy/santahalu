@@ -1,22 +1,14 @@
-import nodemailer, { type Transporter } from "nodemailer";
+import { Resend } from "resend";
 
-let transporter: Transporter | null = null;
+let client: Resend | null = null;
 
-function getTransporter(): Transporter {
-  const user = process.env.GMAIL_USER;
-  const pass = process.env.GMAIL_APP_PASSWORD;
-  if (!user || !pass) {
-    throw new Error(
-      "GMAIL_USER / GMAIL_APP_PASSWORD is not set. Add both to .env before sending emails.",
-    );
+function getClient(): Resend {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    throw new Error("RESEND_API_KEY is not set. Add it to .env before sending emails.");
   }
-  if (!transporter) {
-    transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: { user, pass },
-    });
-  }
-  return transporter;
+  if (!client) client = new Resend(apiKey);
+  return client;
 }
 
 export async function sendEmail({
@@ -28,6 +20,13 @@ export async function sendEmail({
   subject: string;
   html: string;
 }): Promise<void> {
-  const from = process.env.GMAIL_USER;
-  await getTransporter().sendMail({ from, to, subject, html });
+  const from = process.env.RESEND_FROM_EMAIL;
+  if (!from) {
+    throw new Error("RESEND_FROM_EMAIL is not set. Add it to .env before sending emails.");
+  }
+
+  const { error } = await getClient().emails.send({ from, to, subject, html });
+  if (error) {
+    throw new Error(error.message);
+  }
 }
