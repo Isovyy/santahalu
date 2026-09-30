@@ -574,9 +574,13 @@ function IndividualTab({
 
 type SortKey = "createdAt" | Question["key"];
 
+const TABLE_PAGE_SIZE = 35;
+const WRAP_KEYS = new Set(["fandomYume", "fandomGive"]);
+
 function TableTab({ rows, onOpen }: { rows: ParticipantRow[]; onOpen: (id: string) => void }) {
   const [sortKey, setSortKey] = useState<SortKey>("createdAt");
   const [dir, setDir] = useState<"asc" | "desc">("asc");
+  const [page, setPage] = useState(1);
 
   const sorted = useMemo(() => {
     const out = [...rows].sort((a, b) =>
@@ -585,7 +589,15 @@ function TableTab({ rows, onOpen }: { rows: ParticipantRow[]; onOpen: (id: strin
     return dir === "asc" ? out : out.reverse();
   }, [rows, sortKey, dir]);
 
+  const pageCount = Math.max(1, Math.ceil(sorted.length / TABLE_PAGE_SIZE));
+  const clampedPage = Math.min(page, pageCount);
+  const pageRows = sorted.slice(
+    (clampedPage - 1) * TABLE_PAGE_SIZE,
+    clampedPage * TABLE_PAGE_SIZE,
+  );
+
   function toggleSort(key: SortKey) {
+    setPage(1);
     if (key === sortKey) setDir((d) => (d === "asc" ? "desc" : "asc"));
     else {
       setSortKey(key);
@@ -599,43 +611,76 @@ function TableTab({ rows, onOpen }: { rows: ParticipantRow[]; onOpen: (id: strin
   ];
 
   return (
-    <div className="overflow-x-auto rounded-2xl border border-teal-100 bg-white shadow-sm">
-      <table className="min-w-full divide-y divide-teal-100 text-sm">
-        <thead className="bg-teal-50 text-teal-700">
-          <tr>
-            {columns.map((c) => (
-              <th
-                key={c.key}
-                aria-sort={sortKey === c.key ? (dir === "asc" ? "ascending" : "descending") : "none"}
-                className="whitespace-nowrap px-3 py-2 text-left font-medium"
-              >
-                <button onClick={() => toggleSort(c.key)} className="flex items-center gap-1 hover:underline">
-                  {c.label}
-                  <span className="text-xs text-teal-400">
-                    {sortKey === c.key ? (dir === "asc" ? "▲" : "▼") : ""}
-                  </span>
-                </button>
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-teal-100">
-          {sorted.map((r) => (
-            <tr
-              key={r.id}
-              onClick={() => onOpen(r.id)}
-              className="cursor-pointer text-gray-600 hover:bg-teal-50/60"
-            >
-              <td className="whitespace-nowrap px-3 py-2 text-gray-400">{formatTimestamp(r.createdAt)}</td>
-              {QUESTIONS.map((q) => (
-                <td key={q.key} className="max-w-[16rem] truncate px-3 py-2" title={r[q.key]}>
-                  {r[q.key] || <span className="text-gray-300">-</span>}
-                </td>
+    <div className="space-y-3">
+      <div className="overflow-x-auto rounded-2xl border border-teal-100 bg-white shadow-sm">
+        <table className="min-w-full divide-y divide-teal-100 text-sm">
+          <thead className="bg-teal-50 text-teal-700">
+            <tr>
+              {columns.map((c) => (
+                <th
+                  key={c.key}
+                  aria-sort={sortKey === c.key ? (dir === "asc" ? "ascending" : "descending") : "none"}
+                  className="whitespace-nowrap px-3 py-2 text-left font-medium"
+                >
+                  <button onClick={() => toggleSort(c.key)} className="flex items-center gap-1 hover:underline">
+                    {c.label}
+                    <span className="text-xs text-teal-400">
+                      {sortKey === c.key ? (dir === "asc" ? "▲" : "▼") : ""}
+                    </span>
+                  </button>
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-teal-100">
+            {pageRows.map((r) => (
+              <tr
+                key={r.id}
+                onClick={() => onOpen(r.id)}
+                className="cursor-pointer text-gray-600 hover:bg-teal-50/60"
+              >
+                <td className="whitespace-nowrap px-3 py-2 text-gray-400">{formatTimestamp(r.createdAt)}</td>
+                {QUESTIONS.map((q) =>
+                  WRAP_KEYS.has(q.key) ? (
+                    <td key={q.key} className="max-w-[16rem] break-words px-3 py-2">
+                      {r[q.key] || <span className="text-gray-300">-</span>}
+                    </td>
+                  ) : (
+                    <td key={q.key} className="max-w-[16rem] truncate px-3 py-2" title={r[q.key]}>
+                      {r[q.key] || <span className="text-gray-300">-</span>}
+                    </td>
+                  ),
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {pageCount > 1 && (
+        <div className="flex items-center justify-between gap-3 text-sm text-gray-600">
+          <span>
+            {sorted.length} jawaban &middot; halaman {clampedPage} dari {pageCount}
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              disabled={clampedPage === 1}
+              onClick={() => setPage(clampedPage - 1)}
+              className="rounded-lg border border-teal-200 bg-white px-3 py-1.5 hover:bg-teal-50 disabled:opacity-40"
+            >
+              &lsaquo; Sebelumnya
+            </button>
+            <button
+              type="button"
+              disabled={clampedPage === pageCount}
+              onClick={() => setPage(clampedPage + 1)}
+              className="rounded-lg border border-teal-200 bg-white px-3 py-1.5 hover:bg-teal-50 disabled:opacity-40"
+            >
+              Berikutnya &rsaquo;
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
