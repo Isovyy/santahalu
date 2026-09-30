@@ -4,6 +4,21 @@ import { getMatchRunResults } from "@/lib/results";
 
 export const dynamic = "force-dynamic";
 
+// Stored as "Character | Fandom; Character | Fandom" — reformat for display
+// only (the raw pipe/semicolon format stays as-is for CSV export elsewhere).
+function formatAvoidList(raw: string): string {
+  if (!raw) return "-";
+  return raw
+    .split(";")
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+    .map((entry) => {
+      const [character, fandom] = entry.split("|").map((s) => s.trim());
+      return fandom ? `${character} (${fandom})` : character;
+    })
+    .join(", ");
+}
+
 export default async function ResultsPage({
   params,
 }: {
@@ -53,49 +68,27 @@ export default async function ResultsPage({
 
       <h2 className="mt-10 text-lg font-medium text-gray-800">Matched pairs</h2>
       <p className="mt-1 text-xs text-gray-400">
-        &quot;Status&quot; re-checks each pairing against current data — a ⚠ means someone edited
-        their response (oshi, fandom, language, or avoid list) after being matched, and this
-        pairing may no longer make sense. The other columns show the values matching was based on,
-        as giver &rarr; receiver, so you can eyeball why a pairing happened.
+        Columns show the values matching was based on, as giver &rarr; receiver, so you can
+        eyeball why a pairing happened.
       </p>
       <div className="mt-3 overflow-x-auto rounded-2xl border border-teal-100 bg-white shadow-sm">
         <table className="min-w-full divide-y divide-teal-100 text-sm">
           <thead className="bg-teal-50 text-teal-600">
             <tr>
-              <Th>Status</Th>
+              <Th>Yumeship</Th>
+              <Th>Oshi</Th>
+              <Th>Fandom</Th>
+              <Th>Bahasa yang diberi &rarr; diterima</Th>
+              <Th>Giver&apos;s avoid list</Th>
               <Th>Giver</Th>
               <Th>Giver email</Th>
               <Th>Receiver</Th>
               <Th>Receiver email</Th>
-              <Th>Yumeship</Th>
-              <Th>Oshi</Th>
-              <Th>Fandom</Th>
-              <Th>Language</Th>
-              <Th>Yume type</Th>
-              <Th>Giver&apos;s avoid list</Th>
             </tr>
           </thead>
           <tbody className="divide-y divide-teal-100">
             {matchedRows.map((row, i) => (
               <tr key={i} className="text-gray-600">
-                <Td>
-                  {row.stillValid ? (
-                    <span title="Still matches the current data for both participants" className="text-lg text-green-500">
-                      ✅
-                    </span>
-                  ) : (
-                    <span
-                      title="No longer matches — someone likely edited their response after this run"
-                      className="text-lg text-amber-500"
-                    >
-                      ⚠
-                    </span>
-                  )}
-                </Td>
-                <Td>{row.giver_twt_user}</Td>
-                <Td>{row.giver_email}</Td>
-                <Td>{row.receiver_twt_user}</Td>
-                <Td>{row.receiver_email}</Td>
                 <Td>{row.receiver_yumeship_name}</Td>
                 <Td>
                   {row.giver_oshi_name} &rarr; {row.receiver_oshi_name}
@@ -106,17 +99,18 @@ export default async function ResultsPage({
                 <Td>
                   {row.giver_language_give || "-"} &rarr; {row.receiver_language_receive || "-"}
                 </Td>
-                <Td>
-                  {row.giver_yume_type_give || "-"} &rarr; {row.receiver_yume_type_receive || "-"}
+                <Td className="max-w-[16rem] truncate" title={formatAvoidList(row.giver_avoid_list)}>
+                  {formatAvoidList(row.giver_avoid_list)}
                 </Td>
-                <Td className="max-w-[16rem] truncate" title={row.giver_avoid_list}>
-                  {row.giver_avoid_list || "-"}
-                </Td>
+                <Td>{row.giver_twt_user}</Td>
+                <Td>{row.giver_email}</Td>
+                <Td>{row.receiver_twt_user}</Td>
+                <Td>{row.receiver_email}</Td>
               </tr>
             ))}
             {matchedRows.length === 0 && (
               <tr>
-                <td colSpan={11} className="px-4 py-6 text-center text-gray-400">
+                <td colSpan={9} className="px-4 py-6 text-center text-gray-400">
                   No matched pairs.
                 </td>
               </tr>
