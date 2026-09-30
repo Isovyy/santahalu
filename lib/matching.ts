@@ -2,6 +2,8 @@
 // Apps Script (Code.gs) so match behavior stays identical, including the
 // seeded RNG, so a given seed still reproduces the same result.
 
+import { AVOID_WHOLE_FANDOM } from "./avoidList";
+
 export interface MatchParticipant {
   id: string;
   oshiName: string;
@@ -46,15 +48,19 @@ function normalizeCharacter(s: string | null | undefined): string {
   return normalize(s).split(" ").filter(Boolean).sort().join(" ");
 }
 
+const AVOID_WHOLE_FANDOM_NORMALIZED = normalizeCharacter(AVOID_WHOLE_FANDOM);
+
 function isAvoided(giver: MatchParticipant, receiver: MatchParticipant): boolean {
   if (!giver.avoidList) return false;
   const recvChar = normalizeCharacter(receiver.oshiName);
   const recvFandom = normalize(receiver.fandomYume);
   return giver.avoidList.split(";").some((entry) => {
     const [character, fandom] = entry.split("|");
-    return (
-      normalizeCharacter(character) === recvChar && normalize(fandom) === recvFandom
-    );
+    if (normalize(fandom) !== recvFandom) return false;
+    // A "whole fandom" entry excludes every character in that fandom, not
+    // just the one named — so it matches regardless of the receiver's oshi.
+    if (normalizeCharacter(character) === AVOID_WHOLE_FANDOM_NORMALIZED) return true;
+    return normalizeCharacter(character) === recvChar;
   });
 }
 

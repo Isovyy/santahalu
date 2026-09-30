@@ -9,6 +9,9 @@ model Participant {
   updatedAt        temporal.updatedAt()
 
   email            String   @unique
+  // sha256 of the code shown once at registration; required to edit an existing response.
+  // Unique so "edit my response" can look a participant up by code alone.
+  editCodeHash     String   @unique
   twtUser          String
   yumeshipName     String
   oshiName         String

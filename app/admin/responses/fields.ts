@@ -28,7 +28,7 @@ export interface Question {
   kind: QuestionKind;
 }
 
-// Order and titles mirror the registration form, like Google Forms shows them.
+// Order and titles mirror the registration form.
 export const QUESTIONS: Question[] = [
   { key: "email", label: "Email", kind: "text" },
   { key: "twtUser", label: "Username twitter", kind: "text" },
@@ -37,10 +37,10 @@ export const QUESTIONS: Question[] = [
   { key: "oshiName", label: "Nama cc/oshi", kind: "text" },
   { key: "relationshipType", label: "Tipe Yumeship", kind: "single" },
   { key: "yumeTypeReceive", label: "Yumeship type", kind: "single" },
-  { key: "contentType", label: "Karya yang diberi berupa", kind: "multi" },
+  { key: "contentType", label: "Karya yang kamu beri berupa", kind: "multi" },
   { key: "languageReceive", label: "Bahasa yang bersedia kamu terima", kind: "multi" },
   { key: "languageGive", label: "Bahasa yang bersedia kamu tulis", kind: "multi" },
-  { key: "fandomGive", label: "Fandom yang diterima", kind: "multi" },
+  { key: "fandomGive", label: "Fandom yang bersedia kamu buatkan hadiah", kind: "multi" },
   { key: "avoidList", label: "Karakter yang ingin dihindari", kind: "avoid" },
   { key: "yumeDocuLink", label: "Dokumen Yumeship", kind: "link" },
   { key: "notes", label: "Notes", kind: "text" },

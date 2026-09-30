@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { generateEditCode, hashEditCode } from "@/lib/editCode";
 
 const REQUIRED_FIELDS = [
   "email",
@@ -71,11 +72,59 @@ export async function POST(req: NextRequest) {
     avoidList: str(body.avoidList).slice(0, 2000) || null,
   };
 
-  const participant = await db.orm.public.Participant.upsert({
-    create: data,
-    update: data,
-    conflictOn: { email },
+  const submittedCode = str(body.editCode);
+
+  if (submittedCode) {
+    // Editing: identified by the code itself, not by email, so changing the
+    // email as part of an edit works instead of silently creating a duplicate.
+    const existing = await db.orm.public.Participant.first({
+      editCodeHash: hashEditCode(submittedCode),
+    });
+
+    if (!existing) {
+      return NextResponse.json({ error: "Kode edit tidak ditemukan." }, { status: 404 });
+    }
+
+    if (email !== existing.email) {
+      const emailTaken = await db.orm.public.Participant.first({ email });
+      if (emailTaken) {
+        return NextResponse.json(
+          { error: "Email tersebut sudah dipakai oleh peserta lain." },
+          { status: 409 }
+        );
+      }
+    }
+
+    const participant = await db.orm.public.Participant
+      .where({ id: existing.id })
+      .update(data);
+
+    if (!participant) {
+      return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });
+    }
+
+    return NextResponse.json({ ok: true, id: participant.id });
+  }
+
+  // No code supplied: a fresh registration, but guard against silently
+  // overwriting someone else's existing entry via a duplicate email.
+  const emailTaken = await db.orm.public.Participant.first({ email });
+  if (emailTaken) {
+    return NextResponse.json(
+      {
+        error:
+          "Email ini sudah terdaftar. Masukkan kode edit yang kamu terima saat pertama kali daftar untuk memperbarui jawabanmu.",
+        alreadyRegistered: true,
+      },
+      { status: 409 }
+    );
+  }
+
+  const editCode = generateEditCode();
+  const participant = await db.orm.public.Participant.create({
+    ...data,
+    editCodeHash: hashEditCode(editCode),
   });
 
-  return NextResponse.json({ ok: true, id: participant.id });
+  return NextResponse.json({ ok: true, id: participant.id, editCode });
 }

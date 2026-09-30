@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { canGiveTo, matchParticipants, MatchParticipant } from "./matching";
+import { AVOID_WHOLE_FANDOM } from "./avoidList";
 
 function participant(overrides: Partial<MatchParticipant> & { id: string }): MatchParticipant {
   return {
@@ -26,6 +27,18 @@ describe("canGiveTo", () => {
     const giver = participant({ id: "g", avoidList: "Yoichi Isagi | Blue Lock; Other | Elsewhere" });
     const avoided = participant({ id: "r", oshiName: "Isagi Yoichi", fandomYume: "Blue Lock" });
     expect(canGiveTo(giver, avoided)).toBe(false);
+  });
+
+  it("blocks every character in a fandom the giver excluded entirely", () => {
+    const giver = participant({ id: "g", avoidList: `${AVOID_WHOLE_FANDOM} | Blue Lock` });
+    const anyoneInThatFandom = participant({ id: "r", oshiName: "Whoever", fandomYume: "Blue Lock" });
+    expect(canGiveTo(giver, anyoneInThatFandom)).toBe(false);
+  });
+
+  it("whole-fandom exclusion does not affect other fandoms", () => {
+    const giver = participant({ id: "g", avoidList: `${AVOID_WHOLE_FANDOM} | Blue Lock` });
+    const receiver = participant({ id: "r", oshiName: "Whoever", fandomYume: "Fandom A" });
+    expect(canGiveTo(giver, receiver)).toBe(true);
   });
 
   it("does not block same character name in a different fandom", () => {

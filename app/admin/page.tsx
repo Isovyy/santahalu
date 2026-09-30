@@ -57,8 +57,8 @@ export default async function AdminDashboard() {
                 <div className="text-gray-600">
                   {run.createdAt.toLocaleString()}{" "}
                   <span className="text-gray-400">
-                    — {run.matchedPairs}/{run.totalParticipants} matched
-                    {run.seed !== null ? `, seed ${run.seed}` : ""}
+                    ({run.matchedPairs}/{run.totalParticipants} matched
+                    {run.seed !== null ? `, seed ${run.seed}` : ""})
                   </span>
                 </div>
                 <Link href={`/admin/results/${run.id}`} className="text-teal-500 hover:underline">

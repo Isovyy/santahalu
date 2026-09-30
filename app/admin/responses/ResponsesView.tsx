@@ -10,10 +10,12 @@ import {
   type ParticipantRow,
   type Question,
 } from "./fields";
+import EditParticipantForm from "./EditParticipantForm";
+import { FANDOM_ALL } from "@/lib/fandoms";
 
-type Tab = "summary" | "question" | "individual" | "table";
+type Tab = "summary" | "question" | "individual" | "table" | "flagged";
 
-const TABS: { id: Tab; label: string }[] = [
+const BASE_TABS: { id: Tab; label: string }[] = [
   { id: "summary", label: "Summary" },
   { id: "question", label: "Question" },
   { id: "individual", label: "Individual" },
@@ -43,6 +45,36 @@ const NO_FILTERS: Filters = {
 };
 
 const ANY_FANDOM = "apa saja";
+
+interface FlaggedIssue {
+  field: string;
+  value: string;
+}
+
+// Free-text fandom fields (register form + avoid-list) let people type anything,
+// so this surfaces entries that don't match the known fandom list — likely a
+// typo, or a genuinely new fandom worth a quick human look either way.
+function flagRow(row: ParticipantRow): FlaggedIssue[] {
+  const known = (v: string) => FANDOM_ALL.some((f) => f.toLowerCase() === v.toLowerCase());
+  const issues: FlaggedIssue[] = [];
+
+  if (row.fandomYume && !known(row.fandomYume)) {
+    issues.push({ field: "Fandom yumeshipmu", value: row.fandomYume });
+  }
+
+  for (const f of splitMulti(row.fandomGive)) {
+    if (f.toLowerCase() === ANY_FANDOM) continue;
+    if (!known(f)) issues.push({ field: "Fandom yang bersedia kamu buatkan hadiah", value: f });
+  }
+
+  for (const a of parseAvoid(row.avoidList)) {
+    if (a.fandom && !known(a.fandom)) {
+      issues.push({ field: "Karakter yang ingin dihindari (fandom)", value: a.fandom });
+    }
+  }
+
+  return issues;
+}
 
 function applyFilters(rows: ParticipantRow[], f: Filters): ParticipantRow[] {
   const q = f.q.trim().toLowerCase();
@@ -97,6 +129,16 @@ export default function ResponsesView({ participants }: { participants: Particip
 
   const isFiltered = JSON.stringify(filters) !== JSON.stringify(NO_FILTERS);
 
+  const flagged = useMemo(
+    () => participants.map((r) => ({ row: r, issues: flagRow(r) })).filter((x) => x.issues.length > 0),
+    [participants],
+  );
+
+  const tabs = [
+    ...BASE_TABS,
+    { id: "flagged" as const, label: flagged.length > 0 ? `Flagged (${flagged.length})` : "Flagged" },
+  ];
+
   function setFilter<K extends keyof Filters>(key: K, value: Filters[K]) {
     setFilters((f) => ({ ...f, [key]: value }));
   }
@@ -128,7 +170,7 @@ export default function ResponsesView({ participants }: { participants: Particip
 
       {/* Tabs */}
       <div role="tablist" className="mt-6 flex gap-1 border-b border-teal-100">
-        {TABS.map((t) => (
+        {tabs.map((t) => (
           <button
             key={t.id}
             role="tab"
@@ -145,37 +187,41 @@ export default function ResponsesView({ participants }: { participants: Particip
         ))}
       </div>
 
-      {/* Filters: one row above the content they scope */}
-      <div className="mt-4 flex flex-wrap items-center gap-2 rounded-2xl border border-teal-100 bg-white p-3 shadow-sm">
-        <input
-          type="search"
-          value={filters.q}
-          onChange={(e) => setFilter("q", e.target.value)}
-          placeholder="Search name, email, oshi..."
-          className="min-w-[12rem] flex-1 rounded-lg border border-teal-200 px-3 py-1.5 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-300"
-        />
-        <FilterSelect label="Tipe Yumeship" value={filters.relationship} options={options.relationship} onChange={(v) => setFilter("relationship", v)} />
-        <FilterSelect label="Yumeship type" value={filters.yumeRecv} options={options.yumeRecv} onChange={(v) => setFilter("yumeRecv", v)} />
-        <FilterSelect label="Fandom" value={filters.fandom} options={options.fandom} onChange={(v) => setFilter("fandom", v)} />
-        <FilterSelect label="Accepts fandom" value={filters.fandomGive} options={options.fandomGive} onChange={(v) => setFilter("fandomGive", v)} />
-        <FilterSelect label="Karya" value={filters.content} options={options.content} onChange={(v) => setFilter("content", v)} />
-        <FilterSelect label="Bahasa diterima" value={filters.langRecv} options={options.langRecv} onChange={(v) => setFilter("langRecv", v)} />
-        <label className="flex items-center gap-1.5 text-sm text-gray-600">
-          <input type="checkbox" checked={filters.hasAvoid} onChange={(e) => setFilter("hasAvoid", e.target.checked)} />
-          Has avoid list
-        </label>
-        {isFiltered && (
-          <button
-            onClick={() => setFilters(NO_FILTERS)}
-            className="rounded-lg px-2 py-1.5 text-sm text-teal-600 hover:bg-teal-50"
-          >
-            Clear filters
-          </button>
-        )}
-      </div>
+      {/* Filters: one row above the content they scope. Flagged ignores them by design (it's a review queue, not a filtered view). */}
+      {tab !== "flagged" && (
+        <div className="mt-4 flex flex-wrap items-center gap-2 rounded-2xl border border-teal-100 bg-white p-3 shadow-sm">
+          <input
+            type="search"
+            value={filters.q}
+            onChange={(e) => setFilter("q", e.target.value)}
+            placeholder="Search name, email, oshi..."
+            className="min-w-[12rem] flex-1 rounded-lg border border-teal-200 px-3 py-1.5 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-300"
+          />
+          <FilterSelect label="Tipe Yumeship" value={filters.relationship} options={options.relationship} onChange={(v) => setFilter("relationship", v)} />
+          <FilterSelect label="Yumeship type" value={filters.yumeRecv} options={options.yumeRecv} onChange={(v) => setFilter("yumeRecv", v)} />
+          <FilterSelect label="Fandom" value={filters.fandom} options={options.fandom} onChange={(v) => setFilter("fandom", v)} />
+          <FilterSelect label="Accepts fandom" value={filters.fandomGive} options={options.fandomGive} onChange={(v) => setFilter("fandomGive", v)} />
+          <FilterSelect label="Karya" value={filters.content} options={options.content} onChange={(v) => setFilter("content", v)} />
+          <FilterSelect label="Bahasa diterima" value={filters.langRecv} options={options.langRecv} onChange={(v) => setFilter("langRecv", v)} />
+          <label className="flex items-center gap-1.5 text-sm text-gray-600">
+            <input type="checkbox" checked={filters.hasAvoid} onChange={(e) => setFilter("hasAvoid", e.target.checked)} />
+            Has avoid list
+          </label>
+          {isFiltered && (
+            <button
+              onClick={() => setFilters(NO_FILTERS)}
+              className="rounded-lg px-2 py-1.5 text-sm text-teal-600 hover:bg-teal-50"
+            >
+              Clear filters
+            </button>
+          )}
+        </div>
+      )}
 
       <div className="mt-6">
-        {filtered.length === 0 ? (
+        {tab === "flagged" ? (
+          <FlaggedTab flagged={flagged} onOpen={openIndividual} />
+        ) : filtered.length === 0 ? (
           <p className="rounded-2xl border border-teal-100 bg-white p-8 text-center text-sm text-gray-400 shadow-sm">
             {participants.length === 0 ? "No responses yet." : "No responses match these filters."}
           </p>
@@ -225,7 +271,7 @@ function FilterSelect({
   );
 }
 
-/* ---------- Summary / Question ---------- */
+/* Summary / Question */
 
 function countValues(rows: ParticipantRow[], q: Question) {
   const counts = new Map<string, number>();
@@ -351,7 +397,7 @@ function TextAnswers({
 
 function AnswerValue({ row, question }: { row: ParticipantRow; question: Question }) {
   const value = row[question.key];
-  if (!value) return <span className="text-gray-300">—</span>;
+  if (!value) return <span className="text-gray-300">-</span>;
 
   if (question.kind === "link") {
     const safe = /^https?:\/\//i.test(value);
@@ -434,7 +480,7 @@ function QuestionTab({
   );
 }
 
-/* ---------- Individual ---------- */
+/* Individual */
 
 function IndividualTab({
   rows,
@@ -448,6 +494,7 @@ function IndividualTab({
   const found = rows.findIndex((r) => r.id === selectedId);
   const index = found === -1 ? 0 : found;
   const row = rows[index];
+  const [editing, setEditing] = useState(false);
 
   return (
     <div>
@@ -485,23 +532,45 @@ function IndividualTab({
       </div>
 
       <article className="rounded-2xl border border-teal-100 bg-white p-6 shadow-sm">
-        <p className="text-xs text-gray-400">Submitted {formatTimestamp(row.createdAt)}</p>
-        <dl className="mt-4 space-y-5">
-          {QUESTIONS.map((q) => (
-            <div key={q.key}>
-              <dt className="text-sm font-medium text-gray-800">{q.label}</dt>
-              <dd className="mt-1 text-sm text-gray-600">
-                <AnswerValue row={row} question={q} />
-              </dd>
-            </div>
-          ))}
-        </dl>
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-gray-400">Submitted {formatTimestamp(row.createdAt)}</p>
+          {!editing && (
+            <button
+              type="button"
+              onClick={() => setEditing(true)}
+              className="rounded-lg border border-teal-200 px-3 py-1.5 text-sm text-teal-600 hover:bg-teal-50"
+            >
+              Edit jawaban
+            </button>
+          )}
+        </div>
+
+        {editing ? (
+          <div className="mt-4">
+            <EditParticipantForm
+              row={row}
+              onCancel={() => setEditing(false)}
+              onSaved={() => setEditing(false)}
+            />
+          </div>
+        ) : (
+          <dl className="mt-4 space-y-5">
+            {QUESTIONS.map((q) => (
+              <div key={q.key}>
+                <dt className="text-sm font-medium text-gray-800">{q.label}</dt>
+                <dd className="mt-1 text-sm text-gray-600">
+                  <AnswerValue row={row} question={q} />
+                </dd>
+              </div>
+            ))}
+          </dl>
+        )}
       </article>
     </div>
   );
 }
 
-/* ---------- Table ---------- */
+/* Table */
 
 type SortKey = "createdAt" | Question["key"];
 
@@ -560,13 +629,62 @@ function TableTab({ rows, onOpen }: { rows: ParticipantRow[]; onOpen: (id: strin
               <td className="whitespace-nowrap px-3 py-2 text-gray-400">{formatTimestamp(r.createdAt)}</td>
               {QUESTIONS.map((q) => (
                 <td key={q.key} className="max-w-[16rem] truncate px-3 py-2" title={r[q.key]}>
-                  {r[q.key] || <span className="text-gray-300">—</span>}
+                  {r[q.key] || <span className="text-gray-300">-</span>}
                 </td>
               ))}
             </tr>
           ))}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+/* Flagged */
+
+function FlaggedTab({
+  flagged,
+  onOpen,
+}: {
+  flagged: { row: ParticipantRow; issues: FlaggedIssue[] }[];
+  onOpen: (id: string) => void;
+}) {
+  if (flagged.length === 0) {
+    return (
+      <p className="rounded-2xl border border-teal-100 bg-white p-8 text-center text-sm text-gray-400 shadow-sm">
+        Tidak ada fandom yang perlu ditinjau. Semua jawaban cocok dengan daftar fandom yang ada.
+      </p>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <p className="text-sm text-gray-500">
+        {flagged.length} peserta menulis fandom yang tidak ada di daftar (bisa jadi typo, atau memang fandom baru).
+      </p>
+      <ul className="divide-y divide-teal-100 rounded-2xl border border-teal-100 bg-white shadow-sm">
+        {flagged.map(({ row, issues }) => (
+          <li key={row.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
+            <div>
+              <p className="text-sm font-medium text-gray-800">{row.twtUser || row.email}</p>
+              <ul className="mt-1 space-y-1">
+                {issues.map((issue, i) => (
+                  <li key={i} className="text-sm text-gray-600">
+                    {issue.field}: <span className="font-medium text-amber-600">{issue.value}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <button
+              type="button"
+              onClick={() => onOpen(row.id)}
+              className="rounded-lg border border-teal-200 px-3 py-1.5 text-sm text-teal-600 hover:bg-teal-50"
+            >
+              Tinjau &amp; edit
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

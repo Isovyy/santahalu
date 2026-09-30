@@ -3,67 +3,22 @@
 import Image from "next/image";
 import { FormEvent, useMemo, useState } from "react";
 import { OSHI_DATA } from "@/lib/oshi-data";
-
-const RELATIONSHIP_OPTIONS = ["Romantic", "Platonic", "Queerplatonic"];
-const CONTENT_TYPE_OPTIONS = ["Art", "Writing"];
-const LANGUAGE_OPTIONS = ["Indonesia", "English"];
-const OTHER = "Yang lain";
-
-const FANDOM_YUME_OPTIONS = [
-  "Arknights",
-  "Blue Lock",
-  "Bungo Stray Dogs",
-  "Ensemble Stars",
-  "Demon Slayer",
-  "Fate Grand Order",
-  "Fire Emblem",
-  "Genshin Impact",
-  "Helios Rising Heroes",
-  "Honkai Star Rail",
-  "Hypnosis Mic",
-  "IDOLiSH7",
-  "Ikemen Series",
-  "Love and Deep Space",
-  "Mahoyaku",
-  "My Hero Academia",
-  "Obey Me!",
-  "Paradox Live",
-  "Persona",
-  "Project Sekai",
-  "Tears of Themis",
-  "Tokyo Debunker",
-  "Touken Ranbu",
-  "Twisted Wonderland",
-  "Zenless Zone Zero",
-];
-
-// One shared list so a receiver's fandom always matches a giver's accepted fandom 
-const FANDOM_ALL = Array.from(
-  new Set([
-    ...FANDOM_YUME_OPTIONS,
-    ...OSHI_DATA.map((d) => d.fandom),
-  ]),
-).sort((a, b) => a.localeCompare(b));
-
-const ANY_FANDOM = "Apa saja";
-
-const POPULAR_FANDOMS = [
-  "Genshin Impact",
-  "Honkai Star Rail",
-  "Ensemble Stars",
-  "Twisted Wonderland",
-  "Tokyo Debunker",
-  "Hypnosis Mic",
-  "Project Sekai",
-  "Touken Ranbu",
-  "Love and Deep Space",
-  "Obey Me!",
-];
-
-interface AvoidEntry {
-  character: string;
-  fandom: string;
-}
+import {
+  RELATIONSHIP_OPTIONS,
+  CONTENT_TYPE_OPTIONS,
+  LANGUAGE_OPTIONS,
+  AvoidEntry,
+  splitMulti,
+  parseAvoidListValue,
+  inputClass,
+  Field,
+  RadioGroup,
+  CheckboxGroup,
+  AvoidListInput,
+  FandomMultiSelect,
+  FandomSingleSelect,
+  OshiNameSelect,
+} from "./RegisterFields";
 
 interface FormState {
   consent: boolean;
@@ -72,8 +27,7 @@ interface FormState {
   yumeshipName: string;
   oshiName: string;
   relationshipType: string;
-  fandomYumeOption: string;
-  fandomYumeOther: string;
+  fandomYume: string;
   contentType: string[];
   languageReceive: string[];
   languageGive: string[];
@@ -90,8 +44,7 @@ const initialState: FormState = {
   yumeshipName: "",
   oshiName: "",
   relationshipType: "",
-  fandomYumeOption: "",
-  fandomYumeOther: "",
+  fandomYume: "",
   contentType: [],
   languageReceive: [],
   languageGive: [],
@@ -101,365 +54,124 @@ const initialState: FormState = {
   notes: "",
 };
 
-function toggle(list: string[], value: string): string[] {
-  return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
+function formatEditCodeDisplay(code: string): string {
+  return `${code.slice(0, 4)}-${code.slice(4)}`;
 }
 
-function Field({
-  label,
-  hint,
-  required,
-  children,
+interface LookupParticipant {
+  email: string;
+  twtUser: string;
+  yumeshipName: string;
+  oshiName: string;
+  relationshipType: string;
+  fandomYume: string;
+  contentType: string;
+  languageReceive: string;
+  fandomGive: string;
+  yumeDocuLink: string;
+  languageGive: string | null;
+  notes: string | null;
+  avoidList: string | null;
+}
+
+function participantToForm(p: LookupParticipant): FormState {
+  return {
+    consent: true,
+    email: p.email,
+    twtUser: p.twtUser,
+    yumeshipName: p.yumeshipName,
+    oshiName: p.oshiName,
+    relationshipType: p.relationshipType,
+    fandomYume: p.fandomYume,
+    contentType: splitMulti(p.contentType),
+    languageReceive: splitMulti(p.languageReceive),
+    languageGive: splitMulti(p.languageGive ?? ""),
+    fandomGive: splitMulti(p.fandomGive),
+    avoidList: parseAvoidListValue(p.avoidList ?? ""),
+    yumeDocuLink: p.yumeDocuLink,
+    notes: p.notes ?? "",
+  };
+}
+
+function EditLookupPanel({
+  onLoaded,
 }: {
-  label: string;
-  hint?: React.ReactNode;
-  required?: boolean;
-  children: React.ReactNode;
+  onLoaded: (form: FormState, code: string) => void;
 }) {
-  return (
-    <div className="space-y-2 rounded-lg border border-teal-100 bg-white p-6 shadow-sm">
-      <span className="block text-[15px] font-medium text-gray-800">
-        {label}
-        {required && <span className="text-red-400"> *</span>}
-      </span>
-      {hint && <span className="block text-xs text-gray-400">{hint}</span>}
-      {children}
-    </div>
-  );
-}
+  const [open, setOpen] = useState(false);
+  const [code, setCode] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-const inputClass =
-  "w-full rounded-lg border border-teal-200 bg-white px-3 py-2 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-300";
+  async function handleLookup(e: FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
 
-function RadioGroup({
-  name,
-  options,
-  value,
-  onChange,
-  withOther,
-  otherValue,
-  onOtherChange,
-}: {
-  name: string;
-  options: string[];
-  value: string;
-  onChange: (v: string) => void;
-  withOther?: boolean;
-  otherValue?: string;
-  onOtherChange?: (v: string) => void;
-}) {
-  return (
-    <div className="space-y-3">
-      {options.map((opt) => (
-        <label key={opt} className="flex items-center gap-3 text-sm text-gray-700">
-          <input
-            type="radio"
-            name={name}
-            value={opt}
-            checked={value === opt}
-            onChange={(e) => onChange(e.target.value)}
-            className="h-4 w-4 accent-teal-500"
-          />
-          {opt}
-        </label>
-      ))}
-      {withOther && (
-        <label className="flex items-center gap-3 text-sm text-gray-700">
-          <input
-            type="radio"
-            name={name}
-            value={OTHER}
-            checked={value === OTHER}
-            onChange={(e) => onChange(e.target.value)}
-            className="h-4 w-4 accent-teal-500"
-          />
-          {OTHER}
-          {value === OTHER && (
-            <input
-              type="text"
-              className={inputClass + " ml-2"}
-              value={otherValue}
-              onChange={(e) => onOtherChange?.(e.target.value)}
-            />
-          )}
-        </label>
-      )}
-    </div>
-  );
-}
+    try {
+      const res = await fetch("/api/register/lookup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ editCode: code }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Gagal memuat jawaban.");
+        setLoading(false);
+        return;
+      }
+      onLoaded(participantToForm(data.participant), code);
+      setLoading(false);
+      setOpen(false);
+    } catch {
+      setError("Network error, coba lagi.");
+      setLoading(false);
+    }
+  }
 
-// "|" and ";" delimit the stored value so they cant appear inside a name
-function cleanAvoidText(s: string): string {
-  return s.replace(/[|;]/g, " ").replace(/\s+/g, " ").trim();
-}
-
-function AvoidListInput({
-  values,
-  onChange,
-}: {
-  values: AvoidEntry[];
-  onChange: (v: AvoidEntry[]) => void;
-}) {
-  const [character, setCharacter] = useState("");
-  const [fandom, setFandom] = useState("");
-
-  const suggestions = useMemo(() => {
-    const selected = OSHI_DATA.find((d) => d.fandom.toLowerCase() === fandom.trim().toLowerCase());
-    return selected ? selected.characters : [];
-  }, [fandom]);
-
-  const canAdd = cleanAvoidText(character) !== "" && cleanAvoidText(fandom) !== "";
-
-  function add() {
-    const entry = { character: cleanAvoidText(character), fandom: cleanAvoidText(fandom) };
-    if (!entry.character || !entry.fandom) return;
-    const dup = values.some(
-      (v) =>
-        v.character.toLowerCase() === entry.character.toLowerCase() &&
-        v.fandom.toLowerCase() === entry.fandom.toLowerCase(),
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="text-sm font-medium text-teal-600 hover:underline"
+      >
+        Sudah pernah daftar? Edit jawabanmu di sini.
+      </button>
     );
-    if (!dup) onChange([...values, entry]);
-    setCharacter("");
   }
 
   return (
-    <div className="space-y-3">
-      {values.length > 0 && (
-        <ul className="flex flex-wrap gap-2">
-          {values.map((v, i) => (
-            <li
-              key={`${v.fandom}:${v.character}`}
-              className="flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 py-1 pl-3 pr-1 text-sm text-emerald-600"
-            >
-              {v.character} <span className="text-emerald-400">({v.fandom})</span>
-              <button
-                type="button"
-                aria-label={`Hapus ${v.character}`}
-                onClick={() => onChange(values.filter((_, j) => j !== i))}
-                className="flex h-5 w-5 items-center justify-center rounded-full hover:bg-emerald-100"
-              >
-                ×
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
+    <div className="rounded-lg border border-teal-100 bg-white p-6 shadow-sm">
+      <h2 className="text-sm font-medium text-gray-800">Edit jawaban yang sudah ada</h2>
+      <p className="mt-1 text-xs text-gray-400">
+        Masukkan kode edit yang kamu terima saat pertama kali daftar.
+      </p>
+      <form onSubmit={handleLookup} className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto]">
         <input
           type="text"
+          required
+          placeholder="Kode edit (mis. AB3D-9FQK)"
           className={inputClass}
-          placeholder="Fandom"
-          list="avoid-fandoms"
-          autoComplete="off"
-          value={fandom}
-          onChange={(e) => setFandom(e.target.value)}
-        />
-        <input
-          type="text"
-          className={inputClass}
-          placeholder="Nama karakter"
-          list="avoid-characters"
-          autoComplete="off"
-          value={character}
-          onChange={(e) => setCharacter(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              add();
-            }
-          }}
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
         />
         <button
-          type="button"
-          disabled={!canAdd}
-          onClick={add}
-          className="rounded-lg border border-teal-200 px-4 py-2 text-sm text-teal-600 hover:bg-teal-50 disabled:opacity-40"
+          type="submit"
+          disabled={loading}
+          className="rounded-lg bg-teal-400 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-500 disabled:opacity-50"
         >
-          Tambah
+          {loading ? "Memuat..." : "Muat jawaban"}
         </button>
-      </div>
-      <datalist id="avoid-fandoms">
-        {FANDOM_ALL.map((f) => (
-          <option key={f} value={f} />
-        ))}
-      </datalist>
-      <datalist id="avoid-characters">
-        {suggestions.map((c) => (
-          <option key={c} value={c} />
-        ))}
-      </datalist>
-    </div>
-  );
-}
-
-function FandomMultiSelect({
-  values,
-  onChange,
-}: {
-  values: string[];
-  onChange: (v: string[]) => void;
-}) {
-  const [query, setQuery] = useState("");
-  const [open, setOpen] = useState(false);
-  const any = values.includes(ANY_FANDOM);
-  const q = query.trim().toLowerCase();
-
-  const results = useMemo(() => {
-    if (!q) return [];
-    return FANDOM_ALL.filter((f) => !values.includes(f) && f.toLowerCase().includes(q));
-  }, [q, values]);
-
-  const exactExists = FANDOM_ALL.some((f) => f.toLowerCase() === q) || values.some((v) => v.toLowerCase() === q);
-
-  function add(name: string) {
-    // Commas separate fandoms in the stored value, so they can't appear inside a name.
-    const clean = name.replace(/,/g, " ").replace(/\s+/g, " ").trim();
-    if (!clean || values.includes(clean)) return;
-    onChange([...values, clean]);
-    setQuery("");
-  }
-
-  function remove(name: string) {
-    onChange(values.filter((v) => v !== name));
-  }
-
-  function toggleAny(checked: boolean) {
-    onChange(checked ? [ANY_FANDOM] : []);
-    setQuery("");
-  }
-
-  return (
-    <div className="space-y-3">
-      <label className="flex items-center gap-3 text-sm font-medium text-gray-700">
-        <input
-          type="checkbox"
-          checked={any}
-          onChange={(e) => toggleAny(e.target.checked)}
-          className="h-4 w-4 accent-teal-500"
-        />
-        {ANY_FANDOM}
-      </label>
-
-      {!any && (
-        <>
-          {values.length > 0 && (
-            <ul className="flex flex-wrap gap-2">
-              {values.map((v) => (
-                <li
-                  key={v}
-                  className="flex items-center gap-1 rounded-full border border-teal-200 bg-teal-50 py-1 pl-3 pr-1 text-sm text-teal-700"
-                >
-                  {v}
-                  <button
-                    type="button"
-                    aria-label={`Hapus ${v}`}
-                    onClick={() => remove(v)}
-                    className="flex h-5 w-5 items-center justify-center rounded-full text-teal-500 hover:bg-teal-100"
-                  >
-                    ×
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          <div className="relative">
-            <input
-              type="text"
-              className={inputClass}
-              placeholder="Cari fandom..."
-              value={query}
-              autoComplete="off"
-              onChange={(e) => {
-                setQuery(e.target.value);
-                setOpen(true);
-              }}
-              onFocus={() => setOpen(true)}
-              onBlur={() => setOpen(false)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  if (results[0]) add(results[0]);
-                  else if (q && !exactExists) add(query);
-                } else if (e.key === "Escape") {
-                  setOpen(false);
-                }
-              }}
-            />
-            {open && q && (results.length > 0 || !exactExists) && (
-              <ul className="absolute z-20 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-teal-200 bg-white shadow-lg">
-                {results.map((f) => (
-                  <li key={f}>
-                    <button
-                      type="button"
-                      onMouseDown={(e) => e.preventDefault()}
-                      onClick={() => add(f)}
-                      className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-teal-50"
-                    >
-                      {f}
-                    </button>
-                  </li>
-                ))}
-                {!exactExists && (
-                  <li>
-                    <button
-                      type="button"
-                      onMouseDown={(e) => e.preventDefault()}
-                      onClick={() => add(query)}
-                      className="w-full border-t border-teal-100 px-3 py-2 text-left text-sm text-teal-600 hover:bg-teal-50"
-                    >
-                      {OTHER}: tambah &quot;{query.trim()}&quot;
-                    </button>
-                  </li>
-                )}
-              </ul>
-            )}
-          </div>
-
-          {!q && (
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs text-gray-400">Contoh:</span>
-              {POPULAR_FANDOMS.filter((f) => !values.includes(f)).map((f) => (
-                <button
-                  key={f}
-                  type="button"
-                  onClick={() => add(f)}
-                  className="rounded-full border border-teal-200 px-3 py-1 text-xs text-gray-600 hover:bg-teal-50"
-                >
-                  + {f}
-                </button>
-              ))}
-            </div>
-          )}
-        </>
-      )}
-    </div>
-  );
-}
-
-function CheckboxGroup({
-  options,
-  values,
-  onChange,
-}: {
-  options: string[];
-  values: string[];
-  onChange: (v: string[]) => void;
-}) {
-  return (
-    <div className="grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-3">
-      {options.map((opt) => (
-        <label key={opt} className="flex items-center gap-3 text-sm text-gray-700">
-          <input
-            type="checkbox"
-            checked={values.includes(opt)}
-            onChange={() => onChange(toggle(values, opt))}
-            className="h-4 w-4 accent-teal-500"
-          />
-          {opt}
-        </label>
-      ))}
+      </form>
+      {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
+      <button
+        type="button"
+        onClick={() => setOpen(false)}
+        className="mt-2 text-xs text-gray-400 hover:underline"
+      >
+        Batal
+      </button>
     </div>
   );
 }
@@ -468,12 +180,14 @@ export default function RegisterPage() {
   const [form, setForm] = useState<FormState>(initialState);
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
+  const [editCode, setEditCode] = useState("");
+  const [newEditCode, setNewEditCode] = useState<string | null>(null);
 
   const oshiSuggestions = useMemo(() => {
-    const selected = OSHI_DATA.find((d) => d.fandom === form.fandomYumeOption);
+    const selected = OSHI_DATA.find((d) => d.fandom === form.fandomYume);
     const pool = selected ? [selected] : OSHI_DATA;
     return pool.flatMap((d) => d.characters.map((name) => ({ name, fandom: d.fandom })));
-  }, [form.fandomYumeOption]);
+  }, [form.fandomYume]);
 
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -484,8 +198,7 @@ export default function RegisterPage() {
     setStatus("submitting");
     setError(null);
 
-    const fandomYume =
-      form.fandomYumeOption === OTHER ? form.fandomYumeOther.trim() : form.fandomYumeOption;
+    const fandomYume = form.fandomYume.trim();
 
     if (form.fandomGive.length === 0) {
       setError("Pilih minimal satu fandom yang diterima (atau centang 'Apa saja').");
@@ -514,6 +227,7 @@ export default function RegisterPage() {
       avoidList: form.avoidList.map((a) => `${a.character} | ${a.fandom}`).join("; "),
       yumeDocuLink: form.yumeDocuLink,
       notes: form.notes,
+      editCode,
     };
 
     try {
@@ -528,9 +242,10 @@ export default function RegisterPage() {
         setStatus("error");
         return;
       }
+      if (data.editCode) setNewEditCode(data.editCode);
       setStatus("success");
     } catch {
-      setError("Network error — please try again.");
+      setError("Network error. Please try again.");
       setStatus("error");
     }
   }
@@ -538,15 +253,38 @@ export default function RegisterPage() {
   if (status === "success") {
     return (
       <main className="mx-auto flex max-w-lg flex-1 flex-col items-center justify-center px-4 text-center">
-        <h1 className="text-3xl font-bold text-teal-500">Kamu berhasil terdaftar! 🎁</h1>
-        <p className="mt-3 text-gray-500">
-          Terima kasih sudah mendaftar Santahalu Secret Santa. Kamu bisa submit formulir ini lagi
-          dengan email yang sama untuk mengupdate jawabanmu.
-        </p>
+        {newEditCode ? (
+          <>
+            <h1 className="text-3xl font-bold text-teal-500">Kamu berhasil terdaftar! 🎁</h1>
+            <p className="mt-3 text-gray-500">Terima kasih sudah mendaftar Santahalu Secret Santa.</p>
+            <div className="mt-5 w-full rounded-lg border border-teal-200 bg-teal-50 p-4">
+              <p className="text-xs text-gray-500">
+                Kode edit kamu. Simpan baik-baik untuk mengubah jawabanmu nanti:
+              </p>
+              <p className="mt-1 text-2xl font-bold tracking-wider text-teal-600">
+                {formatEditCodeDisplay(newEditCode)}
+              </p>
+              <button
+                type="button"
+                onClick={() => navigator.clipboard.writeText(newEditCode)}
+                className="mt-2 text-xs font-medium text-teal-600 hover:underline"
+              >
+                Salin kode
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <h1 className="text-3xl font-bold text-teal-500">Jawabanmu berhasil diperbarui! 🎁</h1>
+            <p className="mt-3 text-gray-500">Terima kasih sudah memperbarui jawabanmu.</p>
+          </>
+        )}
         <button
           className="mt-6 rounded-lg border border-teal-200 px-4 py-2 text-sm text-gray-600 hover:bg-teal-50"
           onClick={() => {
             setForm(initialState);
+            setEditCode("");
+            setNewEditCode(null);
             setStatus("idle");
           }}
         >
@@ -631,6 +369,13 @@ export default function RegisterPage() {
         </p>
       </section>
 
+      <EditLookupPanel
+        onLoaded={(loadedForm, code) => {
+          setForm(loadedForm);
+          setEditCode(code);
+        }}
+      />
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <label className="flex items-start gap-3 rounded-lg border border-teal-100 bg-white shadow-sm p-6 text-sm text-gray-700">
           <input
@@ -692,48 +437,18 @@ export default function RegisterPage() {
         </Field>
 
         <Field label="Fandom yumeshipmu" required>
-          <select
-            required
-            className={inputClass}
-            value={form.fandomYumeOption}
-            onChange={(e) => update("fandomYumeOption", e.target.value)}
-          >
-            <option value="" disabled>
-              Pilih fandom
-            </option>
-            {FANDOM_ALL.map((f) => (
-              <option key={f} value={f}>
-                {f}
-              </option>
-            ))}
-            <option value={OTHER}>{OTHER}</option>
-          </select>
-          {form.fandomYumeOption === OTHER && (
-            <input
-              type="text"
-              required
-              className={inputClass + " mt-2"}
-              value={form.fandomYumeOther}
-              onChange={(e) => update("fandomYumeOther", e.target.value)}
-            />
-          )}
+          <FandomSingleSelect
+            value={form.fandomYume}
+            onChange={(v) => update("fandomYume", v)}
+          />
         </Field>
 
         <Field label="Nama cc/oshi" required hint="Karakter canon yang di yume">
-          <input
-            type="text"
-            required
-            className={inputClass}
-            list="oshi-suggestions"
-            autoComplete="off"
+          <OshiNameSelect
             value={form.oshiName}
-            onChange={(e) => update("oshiName", e.target.value)}
+            onChange={(v) => update("oshiName", v)}
+            suggestions={oshiSuggestions}
           />
-          <datalist id="oshi-suggestions">
-            {oshiSuggestions.map((c) => (
-              <option key={`${c.fandom}:${c.name}`} value={c.name} label={c.fandom} />
-            ))}
-          </datalist>
         </Field>
 
         <Field label="Tipe Yumeship" required>
@@ -745,7 +460,7 @@ export default function RegisterPage() {
           />
         </Field>
 
-        <Field label="Karya yang diberi berupa" required hint="Centang semua yang termasuk">
+        <Field label="Karya yang kamu beri berupa" required hint="Centang semua yang termasuk">
           <CheckboxGroup
             options={CONTENT_TYPE_OPTIONS}
             values={form.contentType}
@@ -783,7 +498,7 @@ export default function RegisterPage() {
         )}
 
         <Field
-          label="Fandom yang diterima"
+          label="Fandom yang bersedia kamu buatkan hadiah"
           required
           hint="Bila semua cukup centang 'Apa saja'. Cari fandom lalu klik untuk menambah. Fandom yang tidak ada di daftar bisa ditambahkan dengan mengetik namanya."
         >
@@ -798,7 +513,7 @@ export default function RegisterPage() {
           required
           hint={
             <>
-              Tempel link ke Google Doc/Drive yang berisi referensi yumeshipmu. Tidak wajib menggunakan template yang disediakan. 
+              Tempel link ke Google Doc/Drive yang berisi referensi yumeshipmu. Tidak wajib menggunakan template yang disediakan.
               Template (bila butuh): {" "}
               <a
                 href="https://docs.google.com/document/d/1o5zuy5-cCCsJ0nJ8IBzfa9jEFkJChwtgqhYvLltMZxg/edit?tab=t.0"

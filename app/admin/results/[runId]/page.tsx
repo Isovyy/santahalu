@@ -23,7 +23,7 @@ export default async function ResultsPage({
       </Link>
 
       <h1 className="mt-3 text-3xl font-bold text-teal-500">
-        Results — {run.createdAt.toLocaleString()}
+        Results: {run.createdAt.toLocaleString()}
       </h1>
 
       <section className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
