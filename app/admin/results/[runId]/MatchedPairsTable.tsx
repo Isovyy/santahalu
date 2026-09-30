@@ -63,7 +63,7 @@ const COLUMNS: Column[] = [
 ];
 
 const MIN_WIDTH = 60;
-const PAGE_SIZE = 35;
+const PAGE_SIZE = 20;
 
 export default function MatchedPairsTable({ rows }: { rows: ResultRow[] }) {
   const [widths, setWidths] = useState<number[]>(COLUMNS.map((c) => c.width));
