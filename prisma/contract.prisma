@@ -9,9 +9,12 @@ model Participant {
   updatedAt        temporal.updatedAt()
 
   email            String   @unique
-  // sha256 of the code shown once at registration; required to edit an existing response.
-  // Unique so "edit my response" can look a participant up by code alone.
-  editCodeHash     String   @unique
+  // sha256 of the code shown once at registration; lets a participant edit their
+  // existing response. Nullable: existing rows registered before this feature
+  // shipped have none yet (an admin can issue one via "regenerate code"), but
+  // every new registration always gets one. Nullable + unique is fine in
+  // Postgres — multiple NULLs don't violate a unique constraint.
+  editCodeHash     String?  @unique
   twtUser          String
   yumeshipName     String
   oshiName         String
