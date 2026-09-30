@@ -1,6 +1,6 @@
 import { formatEditCode } from "@/lib/editCode";
 
-export const REGISTRATION_EMAIL_SUBJECT = "Santahalu — Kode Edit Kamu";
+export const REGISTRATION_EMAIL_SUBJECT = "Santahalu26: Kode Edit Kamu";
 
 function escapeHtml(value: string): string {
   return value
@@ -13,7 +13,7 @@ function escapeHtml(value: string): string {
 export function registrationEmailHtml(twtUser: string, editCode: string): string {
   return `
 <p>Halo ${escapeHtml(twtUser)},</p>
-<p>Terima kasih sudah mendaftar untuk Santahalu!</p>
+<p>Terima kasih sudah mendaftar untuk Santahalu26!</p>
 <p>Ini kode edit kamu:</p>
 <p style="font-size: 20px; font-weight: bold; letter-spacing: 2px;">${escapeHtml(formatEditCode(editCode))}</p>
 <p>Kode ini juga ditampilkan sekali di layar setelah kamu submit form.</p>

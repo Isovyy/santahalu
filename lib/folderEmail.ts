@@ -1,6 +1,6 @@
 import type { NotifyRow } from "@/lib/notify";
 
-export const FOLDER_EMAIL_SUBJECT = "Santahalu — Link Folder Upload Hadiah";
+export const FOLDER_EMAIL_SUBJECT = "Santahalu26: Link Folder Upload Hadiah";
 
 function escapeHtml(value: string): string {
   return value

@@ -255,11 +255,11 @@ export default function RegisterPage() {
       <main className="mx-auto flex max-w-lg flex-1 flex-col items-center justify-center px-4 text-center">
         {newEditCode ? (
           <>
-            <h1 className="text-3xl font-bold text-teal-500">Kamu berhasil terdaftar! 🎁</h1>
-            <p className="mt-3 text-gray-500">Terima kasih sudah mendaftar Santahalu Secret Santa.</p>
+            <h1 className="text-3xl font-bold text-teal-500">Kamu berhasil terdaftar!</h1>
+            <p className="mt-3 text-gray-500">Terima kasih sudah mendaftar Santahalu26.</p>
             <div className="mt-5 w-full rounded-lg border border-teal-200 bg-teal-50 p-4">
               <p className="text-xs text-gray-500">
-                Kode edit kamu. Simpan baik-baik untuk mengubah jawabanmu nanti:
+                Kode edit kamu (juga dikirim lewat email). Simpan baik-baik untuk mengubah jawabanmu nanti:
               </p>
               <p className="mt-1 text-2xl font-bold tracking-wider text-teal-600">
                 {formatEditCodeDisplay(newEditCode)}
@@ -275,21 +275,10 @@ export default function RegisterPage() {
           </>
         ) : (
           <>
-            <h1 className="text-3xl font-bold text-teal-500">Jawabanmu berhasil diperbarui! 🎁</h1>
+            <h1 className="text-3xl font-bold text-teal-500">Jawabanmu berhasil diperbarui!</h1>
             <p className="mt-3 text-gray-500">Terima kasih sudah memperbarui jawabanmu.</p>
           </>
         )}
-        <button
-          className="mt-6 rounded-lg border border-teal-200 px-4 py-2 text-sm text-gray-600 hover:bg-teal-50"
-          onClick={() => {
-            setForm(initialState);
-            setEditCode("");
-            setNewEditCode(null);
-            setStatus("idle");
-          }}
-        >
-          Submit respon lain
-        </button>
       </main>
     );
   }
@@ -304,7 +293,7 @@ export default function RegisterPage() {
             <Image src="/yumefess-icon.png" alt="Yumefess" width={72} height={72} />
           </div>
           <h1 className="mb-1 text-3xl font-bold text-teal-500">Secret Santa 2026</h1>
-          <p className="text-sm text-gray-400">Santahalu registration</p>
+          <p className="text-sm text-gray-400">Santahalu26 registration</p>
         </div>
       </div>
 
