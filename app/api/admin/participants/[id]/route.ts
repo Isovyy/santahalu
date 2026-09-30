@@ -45,6 +45,7 @@ export async function PATCH(
     languageGive: str(body.languageGive) || null,
     notes: str(body.notes) || null,
     avoidList: str(body.avoidList).slice(0, 2000) || null,
+    folderLink: str(body.folderLink) || null,
   };
 
   const participant = await db.orm.public.Participant.where({ id }).update(data);

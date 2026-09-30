@@ -18,6 +18,7 @@ export interface ParticipantRow {
   yumeDocuLink: string;
   notes: string;
   avoidList: string;
+  folderLink: string;
 }
 
 export type QuestionKind = "text" | "single" | "multi" | "avoid" | "link";
@@ -44,6 +45,7 @@ export const QUESTIONS: Question[] = [
   { key: "avoidList", label: "Karakter yang ingin dihindari", kind: "avoid" },
   { key: "yumeDocuLink", label: "Dokumen Yumeship", kind: "link" },
   { key: "notes", label: "Notes", kind: "text" },
+  { key: "folderLink", label: "Link folder Drive (untuk terima hadiah)", kind: "link" },
 ];
 
 export function splitMulti(value: string): string[] {

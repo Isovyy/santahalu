@@ -27,6 +27,7 @@ export default async function ResponsesPage() {
     yumeDocuLink: p.yumeDocuLink,
     notes: p.notes ?? "",
     avoidList: p.avoidList ?? "",
+    folderLink: p.folderLink ?? "",
   }));
 
   return (

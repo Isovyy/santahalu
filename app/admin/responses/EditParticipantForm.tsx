@@ -41,6 +41,7 @@ export default function EditParticipantForm({
   const [avoidList, setAvoidList] = useState(parseAvoidListValue(row.avoidList));
   const [yumeDocuLink, setYumeDocuLink] = useState(row.yumeDocuLink);
   const [notes, setNotes] = useState(row.notes);
+  const [folderLink, setFolderLink] = useState(row.folderLink);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -63,6 +64,7 @@ export default function EditParticipantForm({
       avoidList: avoidList.map((a) => `${a.character} | ${a.fandom}`).join("; "),
       yumeDocuLink,
       notes,
+      folderLink,
     };
 
     try {
@@ -193,6 +195,16 @@ export default function EditParticipantForm({
           rows={4}
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
+        />
+      </Field>
+
+      <Field label="Link folder Drive (untuk terima hadiah)">
+        <input
+          type="url"
+          className={inputClass}
+          value={folderLink}
+          onChange={(e) => setFolderLink(e.target.value)}
+          placeholder="https://drive.google.com/drive/folders/..."
         />
       </Field>
 

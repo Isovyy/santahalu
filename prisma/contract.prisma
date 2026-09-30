@@ -56,6 +56,25 @@ model Match {
   giver      Participant @relation("giver", fields: [giverId], references: [id])
   receiverId String
   receiver   Participant @relation("receiver", fields: [receiverId], references: [id])
+  // Set once the giver has been emailed who they're matched with (fandom,
+  // oshi, avoid list, etc). Lets admins resend in batches (Gmail caps sends
+  // per day) without double-emailing everyone already notified.
+  notifiedAt       DateTime?
+  // Set once the giver has been emailed the receiver's Drive upload folder
+  // link. Sent separately from the match-info email, since the folder is
+  // usually created and linked some time after matching happens.
+  folderNotifiedAt DateTime?
+
+  // Unguessable token embedded in the match-info email's confirm/report
+  // link (/confirm/[token]) — generated lazily the first time that email is
+  // sent, so the public confirm page needs no participant login.
+  confirmToken     String?   @unique
+  // Set when the giver confirms the match looks correct.
+  confirmedAt      DateTime?
+  // Set when the giver instead reports a problem (double booking, wrong
+  // fandom, etc) via the same page, with their note kept for admins.
+  reportedAt       DateTime?
+  reportNote       String?
 
   @@unique([matchRunId, giverId])
   @@map("Match")

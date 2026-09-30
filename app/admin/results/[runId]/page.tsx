@@ -50,6 +50,18 @@ export default async function ResultsPage({
         >
           Download unmatched.csv
         </a>
+        <Link
+          href={`/admin/results/${run.id}/send`}
+          className="rounded-lg bg-teal-400 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-500"
+        >
+          Kirim email pasangan
+        </Link>
+        <Link
+          href={`/admin/results/${run.id}/send-folder`}
+          className="rounded-lg border border-teal-200 px-4 py-2 text-sm text-gray-700 hover:bg-teal-50"
+        >
+          Kirim link folder
+        </Link>
       </div>
 
       <h2 className="mt-10 text-lg font-medium text-gray-800">Matched pairs</h2>

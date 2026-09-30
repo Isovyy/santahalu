@@ -2,21 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { ResultRow } from "@/lib/results";
-
-// Stored as "Character | Fandom; Character | Fandom" — reformat for display
-// only (the raw pipe/semicolon format stays as-is for CSV export elsewhere).
-function formatAvoidList(raw: string): string {
-  if (!raw) return "-";
-  return raw
-    .split(";")
-    .map((entry) => entry.trim())
-    .filter(Boolean)
-    .map((entry) => {
-      const [character, fandom] = entry.split("|").map((s) => s.trim());
-      return fandom ? `${character} (${fandom})` : character;
-    })
-    .join(", ");
-}
+import { formatAvoidList } from "@/lib/avoidList";
 
 interface Column {
   label: string;
