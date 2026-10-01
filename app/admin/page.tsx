@@ -23,12 +23,20 @@ export default async function AdminDashboard() {
           <h2 className="text-lg font-medium text-gray-800">Participants</h2>
           <p className="mt-1 text-3xl font-semibold text-teal-500">{participantCount}</p>
           <p className="mt-1 text-sm text-gray-400">registered so far</p>
-          <Link
-            href="/admin/responses"
-            className="mt-4 inline-block rounded-lg bg-teal-400 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-500 active:bg-teal-600"
-          >
-            View responses
-          </Link>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link
+              href="/admin/responses"
+              className="inline-block rounded-lg bg-teal-400 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-500 active:bg-teal-600"
+            >
+              View responses
+            </Link>
+            <Link
+              href="/admin/drive-folders"
+              className="inline-block rounded-lg border border-teal-200 px-4 py-2 text-sm text-gray-700 hover:bg-teal-50"
+            >
+              Buat folder Drive
+            </Link>
+          </div>
         </section>
 
         <section className="rounded-2xl border border-teal-100 bg-white shadow-sm p-5">
