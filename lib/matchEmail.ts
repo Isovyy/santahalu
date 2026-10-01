@@ -15,7 +15,7 @@ export function matchEmailHtml(row: NotifyRow, confirmUrl: string, extendUrl: st
   <li>Languages: ${escapeHtml(row.receiverLanguageReceive)}</li>
   <li>Docs: <a href="${escapeHtml(row.receiverYumeDocuLink)}">${escapeHtml(row.receiverYumeDocuLink)}</a></li>
 </ul>
-<p>Mohon diperhatikan terutama preferensi bahasa bagi para penulis dan orientasi ship, lalu
+<p>Mohon diperhatikan terutama preferensi bahasa bagi para penulis, lalu
 konfirmasi bila tidak ada masalah. Dihimbau untuk tidak membuat hadiah terlebih dahulu, karena
 kita akan memberi waktu 2x24 jam bagi semua peserta untuk konfirmasi ulang. Disini masih dapat
 terjadi reshuffle pasangan dan akan diumumkan sekitar pertengahan hingga akhir minggu depan

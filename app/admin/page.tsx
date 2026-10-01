@@ -77,6 +77,101 @@ export default async function AdminDashboard() {
           </ul>
         )}
       </section>
+
+      <section className="mt-6 rounded-2xl border border-teal-100 bg-white shadow-sm p-5">
+        <h2 className="text-lg font-medium text-gray-800">Panduan admin</h2>
+        <p className="mt-1 text-sm text-gray-500">
+          Urutan kerja dari awal pendaftaran sampai semua hadiah terkumpul.
+        </p>
+        <ol className="mt-4 list-decimal space-y-3 pl-5 text-sm text-gray-600">
+          <li>
+            Peserta mendaftar sendiri lewat halaman utama. Mereka dapat kode edit (juga dikirim
+            ke email) untuk mengubah jawabannya sendiri kapan saja.
+          </li>
+          <li>
+            Cek <strong>Semua Jawaban</strong>, terutama tab Flagged, untuk fandom yang tidak ada
+            di daftar (typo atau fandom baru). Perbaiki manual lewat &quot;Tinjau &amp;
+            edit&quot; kalau perlu.
+          </li>
+          <li>
+            Klik &quot;Run matching&quot; di atas. Bisa kasih seed yang sama untuk mengulang
+            hasil yang persis sama kalau perlu coba-coba dulu.
+          </li>
+          <li>
+            Klik &quot;View results&quot; pada run yang baru dibuat. Tabel Matched pairs
+            menunjukkan fandom, oshi, bahasa, dan avoid list giver side-by-side supaya gampang
+            dicek masuk akal atau tidak sebelum dikirim.
+          </li>
+          <li>
+            Dari halaman hasil, klik &quot;Kirim email&quot; &rarr; tab Kirim email pasangan.
+            Setiap giver dapat info penerimanya plus link untuk konfirmasi atau lapor masalah.
+          </li>
+          <li>
+            Peserta punya waktu 2x24 jam untuk konfirmasi pasangannya atau lapor masalah lewat
+            link di email. Statusnya otomatis muncul di tab Kirim email pasangan.
+          </li>
+          <li>
+            Buka &quot;Reshuffle pasangan&quot; dari halaman hasil. Pasangan yang lapor masalah
+            sudah tercentang otomatis. Kalau tidak ada kandidat yang cocok, centang beberapa
+            pasangan lain supaya ada lebih banyak opsi, lalu klik Reshuffle.
+          </li>
+          <li>
+            Pasangan yang berhasil direshuffle otomatis kembali ke status &quot;Belum
+            dikirim&quot;. Kirim ulang email pasangannya seperti langkah 5.
+          </li>
+          <li>
+            Setelah cukup banyak yang konfirmasi, buka &quot;Buat folder Drive&quot; dan buat
+            folder untuk peserta yang belum punya. Link foldernya otomatis tersimpan ke jawaban
+            masing-masing peserta.
+          </li>
+          <li>
+            Di halaman &quot;Kirim email&quot;, tab Kirim link folder hanya menampilkan giver
+            yang sudah konfirmasi pasangannya. Kirim seperti biasa.
+          </li>
+          <li>
+            Giver upload hadiahnya langsung ke folder Drive, lalu klik link &quot;tandai sudah
+            upload&quot; di email yang sama. Status ini terlihat di tab Kirim link folder.
+          </li>
+          <li>
+            Mendekati deadline, tab Kirim reminder H-5 otomatis pilih giver yang belum upload.
+            Bisa dikirim ulang kapan saja.
+          </li>
+          <li>
+            Peserta bisa minta perpanjangan maksimal 3 hari lewat link di email pasangan atau
+            reminder. Ini otomatis disetujui (sekali saja per peserta), tidak perlu persetujuan
+            admin. Statusnya terlihat di tab Kirim reminder H-5.
+          </li>
+        </ol>
+
+        <h3 className="mt-5 font-medium text-gray-700">Pertanyaan umum</h3>
+        <dl className="mt-2 space-y-3 text-sm text-gray-600">
+          <div>
+            <dt className="font-medium text-gray-700">Peserta lupa kode edit mereka?</dt>
+            <dd>
+              Buka jawaban peserta di Semua Jawaban, ada tombol untuk membuat kode edit baru
+              untuk mereka.
+            </dd>
+          </div>
+          <div>
+            <dt className="font-medium text-gray-700">
+              Peserta salah daftar dua kali / minta ganti email?
+            </dt>
+            <dd>
+              Mereka bisa pakai kode edit mereka untuk mengubah email dan jawaban lain sendiri,
+              tidak perlu bikin entri baru.
+            </dd>
+          </div>
+          <div>
+            <dt className="font-medium text-gray-700">
+              Tidak ada kandidat cocok saat reshuffle?
+            </dt>
+            <dd>
+              Tambahkan lebih banyak pasangan ke pilihan di halaman Reshuffle, lalu coba lagi.
+              Semakin banyak pasangan yang dimasukkan, semakin besar kemungkinan ada kecocokan.
+            </dd>
+          </div>
+        </dl>
+      </section>
     </main>
   );
 }
