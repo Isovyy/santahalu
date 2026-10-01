@@ -95,6 +95,12 @@ describe("canGiveTo", () => {
     expect(canGiveTo(giver, receiver)).toBe(false);
   });
 
+  it("still requires a language match for a giver who does both Art and Writing", () => {
+    const giver = participant({ id: "g", contentType: "Art, Writing", languageGive: "English" });
+    const receiver = participant({ id: "r", languageReceive: "Indonesia" });
+    expect(canGiveTo(giver, receiver)).toBe(false);
+  });
+
   it("treats receiver language 'apa saja' as accepting anyone", () => {
     const giver = participant({ id: "g", contentType: "Writing", languageGive: "Japanese" });
     const receiver = participant({ id: "r", languageReceive: "Apa saja" });

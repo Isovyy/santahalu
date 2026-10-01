@@ -33,6 +33,10 @@ export default async function SubmitPage({
             </li>
             <li>Writing minimal 1000 kata.</li>
           </ol>
+          <p className="mt-3 text-amber-700">
+            Kegagalan memenuhi kriteria minimum di atas tanpa komunikasi ke admin dapat
+            mengakibatkan BAN dari seluruh event Santahalu selanjutnya.
+          </p>
         </div>
         <div className="mt-4">
           <SubmitActions

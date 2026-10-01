@@ -3,7 +3,7 @@ import { escapeHtml, ADMIN_CONTACT_HANDLE } from "@/lib/emailHtml";
 
 export const MATCH_EMAIL_SUBJECT = "Your Santahalu26 Match!";
 
-export function matchEmailHtml(row: NotifyRow, confirmUrl: string): string {
+export function matchEmailHtml(row: NotifyRow, confirmUrl: string, extendUrl: string): string {
   return `
 <p>Halo ${escapeHtml(row.giverTwt)},</p>
 <p>Inilah penerima hadiah anda untuk Santahalu! \u{1F381}</p>
@@ -23,6 +23,7 @@ tergantung situasi dan kondisi.</p>
 <p>Bila ada kesalahan dari pihak kami (mendapat doubles/fandom tidak sesuai, dll) mohon
 langsung lapor melalui link dibawah.</p>
 <p>Konfirmasi ulang di link ini: <a href="${escapeHtml(confirmUrl)}">${escapeHtml(confirmUrl)}</a></p>
+<p>Butuh perpanjangan waktu (maks 3 hari)? Ajukan di link ini: <a href="${escapeHtml(extendUrl)}">${escapeHtml(extendUrl)}</a></p>
 <p>Jika ada pertanyaan atau perkara silahkan menghubungi ${escapeHtml(ADMIN_CONTACT_HANDLE)}.</p>
 <p>Happy gifting! \u{1F496}</p>
 `.trim();

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getNotifyRows } from "@/lib/notify";
+import { getNotifyRows, ensureConfirmToken } from "@/lib/notify";
 import { sendEmail } from "@/lib/email";
 import { REMINDER_EMAIL_SUBJECT, reminderEmailHtml } from "@/lib/reminderEmail";
 
@@ -41,10 +41,13 @@ export async function POST(
       continue;
     }
     try {
+      const token = await ensureConfirmToken(matchId);
+      const confirmUrl = new URL(`/confirm/${token}`, req.nextUrl.origin).toString();
+      const extendUrl = new URL(`/extend/${token}`, req.nextUrl.origin).toString();
       await sendEmail({
         to: row.giverEmail,
         subject: REMINDER_EMAIL_SUBJECT,
-        html: reminderEmailHtml(row),
+        html: reminderEmailHtml(row, confirmUrl, extendUrl),
       });
       results[matchId] = "sent";
     } catch (err) {

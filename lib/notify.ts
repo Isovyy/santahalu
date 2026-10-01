@@ -19,6 +19,9 @@ export interface NotifyRow {
   reportedAt: string | null;
   reportNote: string | null;
   submittedAt: string | null;
+  extensionDays: number | null;
+  extensionRequestedAt: string | null;
+  extensionReason: string | null;
 }
 
 export async function getNotifyRows(
@@ -48,6 +51,9 @@ export async function getNotifyRows(
       reportedAt: m.reportedAt ? m.reportedAt.toString() : null,
       reportNote: m.reportNote,
       submittedAt: m.submittedAt ? m.submittedAt.toString() : null,
+      extensionDays: m.extensionDays,
+      extensionRequestedAt: m.extensionRequestedAt ? m.extensionRequestedAt.toString() : null,
+      extensionReason: m.extensionReason,
     }))
     .sort((a, b) => a.giverTwt.localeCompare(b.giverTwt, "en", { sensitivity: "base" }));
 

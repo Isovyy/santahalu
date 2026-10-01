@@ -183,6 +183,17 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [editCode, setEditCode] = useState("");
   const [newEditCode, setNewEditCode] = useState<string | null>(null);
+  const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
+
+  async function copyEditCode(code: string) {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopyState("copied");
+    } catch {
+      setCopyState("failed");
+    }
+    setTimeout(() => setCopyState("idle"), 2000);
+  }
 
   const oshiSuggestions = useMemo(() => {
     const selected = OSHI_DATA.find((d) => d.fandom === form.fandomYume);
@@ -267,10 +278,14 @@ export default function RegisterPage() {
               </p>
               <button
                 type="button"
-                onClick={() => navigator.clipboard.writeText(newEditCode)}
+                onClick={() => copyEditCode(newEditCode)}
                 className="mt-2 text-xs font-medium text-teal-600 hover:underline"
               >
-                Salin kode
+                {copyState === "copied"
+                  ? "Tersalin!"
+                  : copyState === "failed"
+                    ? "Gagal menyalin, salin manual"
+                    : "Salin kode"}
               </button>
             </div>
           </>

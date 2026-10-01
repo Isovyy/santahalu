@@ -97,6 +97,7 @@ export default function SendReminderEmails({
               <th className="px-4 py-2 text-left font-medium">Giver</th>
               <th className="px-4 py-2 text-left font-medium">Email giver</th>
               <th className="px-4 py-2 text-left font-medium">Upload hadiah</th>
+              <th className="px-4 py-2 text-left font-medium">Perpanjangan</th>
               <th className="px-4 py-2 text-left font-medium">Hasil kirim</th>
             </tr>
           </thead>
@@ -122,6 +123,15 @@ export default function SendReminderEmails({
                     )}
                   </td>
                   <td className="px-4 py-2">
+                    {row.extensionDays ? (
+                      <span className="text-teal-600" title={row.extensionReason ?? undefined}>
+                        +{row.extensionDays} hari
+                      </span>
+                    ) : (
+                      <span className="text-gray-400">&mdash;</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-2">
                     {result === "sent" ? (
                       <span className="text-teal-600">Terkirim</span>
                     ) : result === "failed" ? (
@@ -135,7 +145,7 @@ export default function SendReminderEmails({
             })}
             {rows.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-gray-400">
+                <td colSpan={6} className="px-4 py-6 text-center text-gray-400">
                   Tidak ada pasangan pada hasil matching ini.
                 </td>
               </tr>

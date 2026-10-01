@@ -82,6 +82,12 @@ model Match {
   // giver's self-attestation that it meets the minimum criteria.
   submittedAt      DateTime?
 
+  // Self-service extension via /extend/[token] — auto-approved up to 3 days,
+  // just logged here so admins can see who extended without being texted.
+  extensionDays        Int?
+  extensionRequestedAt DateTime?
+  extensionReason      String?
+
   @@unique([matchRunId, giverId])
   @@map("Match")
 }

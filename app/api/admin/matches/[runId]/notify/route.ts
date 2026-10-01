@@ -45,10 +45,11 @@ export async function POST(
     try {
       const token = await ensureConfirmToken(matchId);
       const confirmUrl = new URL(`/confirm/${token}`, req.nextUrl.origin).toString();
+      const extendUrl = new URL(`/extend/${token}`, req.nextUrl.origin).toString();
       await sendEmail({
         to: row.giverEmail,
         subject: MATCH_EMAIL_SUBJECT,
-        html: matchEmailHtml(row, confirmUrl),
+        html: matchEmailHtml(row, confirmUrl, extendUrl),
       });
       await db.orm.public.Match.where({ id: matchId }).update({
         notifiedAt: Temporal.Now.instant(),

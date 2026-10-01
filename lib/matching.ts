@@ -97,7 +97,7 @@ export function canGiveTo(giver: MatchParticipant, receiver: MatchParticipant): 
   if (yumeRecv.length === 0) yumeRecv = ["apa saja"];
 
   const contentGive = normalize(giver.contentType);
-  const giverHasArt = contentGive.includes("art");
+  const giverHasWriting = contentGive.includes("writing");
 
   const fandomGiveSet = new Set(fandomGive);
   const fandomRecvSet = new Set(fandomRecv);
@@ -123,11 +123,14 @@ export function canGiveTo(giver: MatchParticipant, receiver: MatchParticipant): 
     }
   }
 
-  // Language: art givers bypass the language restriction
+  // Language: only relevant if the giver might write — a giver who doesn't
+  // offer Writing at all (pure Art) bypasses it, regardless of the receiver's
+  // accepted languages. A giver who offers Writing (even alongside Art) still
+  // needs a language match, since they could end up writing for this receiver.
   let langOk = false;
   if (langRecvSet.has("apa saja")) {
     langOk = true;
-  } else if (giverHasArt) {
+  } else if (!giverHasWriting) {
     langOk = true;
   } else {
     for (const l of langGiveSet) {
