@@ -1,17 +1,7 @@
 import type { NotifyRow } from "@/lib/notify";
+import { escapeHtml, ADMIN_CONTACT_HANDLE } from "@/lib/emailHtml";
 
 export const MATCH_EMAIL_SUBJECT = "Your Santahalu26 Match!";
-
-// Who participants should ping with questions — update here each event.
-const ADMIN_CONTACT_HANDLE = "@FATUIUWU";
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
 
 export function matchEmailHtml(row: NotifyRow, confirmUrl: string): string {
   return `

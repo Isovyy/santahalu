@@ -76,6 +76,12 @@ model Match {
   reportedAt       DateTime?
   reportNote       String?
 
+  // Set when the giver ticks the disclaimer box on /submit/[token] after
+  // uploading their gift to the receiver's Drive folder. No file handling
+  // on our side — the gift itself stays in Drive, this just records the
+  // giver's self-attestation that it meets the minimum criteria.
+  submittedAt      DateTime?
+
   @@unique([matchRunId, giverId])
   @@map("Match")
 }

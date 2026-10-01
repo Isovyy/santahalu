@@ -117,7 +117,8 @@ export default function SendFolderEmails({
               <th className="px-4 py-2 text-left font-medium">Email giver</th>
               <th className="px-4 py-2 text-left font-medium">Untuk (receiver)</th>
               <th className="px-4 py-2 text-left font-medium">Folder link</th>
-              <th className="px-4 py-2 text-left font-medium">Status</th>
+              <th className="px-4 py-2 text-left font-medium">Status kirim</th>
+              <th className="px-4 py-2 text-left font-medium">Upload hadiah</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-teal-100">
@@ -161,12 +162,19 @@ export default function SendFolderEmails({
                       <span className="text-gray-400">Belum dikirim</span>
                     )}
                   </td>
+                  <td className="px-4 py-2">
+                    {row.submittedAt ? (
+                      <span className="text-teal-600">Sudah upload {formatSentAt(row.submittedAt)}</span>
+                    ) : (
+                      <span className="text-gray-400">Belum upload</span>
+                    )}
+                  </td>
                 </tr>
               );
             })}
             {rows.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-gray-400">
+                <td colSpan={7} className="px-4 py-6 text-center text-gray-400">
                   Tidak ada pasangan pada hasil matching ini.
                 </td>
               </tr>

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Temporal } from "temporal-polyfill";
 import { db } from "@/lib/db";
-import { getNotifyRows } from "@/lib/notify";
+import { getNotifyRows, ensureConfirmToken } from "@/lib/notify";
 import { sendEmail } from "@/lib/email";
 import { FOLDER_EMAIL_SUBJECT, folderEmailHtml } from "@/lib/folderEmail";
 
@@ -47,10 +47,12 @@ export async function POST(
       continue;
     }
     try {
+      const token = await ensureConfirmToken(matchId);
+      const submitUrl = new URL(`/submit/${token}`, req.nextUrl.origin).toString();
       await sendEmail({
         to: row.giverEmail,
         subject: FOLDER_EMAIL_SUBJECT,
-        html: folderEmailHtml(row),
+        html: folderEmailHtml(row, submitUrl),
       });
       await db.orm.public.Match.where({ id: matchId }).update({
         folderNotifiedAt: Temporal.Now.instant(),

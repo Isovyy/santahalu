@@ -18,6 +18,7 @@ export interface NotifyRow {
   confirmedAt: string | null;
   reportedAt: string | null;
   reportNote: string | null;
+  submittedAt: string | null;
 }
 
 export async function getNotifyRows(
@@ -46,6 +47,7 @@ export async function getNotifyRows(
       confirmedAt: m.confirmedAt ? m.confirmedAt.toString() : null,
       reportedAt: m.reportedAt ? m.reportedAt.toString() : null,
       reportNote: m.reportNote,
+      submittedAt: m.submittedAt ? m.submittedAt.toString() : null,
     }))
     .sort((a, b) => a.giverTwt.localeCompare(b.giverTwt, "en", { sensitivity: "base" }));
 
