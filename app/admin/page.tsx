@@ -78,7 +78,7 @@ export default async function AdminDashboard() {
         )}
       </section>
 
-      <section className="mt-6 rounded-2xl border border-teal-100 bg-white shadow-sm p-5">
+      {/* <section className="mt-6 rounded-2xl border border-teal-100 bg-white shadow-sm p-5">
         <h2 className="text-lg font-medium text-gray-800">Panduan admin</h2>
         <p className="mt-1 text-sm text-gray-500">
           Urutan kerja dari awal pendaftaran sampai semua hadiah terkumpul.
@@ -171,7 +171,7 @@ export default async function AdminDashboard() {
             </dd>
           </div>
         </dl>
-      </section>
+      </section> */}
     </main>
   );
 }
