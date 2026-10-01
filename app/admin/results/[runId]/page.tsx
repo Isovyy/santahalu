@@ -14,7 +14,7 @@ export default async function ResultsPage({
   const results = await getMatchRunResults(runId);
   if (!results) notFound();
 
-  const { run, rows, unmatched, totalCurrentParticipants } = results;
+  const { run, rows, noGiver, noReceiver, totalCurrentParticipants } = results;
   const matchedRows = rows.filter((r) => r.giver_twt_user && r.receiver_twt_user);
 
   return (
@@ -27,11 +27,12 @@ export default async function ResultsPage({
         Results: {run.createdAt.toLocaleString()}
       </h1>
 
-      <section className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <section className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-5">
         <Stat label="Participants (run)" value={run.totalParticipants} />
         <Stat label="Participants (now)" value={totalCurrentParticipants} />
         <Stat label="Matched pairs" value={run.matchedPairs} />
-        <Stat label="Unmatched" value={unmatched.length} />
+        <Stat label="Tidak dapat giver" value={noGiver.length} />
+        <Stat label="Tidak punya penerima" value={noReceiver.length} />
       </section>
       {run.seed !== null && (
         <p className="mt-2 text-sm text-gray-400">Seed: {run.seed}</p>
@@ -74,38 +75,64 @@ export default async function ResultsPage({
       </div>
 
       <h2 className="mt-10 text-lg font-medium text-gray-800">
-        Unmatched ({unmatched.length})
+        Tidak dapat giver ({noGiver.length})
       </h2>
-      <div className="mt-3 overflow-x-auto rounded-2xl border border-teal-100 bg-white shadow-sm">
-        <table className="min-w-full divide-y divide-teal-100 text-sm">
-          <thead className="bg-teal-50 text-teal-600">
-            <tr>
-              <Th>Handle</Th>
-              <Th>Email</Th>
-              <Th>Yumeship</Th>
-              <Th>Fandom</Th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-teal-100">
-            {unmatched.map((p) => (
-              <tr key={p.id} className="text-gray-600">
-                <Td>{p.twtUser}</Td>
-                <Td>{p.email}</Td>
-                <Td>{p.yumeshipName}</Td>
-                <Td>{p.fandomYume}</Td>
-              </tr>
-            ))}
-            {unmatched.length === 0 && (
-              <tr>
-                <td colSpan={4} className="px-4 py-6 text-center text-gray-400">
-                  Everyone was matched!
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+      <p className="mt-1 text-xs text-gray-400">
+        Tidak ada yang ditugaskan memberi hadiah ke peserta ini, mereka tidak akan menerima
+        apa-apa kecuali ada yang direshuffle ke sini.
+      </p>
+      <div className="mt-3">
+        <UnmatchedTable participants={noGiver} />
+      </div>
+
+      <h2 className="mt-10 text-lg font-medium text-gray-800">
+        Tidak punya penerima ({noReceiver.length})
+      </h2>
+      <p className="mt-1 text-xs text-gray-400">
+        Peserta ini tidak ditugaskan memberi ke siapa pun, giving slot mereka tidak terpakai.
+      </p>
+      <div className="mt-3">
+        <UnmatchedTable participants={noReceiver} />
       </div>
     </main>
+  );
+}
+
+function UnmatchedTable({
+  participants,
+}: {
+  participants: { id: string; twtUser: string; email: string; yumeshipName: string; fandomYume: string }[];
+}) {
+  return (
+    <div className="overflow-x-auto rounded-2xl border border-teal-100 bg-white shadow-sm">
+      <table className="min-w-full divide-y divide-teal-100 text-sm">
+        <thead className="bg-teal-50 text-teal-600">
+          <tr>
+            <Th>Handle</Th>
+            <Th>Email</Th>
+            <Th>Yumeship</Th>
+            <Th>Fandom</Th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-teal-100">
+          {participants.map((p) => (
+            <tr key={p.id} className="text-gray-600">
+              <Td>{p.twtUser}</Td>
+              <Td>{p.email}</Td>
+              <Td>{p.yumeshipName}</Td>
+              <Td>{p.fandomYume}</Td>
+            </tr>
+          ))}
+          {participants.length === 0 && (
+            <tr>
+              <td colSpan={4} className="px-4 py-6 text-center text-gray-400">
+                Tidak ada.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
   );
 }
 

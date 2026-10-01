@@ -157,8 +157,14 @@ export async function getMatchRunResults(runId: string) {
     );
   });
 
-  const matchedIds = new Set(run.matches.flatMap((m) => [m.giverId, m.receiverId]));
-  const unmatched = participants.filter((p) => !matchedIds.has(p.id));
+  // "Unmatched" alone hides a real distinction: someone can appear in the
+  // match list as a giver but never as a receiver (nobody gives to them,
+  // they get no gift) or vice versa (they never get to give). A single
+  // "appears anywhere" count reports both as fully fine.
+  const giverIds = new Set(run.matches.map((m) => m.giverId));
+  const receiverIds = new Set(run.matches.map((m) => m.receiverId));
+  const noReceiver = participants.filter((p) => !giverIds.has(p.id));
+  const noGiver = participants.filter((p) => !receiverIds.has(p.id));
 
-  return { run, rows, unmatched, totalCurrentParticipants: participants.length };
+  return { run, rows, noGiver, noReceiver, totalCurrentParticipants: participants.length };
 }

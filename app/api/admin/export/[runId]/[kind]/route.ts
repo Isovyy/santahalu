@@ -27,25 +27,37 @@ export async function GET(
     );
     filename = `results_all_${runId}.csv`;
   } else {
+    const unmatchedIds = new Set<string>();
+    const unmatched = [...results.noGiver, ...results.noReceiver].filter((p) => {
+      if (unmatchedIds.has(p.id)) return false;
+      unmatchedIds.add(p.id);
+      return true;
+    });
     csv = toCsv(
-      UNMATCHED_COLUMNS as unknown as string[],
-      results.unmatched.map((p) => [
-        p.email,
-        p.twtUser,
-        p.yumeshipName,
-        p.oshiName,
-        p.relationshipType,
-        p.yumeTypeReceive,
-        p.fandomYume,
-        p.contentType,
-        p.languageGive ?? "",
-        p.languageReceive ?? "",
-        p.fandomGive ?? "",
-        p.yumeTypeGive ?? "",
-        p.yumeDocuLink ?? "",
-        p.notes ?? "",
-        p.avoidList ?? "",
-      ])
+      [...UNMATCHED_COLUMNS, "unmatched_reason"] as unknown as string[],
+      unmatched.map((p) => {
+        const reasons: string[] = [];
+        if (results.noGiver.includes(p)) reasons.push("no_giver");
+        if (results.noReceiver.includes(p)) reasons.push("no_receiver");
+        return [
+          p.email,
+          p.twtUser,
+          p.yumeshipName,
+          p.oshiName,
+          p.relationshipType,
+          p.yumeTypeReceive,
+          p.fandomYume,
+          p.contentType,
+          p.languageGive ?? "",
+          p.languageReceive ?? "",
+          p.fandomGive ?? "",
+          p.yumeTypeGive ?? "",
+          p.yumeDocuLink ?? "",
+          p.notes ?? "",
+          p.avoidList ?? "",
+          reasons.join(", "),
+        ];
+      })
     );
     filename = `results_unmatched_${runId}.csv`;
   }

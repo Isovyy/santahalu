@@ -185,29 +185,51 @@ function shuffle<T>(arr: T[], rng: () => number): void {
   }
 }
 
-function shuffleWithinConstraintGroups(
-  order: number[],
+// Maximum bipartite matching via Kuhn's algorithm (augmenting paths).
+//
+// A one-pass greedy assignment (try each giver once, take the first free
+// compatible receiver) can strand people even when a full solution exists:
+// if giver A (compatible with {X, Y}) grabs X before giver B (compatible
+// with only {X}) gets a turn, B is stuck with no receiver, even though
+// A->Y, B->X would have matched everyone. Kuhn's algorithm fixes this by
+// letting a giver "bump" whoever currently holds a receiver they want, as
+// long as the bumped giver can be rerouted to another option (recursively).
+// This guarantees the largest possible matching, not just whatever the
+// first pass happened to grab, at the cost of no longer being able to
+// cheaply bias toward unpopular receivers (dropped, since correctness
+// matters more than that secondary fairness heuristic).
+function maxBipartiteMatch(
+  giverCount: number,
+  receiverCount: number,
   candidates: Record<number, number[]>,
   rng: () => number
 ): number[] {
-  const groups: Record<number, number[]> = {};
-  order.forEach((i) => {
-    const key = candidates[i].length;
-    if (!groups[key]) groups[key] = [];
-    groups[key].push(i);
-  });
+  const matchOfReceiver = new Array(receiverCount).fill(-1);
+  const matchOfGiver = new Array(giverCount).fill(-1);
 
-  const result: number[] = [];
-  Object.keys(groups)
-    .map(Number)
-    .sort((a, b) => a - b)
-    .forEach((key) => {
-      const group = groups[key];
-      shuffle(group, rng);
-      result.push(...group);
-    });
+  function tryAugment(giver: number, visited: boolean[]): boolean {
+    const options = [...candidates[giver]];
+    shuffle(options, rng);
+    for (const receiver of options) {
+      if (visited[receiver]) continue;
+      visited[receiver] = true;
+      if (matchOfReceiver[receiver] === -1 || tryAugment(matchOfReceiver[receiver], visited)) {
+        matchOfReceiver[receiver] = giver;
+        matchOfGiver[giver] = receiver;
+        return true;
+      }
+    }
+    return false;
+  }
 
-  return result;
+  const giverOrder = Array.from({ length: giverCount }, (_, i) => i);
+  shuffle(giverOrder, rng);
+
+  for (const giver of giverOrder) {
+    tryAugment(giver, new Array(receiverCount).fill(false));
+  }
+
+  return matchOfGiver;
 }
 
 export function matchParticipants(
@@ -215,7 +237,6 @@ export function matchParticipants(
   seed?: number | null
 ): MatchResult {
   const rng = seedRandom(seed ?? Date.now());
-  const matches: Array<[number, number]> = [];
 
   // Precompute compatible receivers per giver (excluding self)
   const candidates: Record<number, number[]> = {};
@@ -228,34 +249,10 @@ export function matchParticipants(
     });
   });
 
-  // Giver order: shuffle, then sort by fewest options, then shuffle within groups
-  let giverOrder = participants.map((_, i) => i);
-  shuffle(giverOrder, rng);
-  giverOrder.sort((a, b) => candidates[a].length - candidates[b].length);
-  giverOrder = shuffleWithinConstraintGroups(giverOrder, candidates, rng);
-
-  // Receiver popularity
-  const receiverPopularity: Record<number, number> = {};
-  Object.values(candidates).forEach((candList) => {
-    candList.forEach((j) => {
-      receiverPopularity[j] = (receiverPopularity[j] || 0) + 1;
-    });
-  });
-
-  const availableReceivers = new Set(participants.map((_, i) => i));
-
-  giverOrder.forEach((i) => {
-    const viable = candidates[i].filter((j) => availableReceivers.has(j));
-    if (viable.length === 0) return;
-
-    shuffle(viable, rng);
-    viable.sort((a, b) => (receiverPopularity[a] || 0) - (receiverPopularity[b] || 0));
-
-    const cutoffIdx = Math.max(1, Math.floor(viable.length / 3));
-    const j = viable[Math.floor(rng() * cutoffIdx)];
-
-    matches.push([i, j]);
-    availableReceivers.delete(j);
+  const matchOfGiver = maxBipartiteMatch(participants.length, participants.length, candidates, rng);
+  const matches: Array<[number, number]> = [];
+  matchOfGiver.forEach((receiverIdx, giverIdx) => {
+    if (receiverIdx !== -1) matches.push([giverIdx, receiverIdx]);
   });
 
   const matchedIndividuals = new Set(matches.flat());
@@ -284,7 +281,6 @@ export function matchBipartite(
   seed?: number | null
 ): BipartiteResult {
   const rng = seedRandom(seed ?? Date.now());
-  const matches: Array<[number, number]> = [];
 
   const candidates: Record<number, number[]> = {};
   givers.forEach((giver, i) => {
@@ -296,32 +292,10 @@ export function matchBipartite(
     });
   });
 
-  let giverOrder = givers.map((_, i) => i);
-  shuffle(giverOrder, rng);
-  giverOrder.sort((a, b) => candidates[a].length - candidates[b].length);
-  giverOrder = shuffleWithinConstraintGroups(giverOrder, candidates, rng);
-
-  const receiverPopularity: Record<number, number> = {};
-  Object.values(candidates).forEach((candList) => {
-    candList.forEach((j) => {
-      receiverPopularity[j] = (receiverPopularity[j] || 0) + 1;
-    });
-  });
-
-  const availableReceivers = new Set(receivers.map((_, j) => j));
-
-  giverOrder.forEach((i) => {
-    const viable = candidates[i].filter((j) => availableReceivers.has(j));
-    if (viable.length === 0) return;
-
-    shuffle(viable, rng);
-    viable.sort((a, b) => (receiverPopularity[a] || 0) - (receiverPopularity[b] || 0));
-
-    const cutoffIdx = Math.max(1, Math.floor(viable.length / 3));
-    const j = viable[Math.floor(rng() * cutoffIdx)];
-
-    matches.push([i, j]);
-    availableReceivers.delete(j);
+  const matchOfGiver = maxBipartiteMatch(givers.length, receivers.length, candidates, rng);
+  const matches: Array<[number, number]> = [];
+  matchOfGiver.forEach((receiverIdx, giverIdx) => {
+    if (receiverIdx !== -1) matches.push([giverIdx, receiverIdx]);
   });
 
   return {

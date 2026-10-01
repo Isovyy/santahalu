@@ -224,4 +224,43 @@ describe("matchBipartite", () => {
     const { matches } = matchBipartite(givers, receivers, 1);
     expect(matches).toEqual([]);
   });
+
+  it("finds a full matching via augmenting paths where naive greedy would strand someone", () => {
+    // giver1 can go to either A or B; giver2 can ONLY go to A. A one-pass
+    // greedy that lets giver1 grab A first (its first candidate) strands
+    // giver2 entirely, even though giver1->B, giver2->A matches both.
+    const giver1 = participant({ id: "g1", fandomGive: "Apa saja" });
+    const giver2 = participant({ id: "g2", fandomGive: "Fandom A" });
+    const receiverA = participant({ id: "rA", oshiName: "OshiA", fandomYume: "Fandom A" });
+    const receiverB = participant({ id: "rB", oshiName: "OshiB", fandomYume: "Fandom B" });
+
+    for (let seed = 0; seed < 20; seed++) {
+      const { stats } = matchBipartite(
+        [giver1, giver2],
+        [receiverA, receiverB],
+        seed,
+      );
+      expect(stats.matchedPairs).toBe(2);
+    }
+  });
+});
+
+describe("matchParticipants (maximum matching)", () => {
+  it("never strands a constrained participant when a full solution exists", () => {
+    // W, X can give to anyone ("apa saja"); Y can ONLY give to X; Z can
+    // ONLY give to W. A full 4-way matching exists (Y->X, Z->W, W->Y,
+    // X->Z), but a one-pass greedy that happens to process W or X first
+    // and grab the other's only receiver first can strand Y or Z, the
+    // same failure mode that stranded two real participants in production.
+    const w = participant({ id: "w", oshiName: "W", fandomGive: "Apa saja", fandomYume: "Fandom W" });
+    const x = participant({ id: "x", oshiName: "X", fandomGive: "Apa saja", fandomYume: "Fandom X" });
+    const y = participant({ id: "y", oshiName: "Y", fandomGive: "Fandom X", fandomYume: "Fandom Y" });
+    const z = participant({ id: "z", oshiName: "Z", fandomGive: "Fandom W", fandomYume: "Fandom Z" });
+
+    for (let seed = 0; seed < 20; seed++) {
+      const { stats } = matchParticipants([w, x, y, z], seed);
+      expect(stats.matchedPairs).toBe(4);
+      expect(stats.unmatched).toBe(0);
+    }
+  });
 });
