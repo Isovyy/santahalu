@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
   try {
     body = await req.json();
   } catch {
-    // no body is fine — seed is optional
+    // no body is fine, seed is optional
   }
 
   const rawSeed = body.seed;

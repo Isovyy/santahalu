@@ -61,7 +61,7 @@ export async function getNotifyRows(
 }
 
 // Called right before the match-info email is sent, so the email can embed
-// a working /confirm/[token] link. Idempotent — reuses the existing token
+// a working /confirm/[token] link. Idempotent: reuses the existing token
 // once one exists, rather than invalidating a link already emailed out.
 export async function ensureConfirmToken(matchId: string): Promise<string> {
   const match = await db.orm.public.Match.first({ id: matchId });

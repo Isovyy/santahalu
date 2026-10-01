@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getNotifyRows } from "@/lib/notify";
-import SendFolderEmails from "./SendFolderEmails";
+import ReshuffleMatches from "./ReshuffleMatches";
 
 export const dynamic = "force-dynamic";
 
-export default async function SendFolderEmailsPage({
+export default async function ReshufflePage({
   params,
 }: {
   params: Promise<{ runId: string }>;
@@ -20,18 +20,16 @@ export default async function SendFolderEmailsPage({
         &larr; Back to results
       </Link>
 
-      <h1 className="mt-3 text-3xl font-bold text-teal-500">Kirim link folder</h1>
+      <h1 className="mt-3 text-3xl font-bold text-teal-500">Reshuffle pasangan</h1>
       <p className="mt-1 text-sm text-gray-500">
-        Email ini hanya berisi link folder Drive untuk upload hadiah. Baris tanpa link folder
-        tidak bisa dikirim &mdash; isi dulu link foldernya di halaman{" "}
-        <Link href="/admin/responses" className="text-teal-500 hover:underline">
-          Semua Jawaban
-        </Link>
-        .
+        Pilih pasangan yang perlu dipasangkan ulang (yang melapor masalah sudah tercentang
+        otomatis). Kalau tidak ada kandidat yang cocok di dalam pilihan, tambahkan pasangan lain
+        supaya ada lebih banyak opsi. Pasangan yang berhasil direshuffle akan direset statusnya
+        dan perlu dikirim ulang email pasangannya.
       </p>
 
       <div className="mt-6">
-        <SendFolderEmails runId={runId} rows={data.rows} />
+        <ReshuffleMatches runId={runId} rows={data.rows} />
       </div>
     </main>
   );

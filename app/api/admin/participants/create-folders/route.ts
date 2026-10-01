@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
   try {
     body = await req.json();
   } catch {
-    // no body is fine — means "all participants missing a folder"
+    // no body is fine, means "all participants missing a folder"
   }
 
   const requestedIds = Array.isArray(body.participantIds)

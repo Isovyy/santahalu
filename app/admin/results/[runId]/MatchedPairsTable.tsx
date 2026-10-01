@@ -12,7 +12,6 @@ interface Column {
 }
 
 const COLUMNS: Column[] = [
-  { label: "Yumeship", width: 160, render: (r) => r.receiver_yumeship_name },
   {
     label: "Oshi",
     width: 220,
@@ -32,6 +31,7 @@ const COLUMNS: Column[] = [
       </>
     ),
   },
+  { label: "Giver's avoid list", width: 220, render: (r) => formatAvoidList(r.giver_avoid_list) },
   {
     label: "Bahasa yang diberi → diterima",
     width: 220,
@@ -41,7 +41,6 @@ const COLUMNS: Column[] = [
       </>
     ),
   },
-  { label: "Giver's avoid list", width: 220, render: (r) => formatAvoidList(r.giver_avoid_list) },
   { label: "Giver", width: 140, render: (r) => r.giver_twt_user },
   { label: "Giver email", width: 200, render: (r) => r.giver_email },
   { label: "Receiver", width: 140, render: (r) => r.receiver_twt_user },
@@ -62,7 +61,7 @@ export default function MatchedPairsTable({ rows }: { rows: ResultRow[] }) {
   const pageRows = rows.slice((clampedPage - 1) * PAGE_SIZE, clampedPage * PAGE_SIZE);
 
   // Prevent text selection and show a consistent cursor for the whole page
-  // while dragging — without this, fast mouse movement during the drag can
+  // while dragging. Without this, fast mouse movement during the drag can
   // select surrounding text instead of just resizing. Done as an effect
   // (rather than mutating document.body directly in the event handlers)
   // since that's a DOM side effect, not a render concern.

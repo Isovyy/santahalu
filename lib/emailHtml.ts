@@ -6,10 +6,10 @@ export function escapeHtml(value: string): string {
     .replace(/"/g, "&quot;");
 }
 
-// Who participants should ping with questions — update here each event.
+// Who participants should ping with questions, update here each event.
 export const ADMIN_CONTACT_HANDLE = "@FATUIUWU";
 
-// Hard deadline for gift uploads — update here each event. End-of-day WIB.
+// Hard deadline for gift uploads, update here each event. End-of-day WIB.
 export const SUBMISSION_DEADLINE = new Date("2026-12-15T23:59:59+07:00");
 
 export function formatDeadline(date: Date): string {

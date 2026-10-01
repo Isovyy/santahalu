@@ -1,6 +1,6 @@
 export const AVOID_WHOLE_FANDOM = "Semua Karakter";
 
-// Stored as "Character | Fandom; Character | Fandom" — reformat for display
+// Stored as "Character | Fandom; Character | Fandom". Reformat for display
 // only (the raw pipe/semicolon format stays as-is for CSV export elsewhere).
 export function formatAvoidList(raw: string): string {
   if (!raw) return "-";

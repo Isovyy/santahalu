@@ -128,7 +128,7 @@ export async function POST(req: NextRequest) {
     editCodeHash: hashEditCode(editCode),
   });
 
-  // Backup to the on-screen one-time display — best-effort, never blocks
+  // Backup to the on-screen one-time display, best-effort, never blocks
   // registration if Gmail is down or misconfigured.
   try {
     await sendEmail({

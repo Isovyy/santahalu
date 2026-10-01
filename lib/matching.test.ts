@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { canGiveTo, matchParticipants, MatchParticipant } from "./matching";
+import { canGiveTo, matchParticipants, matchBipartite, MatchParticipant } from "./matching";
 import { AVOID_WHOLE_FANDOM } from "./avoidList";
 
 function participant(overrides: Partial<MatchParticipant> & { id: string }): MatchParticipant {
@@ -182,6 +182,46 @@ describe("matchParticipants", () => {
       participant({ id: "b", oshiName: "Shared", fandomGive: "Apa saja", yumeTypeGive: "All" }),
     ];
     const { matches } = matchParticipants(pool, 1);
+    expect(matches).toEqual([]);
+  });
+});
+
+describe("matchBipartite", () => {
+  it("pairs each broken giver to a broken receiver when compatible", () => {
+    const givers = [participant({ id: "g1" }), participant({ id: "g2" })];
+    const receivers = [participant({ id: "r1" }), participant({ id: "r2" })];
+    const { matches, stats } = matchBipartite(givers, receivers, 1);
+    expect(stats.matchedPairs).toBe(2);
+    expect(stats.unmatchedGivers).toBe(0);
+    expect(stats.unmatchedReceivers).toBe(0);
+    // Every giver index should appear exactly once.
+    expect(matches.map(([i]) => i).sort()).toEqual([0, 1]);
+  });
+
+  it("never pairs the same person as their own giver and receiver", () => {
+    // "shared" appears as both a broken giver and a broken receiver (pulled
+    // in from two different rows). It must never end up matched to itself.
+    const givers = [participant({ id: "shared" }), participant({ id: "g2" })];
+    const receivers = [participant({ id: "shared" }), participant({ id: "r2" })];
+    const { matches } = matchBipartite(givers, receivers, 1);
+    for (const [i, j] of matches) {
+      expect(givers[i].id === receivers[j].id).toBe(false);
+    }
+  });
+
+  it("leaves givers unmatched when no compatible receiver exists", () => {
+    const givers = [participant({ id: "g1", oshiName: "Lonely", fandomGive: "Nonexistent Fandom" })];
+    const receivers = [participant({ id: "r1", fandomYume: "Fandom A" })];
+    const { matches, stats } = matchBipartite(givers, receivers, 1);
+    expect(matches).toEqual([]);
+    expect(stats.unmatchedGivers).toBe(1);
+    expect(stats.unmatchedReceivers).toBe(1);
+  });
+
+  it("still respects the same-oshi block", () => {
+    const givers = [participant({ id: "g1", oshiName: "Same" })];
+    const receivers = [participant({ id: "r1", oshiName: "Same" })];
+    const { matches } = matchBipartite(givers, receivers, 1);
     expect(matches).toEqual([]);
   });
 });

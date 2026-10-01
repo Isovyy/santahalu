@@ -52,7 +52,7 @@ interface FlaggedIssue {
 }
 
 // Free-text fandom fields (register form + avoid-list) let people type anything,
-// so this surfaces entries that don't match the known fandom list — likely a
+// so this surfaces entries that don't match the known fandom list, likely a
 // typo, or a genuinely new fandom worth a quick human look either way.
 function flagRow(row: ParticipantRow): FlaggedIssue[] {
   const known = (v: string) => FANDOM_ALL.some((f) => f.toLowerCase() === v.toLowerCase());

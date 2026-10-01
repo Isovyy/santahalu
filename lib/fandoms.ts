@@ -1,5 +1,5 @@
 // Shared between the register form's fandom fields (app/RegisterFields.tsx)
-// and the admin "Flagged" view (app/admin/responses/*) — a plain data module
+// and the admin "Flagged" view (app/admin/responses/*): a plain data module
 // (no "use client", no React) so both a client component and a server
 // component can import it without any RSC boundary ambiguity.
 

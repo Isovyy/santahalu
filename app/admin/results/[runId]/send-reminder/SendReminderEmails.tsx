@@ -15,7 +15,7 @@ export default function SendReminderEmails({
   const [error, setError] = useState<string | null>(null);
   const [lastResults, setLastResults] = useState<Record<string, string> | null>(null);
 
-  // Default-select only those who haven't submitted — reminders can still be
+  // Default-select only those who haven't submitted. Reminders can still be
   // resent to anyone manually, this just avoids nagging people who are done.
   const notSubmittedIds = useMemo(
     () => rows.filter((r) => !r.submittedAt).map((r) => r.matchId),

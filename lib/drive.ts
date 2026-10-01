@@ -13,7 +13,7 @@ function getAuth() {
   if (!auth) {
     auth = new google.auth.JWT({
       email,
-      // .env stores the key with literal "\n" sequences — restore real newlines.
+      // .env stores the key with literal "\n" sequences, restore real newlines.
       key: key.replace(/\\n/g, "\n"),
       scopes: ["https://www.googleapis.com/auth/drive"],
     });

@@ -14,7 +14,7 @@ export const OTHER = "Yang lain";
 
 export const ANY_FANDOM = "Apa saja";
 
-// Twitter handles are always stored/displayed with a leading "@" — this
+// Twitter handles are always stored/displayed with a leading "@"; this
 // normalizes what the user types so they don't have to remember to add it.
 export function normalizeTwitterHandle(raw: string): string {
   const stripped = raw.replace(/^@+/, "");

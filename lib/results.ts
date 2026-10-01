@@ -138,7 +138,7 @@ export async function getMatchRunResults(runId: string) {
     }
 
     // Re-checks the pairing against each side's *current* data (not the
-    // frozen state at match time) — surfaces a match gone stale because
+    // frozen state at match time), surfaces a match gone stale because
     // someone edited their response (oshi, fandom, avoid list, etc.)
     // after being matched. null = this participant wasn't matched at all.
     const stillValid = giver

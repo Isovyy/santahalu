@@ -1,4 +1,4 @@
-// Secret Santa / YumeFess greedy matcher — ported from the original Google
+// Secret Santa / YumeFess greedy matcher, ported from the original Google
 // Apps Script (Code.gs) so match behavior stays identical, including the
 // seeded RNG, so a given seed still reproduces the same result.
 
@@ -14,7 +14,7 @@ export interface MatchParticipant {
   yumeTypeGive?: string | null;
   yumeTypeReceive?: string | null;
   contentType: string;
-  // "Character | Fandom" entries separated by ";" — characters this giver does not want to make gifts for.
+  // "Character | Fandom" entries separated by ";", characters this giver does not want to make gifts for.
   avoidList?: string | null;
 }
 
@@ -28,6 +28,19 @@ export interface MatchStats {
 export interface MatchResult {
   matches: Array<[number, number]>; // [giverIndex, receiverIndex]
   stats: MatchStats;
+}
+
+export interface BipartiteStats {
+  totalGivers: number;
+  totalReceivers: number;
+  matchedPairs: number;
+  unmatchedGivers: number;
+  unmatchedReceivers: number;
+}
+
+export interface BipartiteResult {
+  matches: Array<[number, number]>; // [giverIndex into `givers`, receiverIndex into `receivers`]
+  stats: BipartiteStats;
 }
 
 function normalize(s: string | null | undefined): string {
@@ -58,7 +71,7 @@ function isAvoided(giver: MatchParticipant, receiver: MatchParticipant): boolean
     const [character, fandom] = entry.split("|");
     if (normalize(fandom) !== recvFandom) return false;
     // A "whole fandom" entry excludes every character in that fandom, not
-    // just the one named — so it matches regardless of the receiver's oshi.
+    // just the one named, so it matches regardless of the receiver's oshi.
     if (normalizeCharacter(character) === AVOID_WHOLE_FANDOM_NORMALIZED) return true;
     return normalizeCharacter(character) === recvChar;
   });
@@ -123,7 +136,7 @@ export function canGiveTo(giver: MatchParticipant, receiver: MatchParticipant): 
     }
   }
 
-  // Language: only relevant if the giver might write — a giver who doesn't
+  // Language: only relevant if the giver might write. A giver who doesn't
   // offer Writing at all (pure Art) bypasses it, regardless of the receiver's
   // accepted languages. A giver who offers Writing (even alongside Art) still
   // needs a language match, since they could end up writing for this receiver.
@@ -254,6 +267,71 @@ export function matchParticipants(
       matchedPairs: matches.length,
       matchedIndividuals: matchedIndividuals.size,
       unmatched: participants.length - matchedIndividuals.size,
+    },
+  };
+}
+
+// Re-pairs a specific set of "broken" givers against a specific set of
+// "broken" receivers, used for reshuffling a reported/pulled-in subset of
+// an existing match run, where each side is already a fixed, separate list
+// (unlike matchParticipants, which treats one pool as both roles at once).
+// A person can legitimately appear in both lists (e.g. they're the giver in
+// one pulled-in row and the receiver in another), so self-pairing is guarded
+// by id, not array identity.
+export function matchBipartite(
+  givers: MatchParticipant[],
+  receivers: MatchParticipant[],
+  seed?: number | null
+): BipartiteResult {
+  const rng = seedRandom(seed ?? Date.now());
+  const matches: Array<[number, number]> = [];
+
+  const candidates: Record<number, number[]> = {};
+  givers.forEach((giver, i) => {
+    candidates[i] = [];
+    receivers.forEach((receiver, j) => {
+      if (giver.id !== receiver.id && canGiveTo(giver, receiver)) {
+        candidates[i].push(j);
+      }
+    });
+  });
+
+  let giverOrder = givers.map((_, i) => i);
+  shuffle(giverOrder, rng);
+  giverOrder.sort((a, b) => candidates[a].length - candidates[b].length);
+  giverOrder = shuffleWithinConstraintGroups(giverOrder, candidates, rng);
+
+  const receiverPopularity: Record<number, number> = {};
+  Object.values(candidates).forEach((candList) => {
+    candList.forEach((j) => {
+      receiverPopularity[j] = (receiverPopularity[j] || 0) + 1;
+    });
+  });
+
+  const availableReceivers = new Set(receivers.map((_, j) => j));
+
+  giverOrder.forEach((i) => {
+    const viable = candidates[i].filter((j) => availableReceivers.has(j));
+    if (viable.length === 0) return;
+
+    shuffle(viable, rng);
+    viable.sort((a, b) => (receiverPopularity[a] || 0) - (receiverPopularity[b] || 0));
+
+    const cutoffIdx = Math.max(1, Math.floor(viable.length / 3));
+    const j = viable[Math.floor(rng() * cutoffIdx)];
+
+    matches.push([i, j]);
+    availableReceivers.delete(j);
+  });
+
+  return {
+    matches,
+    stats: {
+      totalGivers: givers.length,
+      totalReceivers: receivers.length,
+      matchedPairs: matches.length,
+      unmatchedGivers: givers.length - matches.length,
+      unmatchedReceivers: receivers.length - matches.length,
     },
   };
 }
