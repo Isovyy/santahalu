@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getMatchRunResults } from "@/lib/results";
+import { formatAvoidList } from "@/lib/avoidList";
 import MatchedPairsTable from "./MatchedPairsTable";
 
 export const dynamic = "force-dynamic";
@@ -31,8 +32,8 @@ export default async function ResultsPage({
         <Stat label="Participants (run)" value={run.totalParticipants} />
         <Stat label="Participants (now)" value={totalCurrentParticipants} />
         <Stat label="Matched pairs" value={run.matchedPairs} />
-        <Stat label="Tidak dapat giver" value={noGiver.length} />
-        <Stat label="Tidak punya penerima" value={noReceiver.length} />
+        <Stat label="No giver" value={noGiver.length} />
+        <Stat label="No receiver" value={noReceiver.length} />
       </section>
       {run.seed !== null && (
         <p className="mt-2 text-sm text-gray-400">Seed: {run.seed}</p>
@@ -74,9 +75,7 @@ export default async function ResultsPage({
         <MatchedPairsTable rows={matchedRows} />
       </div>
 
-      <h2 className="mt-10 text-lg font-medium text-gray-800">
-        Tidak dapat giver ({noGiver.length})
-      </h2>
+      <h2 className="mt-10 text-lg font-medium text-gray-800">No giver ({noGiver.length})</h2>
       <p className="mt-1 text-xs text-gray-400">
         Tidak ada yang ditugaskan memberi hadiah ke peserta ini, mereka tidak akan menerima
         apa-apa kecuali ada yang direshuffle ke sini.
@@ -85,9 +84,7 @@ export default async function ResultsPage({
         <UnmatchedTable participants={noGiver} />
       </div>
 
-      <h2 className="mt-10 text-lg font-medium text-gray-800">
-        Tidak punya penerima ({noReceiver.length})
-      </h2>
+      <h2 className="mt-10 text-lg font-medium text-gray-800">No receiver ({noReceiver.length})</h2>
       <p className="mt-1 text-xs text-gray-400">
         Peserta ini tidak ditugaskan memberi ke siapa pun, giving slot mereka tidak terpakai.
       </p>
@@ -98,11 +95,25 @@ export default async function ResultsPage({
   );
 }
 
-function UnmatchedTable({
-  participants,
-}: {
-  participants: { id: string; twtUser: string; email: string; yumeshipName: string; fandomYume: string }[];
-}) {
+interface UnmatchedParticipant {
+  id: string;
+  twtUser: string;
+  email: string;
+  yumeshipName: string;
+  oshiName: string;
+  relationshipType: string;
+  yumeTypeReceive: string | null;
+  fandomYume: string;
+  contentType: string;
+  languageGive: string | null;
+  languageReceive: string;
+  fandomGive: string;
+  yumeDocuLink: string;
+  notes: string | null;
+  avoidList: string | null;
+}
+
+function UnmatchedTable({ participants }: { participants: UnmatchedParticipant[] }) {
   return (
     <div className="overflow-x-auto rounded-2xl border border-teal-100 bg-white shadow-sm">
       <table className="min-w-full divide-y divide-teal-100 text-sm">
@@ -111,7 +122,17 @@ function UnmatchedTable({
             <Th>Handle</Th>
             <Th>Email</Th>
             <Th>Yumeship</Th>
+            <Th>Oshi</Th>
+            <Th>Tipe Yumeship</Th>
+            <Th>Yumeship type</Th>
             <Th>Fandom</Th>
+            <Th>Karya</Th>
+            <Th>Bahasa ditulis</Th>
+            <Th>Bahasa diterima</Th>
+            <Th>Fandom diberikan</Th>
+            <Th>Dokumen</Th>
+            <Th>Notes</Th>
+            <Th>Avoid list</Th>
           </tr>
         </thead>
         <tbody className="divide-y divide-teal-100">
@@ -120,12 +141,26 @@ function UnmatchedTable({
               <Td>{p.twtUser}</Td>
               <Td>{p.email}</Td>
               <Td>{p.yumeshipName}</Td>
+              <Td>{p.oshiName}</Td>
+              <Td>{p.relationshipType}</Td>
+              <Td>{p.yumeTypeReceive || "-"}</Td>
               <Td>{p.fandomYume}</Td>
+              <Td>{p.contentType}</Td>
+              <Td>{p.languageGive || "-"}</Td>
+              <Td>{p.languageReceive}</Td>
+              <Td>{p.fandomGive}</Td>
+              <Td className="max-w-[12rem] truncate" title={p.yumeDocuLink}>
+                {p.yumeDocuLink}
+              </Td>
+              <Td className="max-w-[12rem] truncate" title={p.notes ?? undefined}>
+                {p.notes || "-"}
+              </Td>
+              <Td>{formatAvoidList(p.avoidList ?? "")}</Td>
             </tr>
           ))}
           {participants.length === 0 && (
             <tr>
-              <td colSpan={4} className="px-4 py-6 text-center text-gray-400">
+              <td colSpan={14} className="px-4 py-6 text-center text-gray-400">
                 Tidak ada.
               </td>
             </tr>
