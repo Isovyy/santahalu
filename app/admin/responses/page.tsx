@@ -23,6 +23,7 @@ export default async function ResponsesPage() {
     languageReceive: p.languageReceive,
     languageGive: p.languageGive ?? "",
     fandomGive: p.fandomGive,
+    yumeTypeGive: p.yumeTypeGive,
     yumeTypeReceive: p.yumeTypeReceive ?? "",
     yumeDocuLink: p.yumeDocuLink,
     notes: p.notes ?? "",

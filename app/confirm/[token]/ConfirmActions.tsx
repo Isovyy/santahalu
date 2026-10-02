@@ -97,7 +97,7 @@ export default function ConfirmActions({
           disabled={submitting}
           className="text-sm text-gray-500 hover:underline disabled:opacity-50"
         >
-          Sudah beres? Konfirmasi pasangan ini
+          Berubah pikiran? Konfirmasi pasangan ini
         </button>
         {error && <p className="text-sm text-red-500">{error}</p>}
       </div>

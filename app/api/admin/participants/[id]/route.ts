@@ -46,6 +46,7 @@ export async function PATCH(
     notes: str(body.notes) || null,
     avoidList: str(body.avoidList).slice(0, 2000) || null,
     folderLink: str(body.folderLink) || null,
+    yumeTypeGive: str(body.yumeTypeGive) || "All",
     yumeTypeReceive: str(body.yumeTypeReceive) || null,
   };
 

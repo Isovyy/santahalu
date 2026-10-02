@@ -10,22 +10,45 @@ export { FANDOM_ALL };
 export const RELATIONSHIP_OPTIONS = ["Romantic", "Platonic", "Queerplatonic"];
 export const CONTENT_TYPE_OPTIONS = ["Art", "Writing"];
 export const LANGUAGE_OPTIONS = ["Indonesia", "English"];
-export const YUME_TYPE_RECEIVE_OPTIONS = ["HL", "GL", "BL"];
+export const YUME_TYPE_OPTIONS = ["HL", "GL", "BL"];
 export const OTHER = "Yang lain";
 
-// "Yume type" (HL/GL/BL) only applies to ships with a romantic dimension.
+// "Tipe Yumeship (2)" (what your own ship actually is) only applies to
+// ships with a romantic dimension.
 export function showsYumeTypeReceive(relationshipType: string): boolean {
   return relationshipType === "Romantic" || relationshipType === "Queerplatonic";
 }
 
-// Splits a stored yumeTypeReceive value back into the radio selection plus
-// its free-text "Other" value, for prefilling an edit form.
+// Splits a stored yumeTypeGive value (comma-joined, like other checklist
+// fields) back into which standard checkboxes are selected plus any custom
+// "Other" text, for prefilling an edit form.
+export function splitYumeTypeGive(
+  value: string | null | undefined,
+): { yumeTypeGive: string[]; yumeTypeGiveOther: string } {
+  const parts = splitMulti(value ?? "");
+  const known = parts.filter((p) => (YUME_TYPE_OPTIONS as string[]).includes(p));
+  const custom = parts.find((p) => !(YUME_TYPE_OPTIONS as string[]).includes(p));
+  if (custom) return { yumeTypeGive: [...known, OTHER], yumeTypeGiveOther: custom };
+  return { yumeTypeGive: known, yumeTypeGiveOther: "" };
+}
+
+// Merges the checklist selection + custom "Other" text back into the
+// comma-joined string the backend stores.
+export function joinYumeTypeGive(values: string[], otherValue: string): string {
+  return values
+    .map((v) => (v === OTHER ? otherValue.trim() : v))
+    .filter(Boolean)
+    .join(", ");
+}
+
+// Splits a stored single-choice yumeTypeReceive value back into the radio
+// selection plus its free-text "Other" value, for prefilling an edit form.
 export function splitYumeTypeReceive(
   value: string | null | undefined,
 ): { yumeTypeReceive: string; yumeTypeReceiveOther: string } {
   const v = value ?? "";
   if (!v) return { yumeTypeReceive: "", yumeTypeReceiveOther: "" };
-  if ((YUME_TYPE_RECEIVE_OPTIONS as string[]).includes(v)) {
+  if ((YUME_TYPE_OPTIONS as string[]).includes(v)) {
     return { yumeTypeReceive: v, yumeTypeReceiveOther: "" };
   }
   return { yumeTypeReceive: OTHER, yumeTypeReceiveOther: v };
@@ -164,10 +187,16 @@ export function CheckboxGroup({
   options,
   values,
   onChange,
+  withOther,
+  otherValue,
+  onOtherChange,
 }: {
   options: string[];
   values: string[];
   onChange: (v: string[]) => void;
+  withOther?: boolean;
+  otherValue?: string;
+  onOtherChange?: (v: string) => void;
 }) {
   return (
     <div className="grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-3">
@@ -182,6 +211,25 @@ export function CheckboxGroup({
           {opt}
         </label>
       ))}
+      {withOther && (
+        <label className="col-span-2 flex items-center gap-3 text-sm text-gray-700 sm:col-span-3">
+          <input
+            type="checkbox"
+            checked={values.includes(OTHER)}
+            onChange={() => onChange(toggle(values, OTHER))}
+            className="h-4 w-4 accent-teal-500"
+          />
+          {OTHER}
+          {values.includes(OTHER) && (
+            <input
+              type="text"
+              className={inputClass + " ml-2"}
+              value={otherValue}
+              onChange={(e) => onOtherChange?.(e.target.value)}
+            />
+          )}
+        </label>
+      )}
     </div>
   );
 }

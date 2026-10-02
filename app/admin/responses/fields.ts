@@ -14,6 +14,7 @@ export interface ParticipantRow {
   languageReceive: string;
   languageGive: string;
   fandomGive: string;
+  yumeTypeGive: string;
   yumeTypeReceive: string;
   yumeDocuLink: string;
   notes: string;
@@ -37,7 +38,8 @@ export const QUESTIONS: Question[] = [
   { key: "fandomYume", label: "Fandom yumeshipmu", kind: "single" },
   { key: "oshiName", label: "Nama cc/oshi", kind: "text" },
   { key: "relationshipType", label: "Tipe Yumeship", kind: "single" },
-  { key: "yumeTypeReceive", label: "Yumeship type", kind: "single" },
+  { key: "yumeTypeReceive", label: "Tipe Yumeship (2)", kind: "single" },
+  { key: "yumeTypeGive", label: "Tipe yume yang bersedia kamu terima", kind: "multi" },
   { key: "contentType", label: "Karya yang kamu beri berupa", kind: "multi" },
   { key: "languageReceive", label: "Bahasa yang bersedia kamu terima", kind: "multi" },
   { key: "languageGive", label: "Bahasa yang bersedia kamu tulis", kind: "multi" },

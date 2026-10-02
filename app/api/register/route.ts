@@ -15,6 +15,7 @@ const REQUIRED_FIELDS = [
   "languageReceive",
   "fandomGive",
   "yumeDocuLink",
+  "yumeTypeGive",
 ] as const;
 
 function str(value: unknown): string {
@@ -50,6 +51,19 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // yumeTypeReceive ("Tipe Yumeship (2)") only applies to ships with a
+  // romantic dimension.
+  const relationshipType = str(body.relationshipType);
+  if (
+    (relationshipType === "Romantic" || relationshipType === "Queerplatonic") &&
+    !str(body.yumeTypeReceive)
+  ) {
+    return NextResponse.json(
+      { error: "Missing required field: yumeTypeReceive" },
+      { status: 400 }
+    );
+  }
+
   const email = str(body.email).toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
@@ -60,12 +74,13 @@ export async function POST(req: NextRequest) {
     twtUser: str(body.twtUser),
     yumeshipName: str(body.yumeshipName),
     oshiName: str(body.oshiName),
-    relationshipType: str(body.relationshipType),
+    relationshipType,
     fandomYume: str(body.fandomYume),
     contentType: str(body.contentType),
     languageReceive: str(body.languageReceive),
     fandomGive: str(body.fandomGive),
-    // Not asked anymore: everyone is treated as willing to make any yumeship type.
+    // Falls back to "All" if somehow submitted empty, so older/partial
+    // submissions don't accidentally become uncompatible with everyone.
     yumeTypeGive: str(body.yumeTypeGive) || "All",
     yumeDocuLink: str(body.yumeDocuLink),
     yumeTypeReceive: str(body.yumeTypeReceive) || null,

@@ -7,8 +7,10 @@ import {
   RELATIONSHIP_OPTIONS,
   CONTENT_TYPE_OPTIONS,
   LANGUAGE_OPTIONS,
-  YUME_TYPE_RECEIVE_OPTIONS,
+  YUME_TYPE_OPTIONS,
   showsYumeTypeReceive,
+  splitYumeTypeGive,
+  joinYumeTypeGive,
   splitYumeTypeReceive,
   OTHER,
   AvoidEntry,
@@ -40,6 +42,8 @@ interface FormState {
   avoidList: AvoidEntry[];
   yumeDocuLink: string;
   notes: string;
+  yumeTypeGive: string[];
+  yumeTypeGiveOther: string;
   yumeTypeReceive: string;
   yumeTypeReceiveOther: string;
 }
@@ -59,6 +63,8 @@ const initialState: FormState = {
   avoidList: [],
   yumeDocuLink: "",
   notes: "",
+  yumeTypeGive: [],
+  yumeTypeGiveOther: "",
   yumeTypeReceive: "",
   yumeTypeReceiveOther: "",
 };
@@ -81,6 +87,7 @@ interface LookupParticipant {
   languageGive: string | null;
   notes: string | null;
   avoidList: string | null;
+  yumeTypeGive: string;
   yumeTypeReceive: string | null;
 }
 
@@ -100,6 +107,7 @@ function participantToForm(p: LookupParticipant): FormState {
     avoidList: parseAvoidListValue(p.avoidList ?? ""),
     yumeDocuLink: p.yumeDocuLink,
     notes: p.notes ?? "",
+    ...splitYumeTypeGive(p.yumeTypeGive),
     ...splitYumeTypeReceive(p.yumeTypeReceive),
   };
 }
@@ -234,18 +242,29 @@ export default function RegisterPage() {
       return;
     }
 
-    const showYumeType = showsYumeTypeReceive(form.relationshipType);
-    if (showYumeType && !form.yumeTypeReceive) {
-      setError("Pilih yume type yang kamu bersedia terima.");
+    if (form.yumeTypeGive.length === 0) {
+      setError("Pilih minimal satu tipe yume yang bersedia kamu terima.");
       setStatus("error");
       return;
     }
-    if (showYumeType && form.yumeTypeReceive === OTHER && !form.yumeTypeReceiveOther.trim()) {
-      setError("Isi yume type yang kamu maksud.");
+    if (form.yumeTypeGive.includes(OTHER) && !form.yumeTypeGiveOther.trim()) {
+      setError("Isi tipe yume yang kamu maksud.");
       setStatus("error");
       return;
     }
-    const yumeTypeReceive = !showYumeType
+    const showYumeType2 = showsYumeTypeReceive(form.relationshipType);
+    if (showYumeType2 && !form.yumeTypeReceive) {
+      setError("Pilih tipe yumeship (2).");
+      setStatus("error");
+      return;
+    }
+    if (showYumeType2 && form.yumeTypeReceive === OTHER && !form.yumeTypeReceiveOther.trim()) {
+      setError("Isi tipe yumeship (2) yang kamu maksud.");
+      setStatus("error");
+      return;
+    }
+    const yumeTypeGive = joinYumeTypeGive(form.yumeTypeGive, form.yumeTypeGiveOther);
+    const yumeTypeReceive = !showYumeType2
       ? ""
       : form.yumeTypeReceive === OTHER
         ? form.yumeTypeReceiveOther.trim()
@@ -259,6 +278,7 @@ export default function RegisterPage() {
       oshiName: form.oshiName,
       relationshipType: form.relationshipType,
       fandomYume,
+      yumeTypeGive,
       yumeTypeReceive,
       contentType: form.contentType.join(", "),
       languageReceive: form.languageReceive.join(", "),
@@ -493,11 +513,22 @@ export default function RegisterPage() {
           />
         </Field>
 
+        <Field label="Tipe yume yang bersedia kamu terima" required hint="Centang semua yang termasuk">
+          <CheckboxGroup
+            options={YUME_TYPE_OPTIONS}
+            values={form.yumeTypeGive}
+            onChange={(v) => update("yumeTypeGive", v)}
+            withOther
+            otherValue={form.yumeTypeGiveOther}
+            onOtherChange={(v) => update("yumeTypeGiveOther", v)}
+          />
+        </Field>
+
         {showsYumeTypeReceive(form.relationshipType) && (
-          <Field label="Yume type yang kamu bersedia terima" required>
+          <Field label="Tipe Yumeship (2)" required>
             <RadioGroup
               name="yumeTypeReceive"
-              options={YUME_TYPE_RECEIVE_OPTIONS}
+              options={YUME_TYPE_OPTIONS}
               value={form.yumeTypeReceive}
               onChange={(v) => update("yumeTypeReceive", v)}
               withOther

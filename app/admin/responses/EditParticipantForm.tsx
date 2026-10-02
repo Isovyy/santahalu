@@ -7,8 +7,10 @@ import {
   RELATIONSHIP_OPTIONS,
   CONTENT_TYPE_OPTIONS,
   LANGUAGE_OPTIONS,
-  YUME_TYPE_RECEIVE_OPTIONS,
+  YUME_TYPE_OPTIONS,
   showsYumeTypeReceive,
+  splitYumeTypeGive,
+  joinYumeTypeGive,
   splitYumeTypeReceive,
   OTHER,
   splitMulti,
@@ -39,10 +41,15 @@ export default function EditParticipantForm({
   const [oshiName, setOshiName] = useState(row.oshiName);
   const [relationshipType, setRelationshipType] = useState(row.relationshipType);
   const [fandomYume, setFandomYume] = useState(row.fandomYume);
-  const initialYumeType = splitYumeTypeReceive(row.yumeTypeReceive);
-  const [yumeTypeReceive, setYumeTypeReceive] = useState(initialYumeType.yumeTypeReceive);
+  const initialYumeTypeGive = splitYumeTypeGive(row.yumeTypeGive);
+  const [yumeTypeGive, setYumeTypeGive] = useState(initialYumeTypeGive.yumeTypeGive);
+  const [yumeTypeGiveOther, setYumeTypeGiveOther] = useState(
+    initialYumeTypeGive.yumeTypeGiveOther,
+  );
+  const initialYumeTypeReceive = splitYumeTypeReceive(row.yumeTypeReceive);
+  const [yumeTypeReceive, setYumeTypeReceive] = useState(initialYumeTypeReceive.yumeTypeReceive);
   const [yumeTypeReceiveOther, setYumeTypeReceiveOther] = useState(
-    initialYumeType.yumeTypeReceiveOther,
+    initialYumeTypeReceive.yumeTypeReceiveOther,
   );
   const [contentType, setContentType] = useState(splitMulti(row.contentType));
   const [languageReceive, setLanguageReceive] = useState(splitMulti(row.languageReceive));
@@ -60,8 +67,8 @@ export default function EditParticipantForm({
     setSaving(true);
     setError(null);
 
-    const showYumeType = showsYumeTypeReceive(relationshipType);
-    const yumeTypeReceiveFinal = !showYumeType
+    const yumeTypeGiveFinal = joinYumeTypeGive(yumeTypeGive, yumeTypeGiveOther);
+    const yumeTypeReceiveFinal = !showsYumeTypeReceive(relationshipType)
       ? ""
       : yumeTypeReceive === OTHER
         ? yumeTypeReceiveOther.trim()
@@ -74,6 +81,7 @@ export default function EditParticipantForm({
       oshiName,
       relationshipType,
       fandomYume,
+      yumeTypeGive: yumeTypeGiveFinal,
       yumeTypeReceive: yumeTypeReceiveFinal,
       contentType: contentType.join(", "),
       languageReceive: languageReceive.join(", "),
@@ -160,11 +168,22 @@ export default function EditParticipantForm({
         />
       </Field>
 
+      <Field label="Tipe yume yang bersedia kamu terima">
+        <CheckboxGroup
+          options={YUME_TYPE_OPTIONS}
+          values={yumeTypeGive}
+          onChange={setYumeTypeGive}
+          withOther
+          otherValue={yumeTypeGiveOther}
+          onOtherChange={setYumeTypeGiveOther}
+        />
+      </Field>
+
       {showsYumeTypeReceive(relationshipType) && (
-        <Field label="Yume type yang kamu bersedia terima">
+        <Field label="Tipe Yumeship (2)">
           <RadioGroup
             name="edit-yumeTypeReceive"
-            options={YUME_TYPE_RECEIVE_OPTIONS}
+            options={YUME_TYPE_OPTIONS}
             value={yumeTypeReceive}
             onChange={setYumeTypeReceive}
             withOther
