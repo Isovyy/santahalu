@@ -8,9 +8,12 @@ import {
   CONTENT_TYPE_OPTIONS,
   LANGUAGE_OPTIONS,
   YUME_TYPE_OPTIONS,
+  YUME_TYPE_GIVE_OPTIONS,
+  ALL_YUME_TYPES,
   showsYumeTypeReceive,
   splitYumeTypeGive,
   joinYumeTypeGive,
+  toggleYumeTypeGive,
   splitYumeTypeReceive,
   OTHER,
   AvoidEntry,
@@ -529,12 +532,18 @@ export default function RegisterPage() {
 
         <Field label="Tipe yume yang bersedia kamu terima" required hint="Centang semua yang termasuk">
           <CheckboxGroup
-            options={YUME_TYPE_OPTIONS}
+            options={YUME_TYPE_GIVE_OPTIONS}
             values={form.yumeTypeGive}
             onChange={(v) => update("yumeTypeGive", v)}
+            toggleOption={toggleYumeTypeGive}
             withOther
             otherValue={form.yumeTypeGiveOther}
             onOtherChange={(v) => update("yumeTypeGiveOther", v)}
+            disabledValues={
+              form.yumeTypeGive.includes(ALL_YUME_TYPES)
+                ? [...YUME_TYPE_OPTIONS, OTHER]
+                : []
+            }
           />
         </Field>
 

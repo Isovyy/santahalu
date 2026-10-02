@@ -4,6 +4,7 @@ import { getMatchRunResults } from "@/lib/results";
 import { formatAvoidList } from "@/lib/avoidList";
 import MatchedPairsTable from "./MatchedPairsTable";
 import DeleteMatchRun from "./DeleteMatchRun";
+import CloseConfirmation from "./CloseConfirmation";
 
 export const dynamic = "force-dynamic";
 
@@ -65,6 +66,7 @@ export default async function ResultsPage({
         >
           Reshuffle pasangan
         </Link>
+        <CloseConfirmation runId={run.id} initialClosed={Boolean(run.confirmationClosedAt)} />
         <DeleteMatchRun runId={run.id} />
       </div>
 

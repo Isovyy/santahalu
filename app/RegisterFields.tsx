@@ -11,6 +11,10 @@ export const RELATIONSHIP_OPTIONS = ["Romantic", "Platonic", "Queerplatonic"];
 export const CONTENT_TYPE_OPTIONS = ["Art", "Writing"];
 export const LANGUAGE_OPTIONS = ["Indonesia", "English"];
 export const YUME_TYPE_OPTIONS = ["HL", "GL", "BL"];
+export const ALL_YUME_TYPES = "All";
+// "All" comes first and is mutually exclusive with the rest (picking it
+// means "any type is fine", so the specific ones + "Other" get disabled).
+export const YUME_TYPE_GIVE_OPTIONS = [ALL_YUME_TYPES, ...YUME_TYPE_OPTIONS];
 export const OTHER = "Yang lain";
 
 // "Tipe Yumeship (2)" (what your own ship actually is) only applies to
@@ -26,10 +30,20 @@ export function splitYumeTypeGive(
   value: string | null | undefined,
 ): { yumeTypeGive: string[]; yumeTypeGiveOther: string } {
   const parts = splitMulti(value ?? "");
-  const known = parts.filter((p) => (YUME_TYPE_OPTIONS as string[]).includes(p));
-  const custom = parts.find((p) => !(YUME_TYPE_OPTIONS as string[]).includes(p));
+  const known = parts.filter((p) => (YUME_TYPE_GIVE_OPTIONS as string[]).includes(p));
+  const custom = parts.find((p) => !(YUME_TYPE_GIVE_OPTIONS as string[]).includes(p));
   if (custom) return { yumeTypeGive: [...known, OTHER], yumeTypeGiveOther: custom };
   return { yumeTypeGive: known, yumeTypeGiveOther: "" };
+}
+
+// Toggles one yumeTypeGive checkbox while keeping "All" mutually exclusive
+// with the rest: picking "All" clears everything else, picking anything
+// else while "All" is active drops "All".
+export function toggleYumeTypeGive(values: string[], opt: string): string[] {
+  if (opt === ALL_YUME_TYPES) {
+    return values.includes(ALL_YUME_TYPES) ? [] : [ALL_YUME_TYPES];
+  }
+  return toggle(values, opt).filter((v) => v !== ALL_YUME_TYPES);
 }
 
 // Merges the checklist selection + custom "Other" text back into the
@@ -190,6 +204,8 @@ export function CheckboxGroup({
   withOther,
   otherValue,
   onOtherChange,
+  disabledValues,
+  toggleOption,
 }: {
   options: string[];
   values: string[];
@@ -197,27 +213,41 @@ export function CheckboxGroup({
   withOther?: boolean;
   otherValue?: string;
   onOtherChange?: (v: string) => void;
+  disabledValues?: string[];
+  toggleOption?: (values: string[], opt: string) => string[];
 }) {
+  const doToggle = toggleOption ?? toggle;
+  const otherDisabled = disabledValues?.includes(OTHER) ?? false;
   return (
     <div className="grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-3">
-      {options.map((opt) => (
-        <label key={opt} className="flex items-center gap-3 text-sm text-gray-700">
-          <input
-            type="checkbox"
-            checked={values.includes(opt)}
-            onChange={() => onChange(toggle(values, opt))}
-            className="h-4 w-4 accent-teal-500"
-          />
-          {opt}
-        </label>
-      ))}
+      {options.map((opt) => {
+        const disabled = disabledValues?.includes(opt) ?? false;
+        return (
+          <label
+            key={opt}
+            className={`flex items-center gap-3 text-sm ${disabled ? "text-gray-300" : "text-gray-700"}`}
+          >
+            <input
+              type="checkbox"
+              checked={values.includes(opt)}
+              disabled={disabled}
+              onChange={() => onChange(doToggle(values, opt))}
+              className="h-4 w-4 accent-teal-500 disabled:opacity-40"
+            />
+            {opt}
+          </label>
+        );
+      })}
       {withOther && (
-        <label className="col-span-2 flex items-center gap-3 text-sm text-gray-700 sm:col-span-3">
+        <label
+          className={`col-span-2 flex items-center gap-3 text-sm sm:col-span-3 ${otherDisabled ? "text-gray-300" : "text-gray-700"}`}
+        >
           <input
             type="checkbox"
             checked={values.includes(OTHER)}
-            onChange={() => onChange(toggle(values, OTHER))}
-            className="h-4 w-4 accent-teal-500"
+            disabled={otherDisabled}
+            onChange={() => onChange(doToggle(values, OTHER))}
+            className="h-4 w-4 accent-teal-500 disabled:opacity-40"
           />
           {OTHER}
           {values.includes(OTHER) && (

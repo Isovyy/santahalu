@@ -20,6 +20,14 @@ export async function POST(
     return NextResponse.json({ error: "Link tidak valid." }, { status: 404 });
   }
 
+  const run = await db.orm.public.MatchRun.first({ id: match.matchRunId });
+  if (run?.confirmationClosedAt) {
+    return NextResponse.json(
+      { error: "Konfirmasi untuk matching ini sudah ditutup." },
+      { status: 403 },
+    );
+  }
+
   if (body.action === "confirm") {
     await db.orm.public.Match.where({ id: match.id }).update({
       confirmedAt: Temporal.Now.instant(),

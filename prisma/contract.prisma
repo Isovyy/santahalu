@@ -45,6 +45,10 @@ model MatchRun {
   matchedPairs      Int
   matches           Match[]
 
+  // Manually set by an admin to close /confirm/[token] for every match in
+  // this run (no more confirms or reports accepted). Null means still open.
+  confirmationClosedAt DateTime?
+
   @@map("MatchRun")
 }
 

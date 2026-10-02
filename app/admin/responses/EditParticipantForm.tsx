@@ -8,9 +8,12 @@ import {
   CONTENT_TYPE_OPTIONS,
   LANGUAGE_OPTIONS,
   YUME_TYPE_OPTIONS,
+  YUME_TYPE_GIVE_OPTIONS,
+  ALL_YUME_TYPES,
   showsYumeTypeReceive,
   splitYumeTypeGive,
   joinYumeTypeGive,
+  toggleYumeTypeGive,
   splitYumeTypeReceive,
   OTHER,
   splitMulti,
@@ -182,14 +185,18 @@ export default function EditParticipantForm({
         </Field>
       )}
 
-      <Field label="Tipe yume yang bersedia kamu terima">
+      <Field label="Tipe yumeship yang bersedia kamu terima">
         <CheckboxGroup
-          options={YUME_TYPE_OPTIONS}
+          options={YUME_TYPE_GIVE_OPTIONS}
           values={yumeTypeGive}
           onChange={setYumeTypeGive}
+          toggleOption={toggleYumeTypeGive}
           withOther
           otherValue={yumeTypeGiveOther}
           onOtherChange={setYumeTypeGiveOther}
+          disabledValues={
+            yumeTypeGive.includes(ALL_YUME_TYPES) ? [...YUME_TYPE_OPTIONS, OTHER] : []
+          }
         />
       </Field>
 

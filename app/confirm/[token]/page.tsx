@@ -13,8 +13,11 @@ export default async function ConfirmPage({
 
   const match = await db.orm.public.Match
     .include("receiver")
+    .include("matchRun")
     .first({ confirmToken: token });
   if (!match) notFound();
+
+  const closed = Boolean(match.matchRun.confirmationClosedAt);
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col justify-center px-4 py-10">
@@ -24,19 +27,28 @@ export default async function ConfirmPage({
           Kamu akan membuatkan hadiah untuk fandom <strong>{match.receiver.fandomYume}</strong>,
           oshi <strong>{match.receiver.oshiName}</strong>.
         </p>
-        <p className="mt-1 text-sm text-gray-500">
-          Kalau sudah sesuai, konfirmasi di bawah. Kalau ada masalah (dapat doubles, fandom
-          tidak sesuai, dll), laporkan supaya admin bisa reshuffle sebelum kamu mulai membuat
-          hadiah.
-        </p>
-        <div className="mt-4">
-          <ConfirmActions
-            token={token}
-            initialConfirmedAt={match.confirmedAt ? match.confirmedAt.toString() : null}
-            initialReportedAt={match.reportedAt ? match.reportedAt.toString() : null}
-            initialReportNote={match.reportNote}
-          />
-        </div>
+        {closed ? (
+          <p className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700">
+            Konfirmasi untuk matching ini sudah ditutup. Kalau masih ada masalah, hubungi admin
+            langsung.
+          </p>
+        ) : (
+          <>
+            <p className="mt-1 text-sm text-gray-500">
+              Kalau sudah sesuai, konfirmasi di bawah. Kalau ada masalah (dapat doubles, fandom
+              tidak sesuai, dll), laporkan supaya admin bisa reshuffle sebelum kamu mulai membuat
+              hadiah.
+            </p>
+            <div className="mt-4">
+              <ConfirmActions
+                token={token}
+                initialConfirmedAt={match.confirmedAt ? match.confirmedAt.toString() : null}
+                initialReportedAt={match.reportedAt ? match.reportedAt.toString() : null}
+                initialReportNote={match.reportNote}
+              />
+            </div>
+          </>
+        )}
       </div>
     </main>
   );
