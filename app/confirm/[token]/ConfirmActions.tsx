@@ -71,7 +71,7 @@ export default function ConfirmActions({
           onClick={() => setShowReportForm(true)}
           className="text-sm text-gray-500 hover:underline"
         >
-          Ternyata ada masalah? Laporkan di sini
+          Ternyata ada masalah? Minta reshuffle di sini
         </button>
         {showReportForm && (
           <ReportForm
@@ -120,7 +120,7 @@ export default function ConfirmActions({
           onClick={() => setShowReportForm((v) => !v)}
           className="rounded-lg border border-teal-200 px-4 py-2 text-sm text-gray-700 hover:bg-teal-50"
         >
-          Laporkan masalah
+          Request Reshuffle
         </button>
       </div>
       {showReportForm && (
