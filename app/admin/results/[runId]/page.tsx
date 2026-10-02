@@ -30,7 +30,7 @@ export default async function ResultsPage({
         Results: {run.createdAt.toLocaleString()}
       </h1>
 
-      <section className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-5">
+      <section className="mt-6 grid grid-cols-3 gap-4 sm:grid-cols-5">
         <Stat label="Participants (run)" value={run.totalParticipants} />
         <Stat label="Participants (now)" value={totalCurrentParticipants} />
         <Stat label="Matched pairs" value={run.matchedPairs} />
@@ -41,7 +41,7 @@ export default async function ResultsPage({
         <p className="mt-2 text-sm text-gray-400">Seed: {run.seed}</p>
       )}
 
-      <div className="mt-6 flex gap-3">
+      <div className="mt-6 flex flex-wrap gap-3">
         <a
           href={`/api/admin/export/${run.id}/all`}
           className="rounded-lg border border-teal-200 px-4 py-2 text-sm text-gray-700 hover:bg-teal-50"
@@ -75,7 +75,7 @@ export default async function ResultsPage({
         Columns show the values matching was based on, as giver &rarr; receiver, so you can
         eyeball why a pairing happened. Drag a column&apos;s right edge to resize it.
       </p>
-      <div className="mt-3">
+      <div className="mt-3 -mx-4 sm:mx-0">
         <MatchedPairsTable rows={matchedRows} />
       </div>
 

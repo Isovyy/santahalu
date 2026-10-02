@@ -133,7 +133,7 @@ export default function MatchedPairsTable({ rows }: { rows: ResultRow[] }) {
     <div className="space-y-3">
       <div className="overflow-x-auto rounded-2xl border border-teal-100 bg-white shadow-sm">
         <table
-          className="divide-y divide-teal-100 text-sm"
+          className="divide-y divide-teal-100 text-xs"
           style={{ tableLayout: "fixed", width: totalWidth }}
         >
           <thead className="bg-teal-50 text-teal-600">
@@ -142,7 +142,7 @@ export default function MatchedPairsTable({ rows }: { rows: ResultRow[] }) {
                 <th
                   key={col.label}
                   style={{ width: widths[i], minWidth: widths[i], maxWidth: widths[i] }}
-                  className="relative select-none overflow-hidden px-4 py-2 text-left font-medium"
+                  className="relative select-none overflow-hidden px-2 py-1.5 text-left font-medium"
                 >
                   <span className="block truncate pr-2">{col.label}</span>
                   <span
@@ -167,7 +167,7 @@ export default function MatchedPairsTable({ rows }: { rows: ResultRow[] }) {
                     <td
                       key={col.label}
                       style={{ width: widths[ci], minWidth: widths[ci], maxWidth: widths[ci] }}
-                      className={col.wrap ? "break-words px-4 py-2" : "truncate px-4 py-2"}
+                      className={col.wrap ? "break-words px-2 py-1.5" : "truncate px-2 py-1.5"}
                       title={!col.wrap && typeof content === "string" ? content : undefined}
                     >
                       {content}
@@ -178,7 +178,7 @@ export default function MatchedPairsTable({ rows }: { rows: ResultRow[] }) {
             ))}
             {rows.length === 0 && (
               <tr>
-                <td colSpan={COLUMNS.length} className="px-4 py-6 text-center text-gray-400">
+                <td colSpan={COLUMNS.length} className="px-2 py-6 text-center text-gray-400">
                   No matched pairs.
                 </td>
               </tr>
