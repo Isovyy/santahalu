@@ -46,9 +46,7 @@ export default function EditParticipantForm({
   const [fandomYume, setFandomYume] = useState(row.fandomYume);
   const initialYumeTypeGive = splitYumeTypeGive(row.yumeTypeGive);
   const [yumeTypeGive, setYumeTypeGive] = useState(initialYumeTypeGive.yumeTypeGive);
-  const [yumeTypeGiveOther, setYumeTypeGiveOther] = useState(
-    initialYumeTypeGive.yumeTypeGiveOther,
-  );
+  const yumeTypeGiveOther = initialYumeTypeGive.yumeTypeGiveOther;
   const initialYumeTypeReceive = splitYumeTypeReceive(row.yumeTypeReceive);
   const [yumeTypeReceive, setYumeTypeReceive] = useState(initialYumeTypeReceive.yumeTypeReceive);
   const [yumeTypeReceiveOther, setYumeTypeReceiveOther] = useState(
@@ -185,18 +183,13 @@ export default function EditParticipantForm({
         </Field>
       )}
 
-      <Field label="Tipe yumeship yang bersedia kamu terima">
+      <Field label="Tipe yumeship yang bersedia kamu buat">
         <CheckboxGroup
           options={YUME_TYPE_GIVE_OPTIONS}
           values={yumeTypeGive}
           onChange={setYumeTypeGive}
           toggleOption={toggleYumeTypeGive}
-          withOther
-          otherValue={yumeTypeGiveOther}
-          onOtherChange={setYumeTypeGiveOther}
-          disabledValues={
-            yumeTypeGive.includes(ALL_YUME_TYPES) ? [...YUME_TYPE_OPTIONS, OTHER] : []
-          }
+          disabledValues={yumeTypeGive.includes(ALL_YUME_TYPES) ? [...YUME_TYPE_OPTIONS] : []}
         />
       </Field>
 

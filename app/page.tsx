@@ -250,11 +250,6 @@ export default function RegisterPage() {
       setStatus("error");
       return;
     }
-    if (form.yumeTypeGive.includes(OTHER) && !form.yumeTypeGiveOther.trim()) {
-      setError("Isi tipe yume yang kamu maksud.");
-      setStatus("error");
-      return;
-    }
     const showYumeType2 = showsYumeTypeReceive(form.relationshipType);
     if (showYumeType2 && !form.yumeTypeReceive) {
       setError("Pilih tipe yumeship (2).");
@@ -536,13 +531,8 @@ export default function RegisterPage() {
             values={form.yumeTypeGive}
             onChange={(v) => update("yumeTypeGive", v)}
             toggleOption={toggleYumeTypeGive}
-            withOther
-            otherValue={form.yumeTypeGiveOther}
-            onOtherChange={(v) => update("yumeTypeGiveOther", v)}
             disabledValues={
-              form.yumeTypeGive.includes(ALL_YUME_TYPES)
-                ? [...YUME_TYPE_OPTIONS, OTHER]
-                : []
+              form.yumeTypeGive.includes(ALL_YUME_TYPES) ? [...YUME_TYPE_OPTIONS] : []
             }
           />
         </Field>
@@ -624,8 +614,8 @@ export default function RegisterPage() {
         </Field>
 
         <Field
-          label="Karakter yang ingin dihindari"
-          hint="Opsional. Karakter dari fandom tertentu yang tidak ingin kamu buatkan hadiah. Isi fandom dan nama karakter, lalu klik Tambah (bisa lebih dari satu)."
+          label="Karakter/Fandom yang ingin dihindari"
+          hint="Opsional. Karakter atau fandom tertentu yang tidak ingin kamu buatkan hadiah. Isi fandom dan nama karakter, lalu klik Tambah (bisa lebih dari satu)."
         >
           <AvoidListInput
             values={form.avoidList}
