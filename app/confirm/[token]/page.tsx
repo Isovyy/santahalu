@@ -36,8 +36,7 @@ export default async function ConfirmPage({
           <>
             <p className="mt-1 text-sm text-gray-500">
               Kalau sudah sesuai, konfirmasi di bawah. Kalau ada masalah (dapat doubles, fandom
-              tidak sesuai, dll), laporkan supaya admin bisa reshuffle sebelum kamu mulai membuat
-              hadiah.
+              tidak sesuai, dll), mohon minta reshuffle.
             </p>
             <div className="mt-4">
               <ConfirmActions
