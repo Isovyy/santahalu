@@ -513,17 +513,6 @@ export default function RegisterPage() {
           />
         </Field>
 
-        <Field label="Tipe yume yang bersedia kamu terima" required hint="Centang semua yang termasuk">
-          <CheckboxGroup
-            options={YUME_TYPE_OPTIONS}
-            values={form.yumeTypeGive}
-            onChange={(v) => update("yumeTypeGive", v)}
-            withOther
-            otherValue={form.yumeTypeGiveOther}
-            onOtherChange={(v) => update("yumeTypeGiveOther", v)}
-          />
-        </Field>
-
         {showsYumeTypeReceive(form.relationshipType) && (
           <Field label="Tipe Yumeship (2)" required>
             <RadioGroup
@@ -537,6 +526,17 @@ export default function RegisterPage() {
             />
           </Field>
         )}
+
+        <Field label="Tipe yume yang bersedia kamu terima" required hint="Centang semua yang termasuk">
+          <CheckboxGroup
+            options={YUME_TYPE_OPTIONS}
+            values={form.yumeTypeGive}
+            onChange={(v) => update("yumeTypeGive", v)}
+            withOther
+            otherValue={form.yumeTypeGiveOther}
+            onOtherChange={(v) => update("yumeTypeGiveOther", v)}
+          />
+        </Field>
 
         <Field label="Karya yang kamu beri berupa" required hint="Centang semua yang termasuk">
           <CheckboxGroup

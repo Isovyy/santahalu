@@ -168,17 +168,6 @@ export default function EditParticipantForm({
         />
       </Field>
 
-      <Field label="Tipe yume yang bersedia kamu terima">
-        <CheckboxGroup
-          options={YUME_TYPE_OPTIONS}
-          values={yumeTypeGive}
-          onChange={setYumeTypeGive}
-          withOther
-          otherValue={yumeTypeGiveOther}
-          onOtherChange={setYumeTypeGiveOther}
-        />
-      </Field>
-
       {showsYumeTypeReceive(relationshipType) && (
         <Field label="Tipe Yumeship (2)">
           <RadioGroup
@@ -192,6 +181,17 @@ export default function EditParticipantForm({
           />
         </Field>
       )}
+
+      <Field label="Tipe yume yang bersedia kamu terima">
+        <CheckboxGroup
+          options={YUME_TYPE_OPTIONS}
+          values={yumeTypeGive}
+          onChange={setYumeTypeGive}
+          withOther
+          otherValue={yumeTypeGiveOther}
+          onOtherChange={setYumeTypeGiveOther}
+        />
+      </Field>
 
       <Field label="Karya yang kamu beri berupa" required>
         <CheckboxGroup
