@@ -10,7 +10,26 @@ export { FANDOM_ALL };
 export const RELATIONSHIP_OPTIONS = ["Romantic", "Platonic", "Queerplatonic"];
 export const CONTENT_TYPE_OPTIONS = ["Art", "Writing"];
 export const LANGUAGE_OPTIONS = ["Indonesia", "English"];
+export const YUME_TYPE_RECEIVE_OPTIONS = ["HL", "GL", "BL"];
 export const OTHER = "Yang lain";
+
+// "Yume type" (HL/GL/BL) only applies to ships with a romantic dimension.
+export function showsYumeTypeReceive(relationshipType: string): boolean {
+  return relationshipType === "Romantic" || relationshipType === "Queerplatonic";
+}
+
+// Splits a stored yumeTypeReceive value back into the radio selection plus
+// its free-text "Other" value, for prefilling an edit form.
+export function splitYumeTypeReceive(
+  value: string | null | undefined,
+): { yumeTypeReceive: string; yumeTypeReceiveOther: string } {
+  const v = value ?? "";
+  if (!v) return { yumeTypeReceive: "", yumeTypeReceiveOther: "" };
+  if ((YUME_TYPE_RECEIVE_OPTIONS as string[]).includes(v)) {
+    return { yumeTypeReceive: v, yumeTypeReceiveOther: "" };
+  }
+  return { yumeTypeReceive: OTHER, yumeTypeReceiveOther: v };
+}
 
 export const ANY_FANDOM = "Apa saja";
 

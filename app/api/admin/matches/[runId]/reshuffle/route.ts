@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { matchBipartite } from "@/lib/matching";
+import { matchBipartite, canGiveTo } from "@/lib/matching";
 
 export async function POST(
   req: NextRequest,
@@ -53,10 +53,23 @@ export async function POST(
     newReceiverOshiName: string;
     newReceiverFandomYume: string;
   }[] = [];
+  const blocked: { giverTwt: string; wouldBeReceiverTwt: string }[] = [];
 
   for (const [giverIdx, receiverIdx] of pairs) {
     const giver = givers[giverIdx];
     const newReceiver = receivers[receiverIdx];
+
+    // Belt-and-suspenders: matchBipartite only ever proposes pairs that
+    // already pass canGiveTo (same-oshi, language, fandom, avoid list), so
+    // this should never trip. If it ever does, refuse to write the pairing
+    // rather than trust a result that contradicts the rules it's supposed
+    // to have already checked.
+    if (!canGiveTo(giver, newReceiver)) {
+      console.error("reshuffle produced a rule-violating pair", giver.id, newReceiver.id);
+      blocked.push({ giverTwt: giver.twtUser, wouldBeReceiverTwt: newReceiver.twtUser });
+      continue;
+    }
+
     const row = selected.find((m) => m.giverId === giver.id);
     if (!row) continue;
 
@@ -94,5 +107,7 @@ export async function POST(
     unmatched: stats.unmatchedGivers,
     resolved,
     unresolved,
+    blocked,
+    rulesVerified: true,
   });
 }

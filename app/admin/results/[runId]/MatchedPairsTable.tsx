@@ -78,23 +78,36 @@ export default function MatchedPairsTable({ rows }: { rows: ResultRow[] }) {
   useEffect(() => {
     if (!isDragging) return;
 
-    function onMouseMove(e: MouseEvent) {
+    function resizeTo(clientX: number) {
       if (!drag.current) return;
       const { index, startX, startWidth } = drag.current;
-      const next = Math.max(MIN_WIDTH, startWidth + (e.clientX - startX));
+      const next = Math.max(MIN_WIDTH, startWidth + (clientX - startX));
       setWidths((w) => w.map((width, i) => (i === index ? next : width)));
     }
 
-    function onMouseUp() {
+    function onMouseMove(e: MouseEvent) {
+      resizeTo(e.clientX);
+    }
+    function onTouchMove(e: TouchEvent) {
+      if (e.touches.length !== 1) return;
+      resizeTo(e.touches[0].clientX);
+    }
+    function stopDrag() {
       drag.current = null;
       setIsDragging(false);
     }
 
     window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mouseup", onMouseUp);
+    window.addEventListener("mouseup", stopDrag);
+    window.addEventListener("touchmove", onTouchMove);
+    window.addEventListener("touchend", stopDrag);
+    window.addEventListener("touchcancel", stopDrag);
     return () => {
       window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mouseup", onMouseUp);
+      window.removeEventListener("mouseup", stopDrag);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", stopDrag);
+      window.removeEventListener("touchcancel", stopDrag);
     };
   }, [isDragging]);
 
@@ -102,6 +115,14 @@ export default function MatchedPairsTable({ rows }: { rows: ResultRow[] }) {
     return (e: React.MouseEvent) => {
       e.preventDefault();
       drag.current = { index, startX: e.clientX, startWidth: widths[index] };
+      setIsDragging(true);
+    };
+  }
+
+  function startResizeTouch(index: number) {
+    return (e: React.TouchEvent) => {
+      if (e.touches.length !== 1) return;
+      drag.current = { index, startX: e.touches[0].clientX, startWidth: widths[index] };
       setIsDragging(true);
     };
   }
@@ -126,10 +147,12 @@ export default function MatchedPairsTable({ rows }: { rows: ResultRow[] }) {
                   <span className="block truncate pr-2">{col.label}</span>
                   <span
                     onMouseDown={startResize(i)}
+                    onTouchStart={startResizeTouch(i)}
                     role="separator"
                     aria-orientation="vertical"
                     title="Drag to resize"
-                    className="absolute right-0 top-0 z-10 h-full w-2 cursor-col-resize hover:bg-teal-300 active:bg-teal-400"
+                    style={{ touchAction: "none" }}
+                    className="absolute right-0 top-0 z-10 h-full w-4 cursor-col-resize hover:bg-teal-300 active:bg-teal-400"
                   />
                 </th>
               ))}

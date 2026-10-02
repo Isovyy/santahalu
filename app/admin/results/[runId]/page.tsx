@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getMatchRunResults } from "@/lib/results";
 import { formatAvoidList } from "@/lib/avoidList";
 import MatchedPairsTable from "./MatchedPairsTable";
+import DeleteMatchRun from "./DeleteMatchRun";
 
 export const dynamic = "force-dynamic";
 
@@ -64,6 +65,7 @@ export default async function ResultsPage({
         >
           Reshuffle pasangan
         </Link>
+        <DeleteMatchRun runId={run.id} />
       </div>
 
       <h2 className="mt-10 text-lg font-medium text-gray-800">Matched pairs</h2>

@@ -119,6 +119,58 @@ describe("canGiveTo", () => {
     expect(canGiveTo(giver, receiver)).toBe(false);
   });
 
+  it("blocks a giver whose own yumeship type doesn't match a Romantic receiver's", () => {
+    const giver = participant({ id: "g", yumeTypeGive: "All", yumeTypeReceive: "GL" });
+    const receiver = participant({
+      id: "r",
+      relationshipType: "Romantic",
+      yumeTypeReceive: "BL",
+    });
+    expect(canGiveTo(giver, receiver)).toBe(false);
+  });
+
+  it("allows a giver whose own yumeship type matches a Romantic receiver's", () => {
+    const giver = participant({ id: "g", yumeTypeGive: "All", yumeTypeReceive: "BL" });
+    const receiver = participant({
+      id: "r",
+      relationshipType: "Romantic",
+      yumeTypeReceive: "BL",
+    });
+    expect(canGiveTo(giver, receiver)).toBe(true);
+  });
+
+  it("applies the yumeship-type match for Queerplatonic too, not just Romantic", () => {
+    const giver = participant({ id: "g", yumeTypeGive: "All", yumeTypeReceive: "GL" });
+    const receiver = participant({
+      id: "r",
+      relationshipType: "Queerplatonic",
+      yumeTypeReceive: "BL",
+    });
+    expect(canGiveTo(giver, receiver)).toBe(false);
+  });
+
+  it("does not apply the yumeship-type match when the receiver's ship is Platonic", () => {
+    const giver = participant({ id: "g", yumeTypeGive: "All", yumeTypeReceive: "GL" });
+    const receiver = participant({
+      id: "r",
+      relationshipType: "Platonic",
+      yumeTypeReceive: "BL",
+    });
+    expect(canGiveTo(giver, receiver)).toBe(true);
+  });
+
+  it("bypasses the yumeship-type match when either side hasn't set one (legacy data)", () => {
+    const giverMissing = participant({ id: "g1", yumeTypeGive: "All", yumeTypeReceive: null });
+    const giverSet = participant({ id: "g2", yumeTypeGive: "All", yumeTypeReceive: "GL" });
+    const receiverRomanticNoType = participant({
+      id: "r",
+      relationshipType: "Romantic",
+      yumeTypeReceive: null,
+    });
+    expect(canGiveTo(giverMissing, receiverRomanticNoType)).toBe(true);
+    expect(canGiveTo(giverSet, receiverRomanticNoType)).toBe(true);
+  });
+
   it("returns false when receiver has no fandom_yume at all", () => {
     const giver = participant({ id: "g", fandomGive: "Apa saja" });
     const receiver = participant({ id: "r", fandomYume: "" });

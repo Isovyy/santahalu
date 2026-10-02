@@ -2,6 +2,7 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import RunMatchingForm from "./RunMatchingForm";
 import LogoutButton from "./LogoutButton";
+import DeleteMatchRun from "./results/[runId]/DeleteMatchRun";
 
 export const dynamic = "force-dynamic";
 
@@ -69,9 +70,12 @@ export default async function AdminDashboard() {
                     {run.seed !== null ? `, seed ${run.seed}` : ""})
                   </span>
                 </div>
-                <Link href={`/admin/results/${run.id}`} className="text-teal-500 hover:underline">
-                  View results
-                </Link>
+                <div className="flex items-center gap-3">
+                  <Link href={`/admin/results/${run.id}`} className="text-teal-500 hover:underline">
+                    View results
+                  </Link>
+                  <DeleteMatchRun runId={run.id} />
+                </div>
               </li>
             ))}
           </ul>

@@ -13,6 +13,7 @@ export interface MatchParticipant {
   languageReceive?: string | null;
   yumeTypeGive?: string | null;
   yumeTypeReceive?: string | null;
+  relationshipType?: string | null;
   contentType: string;
   // "Character | Fandom" entries separated by ";", characters this giver does not want to make gifts for.
   avoidList?: string | null;
@@ -167,7 +168,25 @@ export function canGiveTo(giver: MatchParticipant, receiver: MatchParticipant): 
     }
   }
 
-  return fandomOk && langOk && yumeOk;
+  // Yumeship type (HL/GL/BL, "yume yang bersedia diterima") only matters
+  // for ships with a romantic dimension. When it does, the giver's own
+  // stated yumeship type must match what the receiver's ship actually is —
+  // used as a stand-in for "am I comfortable creating this kind of ship
+  // dynamic", since there's no separate field asking that directly. Missing
+  // data on either side (participants registered before this field
+  // existed) bypasses the check rather than blocking the match, so it only
+  // applies going forward.
+  const RELATIONSHIP_NEEDS_YUME_TYPE = new Set(["romantic", "queerplatonic"]);
+  let yumeTypeMatchOk = true;
+  if (RELATIONSHIP_NEEDS_YUME_TYPE.has(normalize(receiver.relationshipType))) {
+    const giverYumeType = normalize(giver.yumeTypeReceive);
+    const recvYumeType = normalize(receiver.yumeTypeReceive);
+    if (giverYumeType && recvYumeType) {
+      yumeTypeMatchOk = giverYumeType === recvYumeType;
+    }
+  }
+
+  return fandomOk && langOk && yumeOk && yumeTypeMatchOk;
 }
 
 function seedRandom(seed: number): () => number {

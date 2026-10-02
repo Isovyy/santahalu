@@ -7,6 +7,10 @@ import {
   RELATIONSHIP_OPTIONS,
   CONTENT_TYPE_OPTIONS,
   LANGUAGE_OPTIONS,
+  YUME_TYPE_RECEIVE_OPTIONS,
+  showsYumeTypeReceive,
+  splitYumeTypeReceive,
+  OTHER,
   splitMulti,
   parseAvoidListValue,
   inputClass,
@@ -35,6 +39,11 @@ export default function EditParticipantForm({
   const [oshiName, setOshiName] = useState(row.oshiName);
   const [relationshipType, setRelationshipType] = useState(row.relationshipType);
   const [fandomYume, setFandomYume] = useState(row.fandomYume);
+  const initialYumeType = splitYumeTypeReceive(row.yumeTypeReceive);
+  const [yumeTypeReceive, setYumeTypeReceive] = useState(initialYumeType.yumeTypeReceive);
+  const [yumeTypeReceiveOther, setYumeTypeReceiveOther] = useState(
+    initialYumeType.yumeTypeReceiveOther,
+  );
   const [contentType, setContentType] = useState(splitMulti(row.contentType));
   const [languageReceive, setLanguageReceive] = useState(splitMulti(row.languageReceive));
   const [languageGive, setLanguageGive] = useState(splitMulti(row.languageGive));
@@ -51,6 +60,13 @@ export default function EditParticipantForm({
     setSaving(true);
     setError(null);
 
+    const showYumeType = showsYumeTypeReceive(relationshipType);
+    const yumeTypeReceiveFinal = !showYumeType
+      ? ""
+      : yumeTypeReceive === OTHER
+        ? yumeTypeReceiveOther.trim()
+        : yumeTypeReceive;
+
     const payload = {
       email,
       twtUser,
@@ -58,6 +74,7 @@ export default function EditParticipantForm({
       oshiName,
       relationshipType,
       fandomYume,
+      yumeTypeReceive: yumeTypeReceiveFinal,
       contentType: contentType.join(", "),
       languageReceive: languageReceive.join(", "),
       languageGive: languageGive.join(", "),
@@ -142,6 +159,20 @@ export default function EditParticipantForm({
           onChange={setRelationshipType}
         />
       </Field>
+
+      {showsYumeTypeReceive(relationshipType) && (
+        <Field label="Yume type yang kamu bersedia terima">
+          <RadioGroup
+            name="edit-yumeTypeReceive"
+            options={YUME_TYPE_RECEIVE_OPTIONS}
+            value={yumeTypeReceive}
+            onChange={setYumeTypeReceive}
+            withOther
+            otherValue={yumeTypeReceiveOther}
+            onOtherChange={setYumeTypeReceiveOther}
+          />
+        </Field>
+      )}
 
       <Field label="Karya yang kamu beri berupa" required>
         <CheckboxGroup
