@@ -95,3 +95,15 @@ model Match {
   @@unique([matchRunId, giverId])
   @@map("Match")
 }
+
+// Admin-editable overrides for the public registration form's own wording
+// (field labels, hints, rules text, option labels). A missing row means
+// "use the hardcoded default" (see lib/formCopy.ts) — this table only ever
+// holds the strings an admin has actually changed.
+model FormCopy {
+  key       String   @id
+  value     String
+  updatedAt temporal.updatedAt()
+
+  @@map("FormCopy")
+}

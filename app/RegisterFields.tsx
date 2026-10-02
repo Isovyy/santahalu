@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { OSHI_DATA } from "@/lib/oshi-data";
 import { AVOID_WHOLE_FANDOM } from "@/lib/avoidList";
 import { FANDOM_ALL } from "@/lib/fandoms";
+import { matchesCharacterName } from "@/lib/characterAliases";
 
 export { FANDOM_ALL };
 
@@ -148,6 +149,8 @@ export function RadioGroup({
   withOther,
   otherValue,
   onOtherChange,
+  renderLabel,
+  otherLabel,
 }: {
   name: string;
   options: string[];
@@ -156,6 +159,8 @@ export function RadioGroup({
   withOther?: boolean;
   otherValue?: string;
   onOtherChange?: (v: string) => void;
+  renderLabel?: (opt: string) => React.ReactNode;
+  otherLabel?: React.ReactNode;
 }) {
   return (
     <div className="space-y-3">
@@ -169,7 +174,7 @@ export function RadioGroup({
             onChange={(e) => onChange(e.target.value)}
             className="h-4 w-4 accent-teal-500"
           />
-          {opt}
+          {renderLabel ? renderLabel(opt) : opt}
         </label>
       ))}
       {withOther && (
@@ -182,7 +187,7 @@ export function RadioGroup({
             onChange={(e) => onChange(e.target.value)}
             className="h-4 w-4 accent-teal-500"
           />
-          {OTHER}
+          {otherLabel ?? OTHER}
           {value === OTHER && (
             <input
               type="text"
@@ -206,6 +211,8 @@ export function CheckboxGroup({
   onOtherChange,
   disabledValues,
   toggleOption,
+  renderLabel,
+  otherLabel,
 }: {
   options: string[];
   values: string[];
@@ -215,6 +222,8 @@ export function CheckboxGroup({
   onOtherChange?: (v: string) => void;
   disabledValues?: string[];
   toggleOption?: (values: string[], opt: string) => string[];
+  renderLabel?: (opt: string) => React.ReactNode;
+  otherLabel?: React.ReactNode;
 }) {
   const doToggle = toggleOption ?? toggle;
   const otherDisabled = disabledValues?.includes(OTHER) ?? false;
@@ -234,7 +243,7 @@ export function CheckboxGroup({
               onChange={() => onChange(doToggle(values, opt))}
               className="h-4 w-4 accent-teal-500 disabled:opacity-40"
             />
-            {opt}
+            {renderLabel ? renderLabel(opt) : opt}
           </label>
         );
       })}
@@ -249,7 +258,7 @@ export function CheckboxGroup({
             onChange={() => onChange(doToggle(values, OTHER))}
             className="h-4 w-4 accent-teal-500 disabled:opacity-40"
           />
-          {OTHER}
+          {otherLabel ?? OTHER}
           {values.includes(OTHER) && (
             <input
               type="text"
@@ -280,11 +289,18 @@ export function AvoidListInput({
   const [fandom, setFandom] = useState("");
   const [wholeFandom, setWholeFandom] = useState(false);
   const [fandomOpen, setFandomOpen] = useState(false);
+  const [characterOpen, setCharacterOpen] = useState(false);
 
   const suggestions = useMemo(() => {
     const selected = OSHI_DATA.find((d) => d.fandom.toLowerCase() === fandom.trim().toLowerCase());
     return selected ? selected.characters : [];
   }, [fandom]);
+
+  const characterQ = character.trim().toLowerCase();
+  const characterResults = useMemo(() => {
+    if (!characterQ) return suggestions;
+    return suggestions.filter((c) => matchesCharacterName(c, characterQ));
+  }, [characterQ, suggestions]);
 
   const fandomQ = fandom.trim().toLowerCase();
   const fandomResults = useMemo(() => {
@@ -392,21 +408,47 @@ export function AvoidListInput({
           )}
         </div>
         {!wholeFandom && (
-          <input
-            type="text"
-            className={inputClass}
-            placeholder="Nama karakter"
-            list="avoid-characters"
-            autoComplete="off"
-            value={character}
-            onChange={(e) => setCharacter(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                add();
-              }
-            }}
-          />
+          <div className="relative">
+            <input
+              type="text"
+              className={inputClass}
+              placeholder="Nama karakter"
+              autoComplete="off"
+              value={character}
+              onChange={(e) => {
+                setCharacter(e.target.value);
+                setCharacterOpen(true);
+              }}
+              onFocus={() => setCharacterOpen(true)}
+              onBlur={() => setCharacterOpen(false)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") setCharacterOpen(false);
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  add();
+                }
+              }}
+            />
+            {characterOpen && characterResults.length > 0 && (
+              <ul className="absolute z-20 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-teal-200 bg-white shadow-lg">
+                {characterResults.map((c) => (
+                  <li key={c}>
+                    <button
+                      type="button"
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => {
+                        setCharacter(c);
+                        setCharacterOpen(false);
+                      }}
+                      className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-teal-50"
+                    >
+                      {c}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         )}
         <button
           type="button"
@@ -417,11 +459,6 @@ export function AvoidListInput({
           Tambah
         </button>
       </div>
-      <datalist id="avoid-characters">
-        {suggestions.map((c) => (
-          <option key={c} value={c} />
-        ))}
-      </datalist>
     </div>
   );
 }
@@ -656,7 +693,7 @@ export function OshiNameSelect({
 
   const results = useMemo(() => {
     if (!q) return [];
-    return suggestions.filter((s) => s.name.toLowerCase().includes(q)).slice(0, 20);
+    return suggestions.filter((s) => matchesCharacterName(s.name, q)).slice(0, 20);
   }, [q, suggestions]);
 
   return (

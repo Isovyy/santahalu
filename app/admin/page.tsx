@@ -37,6 +37,12 @@ export default async function AdminDashboard() {
             >
               Buat folder Drive
             </Link>
+            <Link
+              href="/admin/form-copy"
+              className="inline-block rounded-lg border border-teal-200 px-4 py-2 text-sm text-gray-700 hover:bg-teal-50"
+            >
+              Edit teks formulir
+            </Link>
           </div>
         </section>
 
