@@ -20,9 +20,9 @@ export const FORM_COPY_DEFAULTS = {
   "rules.heading": "#SantaHalu: Secret Santa EVENT RULES",
   "rules.section1.title": "I - Registration",
   "rules.section1.intro":
-    "Kuota pendaftaran 100 orang. Pada saat pendaftaran, harus menyertakan hal hal berikut:",
+    "Kuota pendaftaran 150 orang. Pada saat pendaftaran, harus menyertakan hal hal berikut:",
   "rules.section1.item1":
-    "Referensi oc/sona dan referensi cc/oshi, dynamic yumeship, background yumeship, timeline dan lain-lain SELENGKAP-LENGKAPNYA pada Google Document yang disediakan.",
+    "Referensi oc/sona dan referensi cc/oshi, dynamic yumeship, background yumeship, timeline dan lain-lain SELENGKAP-LENGKAPNYA. Dianjurkan menggunakan Google Document yang disediakan:",
   "rules.section1.item2": "Nama yumeship.",
   "rules.section1.item3":
     "Previous works/karya-karya yumeship yang sudah ada sebagai referensi lebih lanjut (jika ada).",

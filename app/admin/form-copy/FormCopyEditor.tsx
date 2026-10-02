@@ -40,7 +40,11 @@ const SECTIONS: CopySection[] = [
       { key: "rules.heading", label: "Judul" },
       { key: "rules.section1.title", label: "I - Judul bagian" },
       { key: "rules.section1.intro", label: "I - Intro", multiline: true },
-      { key: "rules.section1.item1", label: "I - Item 1", multiline: true },
+      {
+        key: "rules.section1.item1",
+        label: "I - Item 1 (sebelum link Template, link tidak bisa diubah di sini)",
+        multiline: true,
+      },
       { key: "rules.section1.item2", label: "I - Item 2" },
       { key: "rules.section1.item3", label: "I - Item 3", multiline: true },
       { key: "rules.section1.item4", label: "I - Item 4" },

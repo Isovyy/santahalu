@@ -395,7 +395,17 @@ export default function RegisterForm({ copy }: { copy: FormCopy }) {
           <p className="font-medium text-gray-600">{copy["rules.section1.title"]}</p>
           <p className="mt-1">{copy["rules.section1.intro"]}</p>
           <ol className="mt-1 list-decimal space-y-1 pl-5">
-            <li>{copy["rules.section1.item1"]}</li>
+            <li>
+              {copy["rules.section1.item1"]}{" "}
+              <a
+                href="https://docs.google.com/document/d/1o5zuy5-cCCsJ0nJ8IBzfa9jEFkJChwtgqhYvLltMZxg/edit?tab=t.0"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-teal-500 hover:underline"
+              >
+                Template
+              </a>
+            </li>
             <li>{copy["rules.section1.item2"]}</li>
             <li>{copy["rules.section1.item3"]}</li>
             <li>{copy["rules.section1.item4"]}</li>
