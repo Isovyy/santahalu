@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import RunMatchingForm from "./RunMatchingForm";
 import LogoutButton from "./LogoutButton";
 import DeleteMatchRun from "./results/[runId]/DeleteMatchRun";
+import SetActiveButton from "./SetActiveButton";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,7 @@ export default async function AdminDashboard() {
     db.orm.public.Participant.aggregate((a) => ({ total: a.count() })),
     db.orm.public.MatchRun.orderBy((r) => r.createdAt.desc()).limit(20).all(),
   ]);
+  const activeRun = runs.find((r) => r.isActive) ?? null;
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-10 lg:max-w-4xl">
@@ -30,12 +32,6 @@ export default async function AdminDashboard() {
               className="inline-block rounded-lg bg-teal-400 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-500 active:bg-teal-600"
             >
               View responses
-            </Link>
-            <Link
-              href="/admin/drive-folders"
-              className="inline-block rounded-lg border border-teal-200 px-4 py-2 text-sm text-gray-700 hover:bg-teal-50"
-            >
-              Buat folder Drive
             </Link>
             <Link
               href="/admin/form-copy"
@@ -62,19 +58,45 @@ export default async function AdminDashboard() {
       </div>
 
       <section className="mt-6 rounded-2xl border border-teal-100 bg-white shadow-sm p-5">
+        <h2 className="text-lg font-medium text-gray-800">Match run aktif</h2>
+        {activeRun ? (
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-3 text-sm">
+            <div className="text-gray-600">
+              {activeRun.createdAt.toLocaleString()}{" "}
+              <span className="text-gray-400">
+                ({activeRun.matchedPairs}/{activeRun.totalParticipants} matched
+                {activeRun.seed !== null ? `, seed ${activeRun.seed}` : ""})
+              </span>
+            </div>
+            <Link
+              href={`/admin/results/${activeRun.id}`}
+              className="rounded-lg bg-teal-400 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-500"
+            >
+              Lihat hasil
+            </Link>
+          </div>
+        ) : (
+          <p className="mt-2 text-sm text-gray-400">
+            Belum ada run yang ditandai aktif. Pilih salah satu dari Past runs di bawah.
+          </p>
+        )}
+      </section>
+
+      <section className="mt-6 rounded-2xl border border-teal-100 bg-white shadow-sm p-5">
         <h2 className="text-lg font-medium text-gray-800">Past runs</h2>
         {runs.length === 0 ? (
           <p className="mt-2 text-sm text-gray-400">No matching runs yet.</p>
         ) : (
           <ul className="mt-3 divide-y divide-teal-100">
             {runs.map((run) => (
-              <li key={run.id} className="flex items-center justify-between py-2 text-sm">
-                <div className="text-gray-600">
+              <li key={run.id} className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm">
+                <div className="flex items-center gap-2 text-gray-600">
                   {run.createdAt.toLocaleString()}{" "}
                   <span className="text-gray-400">
                     ({run.matchedPairs}/{run.totalParticipants} matched
                     {run.seed !== null ? `, seed ${run.seed}` : ""})
                   </span>
+                  <SetActiveButton runId={run.id} isActive={run.isActive} />
                 </div>
                 <div className="flex items-center gap-3">
                   <Link href={`/admin/results/${run.id}`} className="text-teal-500 hover:underline">

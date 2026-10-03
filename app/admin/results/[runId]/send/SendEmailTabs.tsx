@@ -3,10 +3,11 @@
 import { useState } from "react";
 import type { NotifyRow } from "@/lib/notify";
 import SendMatchEmails from "./SendMatchEmails";
+import CreateReceiverFolders from "./CreateReceiverFolders";
 import SendFolderEmails from "../send-folder/SendFolderEmails";
 import SendReminderEmails from "../send-reminder/SendReminderEmails";
 
-type Tab = "pasangan" | "folder" | "reminder";
+type Tab = "pasangan" | "buatfolder" | "folder" | "reminder";
 
 export default function SendEmailTabs({
   runId,
@@ -24,6 +25,9 @@ export default function SendEmailTabs({
         <TabButton active={tab === "pasangan"} onClick={() => setTab("pasangan")}>
           Kirim email pasangan
         </TabButton>
+        <TabButton active={tab === "buatfolder"} onClick={() => setTab("buatfolder")}>
+          Buat folder
+        </TabButton>
         <TabButton active={tab === "folder"} onClick={() => setTab("folder")}>
           Kirim link folder
         </TabButton>
@@ -33,6 +37,8 @@ export default function SendEmailTabs({
       </div>
 
       {tab === "pasangan" && <SendMatchEmails runId={runId} rows={rows} />}
+
+      {tab === "buatfolder" && <CreateReceiverFolders runId={runId} rows={confirmedRows} />}
 
       {tab === "folder" && (
         <div className="space-y-3">

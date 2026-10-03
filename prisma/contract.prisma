@@ -50,6 +50,11 @@ model MatchRun {
   // this run (no more confirms or reports accepted). Null means still open.
   confirmationClosedAt DateTime?
 
+  // Marks the one run admins are currently working from, since several runs
+  // accumulate over time (reshuffle testing, re-runs). At most one run has
+  // this set at a time — enforced in the API, not the schema.
+  isActive Boolean @default(false)
+
   @@map("MatchRun")
 }
 

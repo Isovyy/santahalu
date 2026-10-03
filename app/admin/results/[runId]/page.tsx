@@ -42,18 +42,6 @@ export default async function ResultsPage({
       )}
 
       <div className="mt-6 flex flex-wrap gap-3">
-        <a
-          href={`/api/admin/export/${run.id}/all`}
-          className="rounded-lg border border-teal-200 px-4 py-2 text-sm text-gray-700 hover:bg-teal-50"
-        >
-          Download results_all.csv
-        </a>
-        <a
-          href={`/api/admin/export/${run.id}/unmatched`}
-          className="rounded-lg border border-teal-200 px-4 py-2 text-sm text-gray-700 hover:bg-teal-50"
-        >
-          Download unmatched.csv
-        </a>
         <Link
           href={`/admin/results/${run.id}/send`}
           className="rounded-lg bg-teal-400 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-500"
@@ -75,6 +63,20 @@ export default async function ResultsPage({
         Columns show the values matching was based on, as giver &rarr; receiver, so you can
         eyeball why a pairing happened. Drag a column&apos;s right edge to resize it.
       </p>
+      <div className="mt-2 flex flex-wrap gap-4 text-sm">
+        <a
+          href={`/api/admin/export/${run.id}/all`}
+          className="text-teal-600 hover:underline"
+        >
+          Download results_all.csv
+        </a>
+        <a
+          href={`/api/admin/export/${run.id}/unmatched`}
+          className="text-teal-600 hover:underline"
+        >
+          Download unmatched.csv
+        </a>
+      </div>
       <div className="mt-3 -mx-4 sm:mx-0">
         <MatchedPairsTable rows={matchedRows} />
       </div>
