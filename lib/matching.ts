@@ -328,3 +328,98 @@ export function matchBipartite(
     },
   };
 }
+
+export interface ChainStep {
+  giverId: string;
+  previousReceiverId: string | null;
+  newReceiverId: string;
+}
+
+// Finds the SHORTEST chain of reassignments that frees up a receiver for
+// `stuckGiverId`, searching the run's full current matching rather than a
+// hand-picked subset. This is the same "bump whoever holds the receiver I
+// want, as long as they can be rerouted" idea as maxBipartiteMatch's
+// tryAugment, but breadth-first instead of depth-first: DFS finds *a*
+// augmenting path, BFS finds the *shortest* one, which is what "break the
+// fewest existing matches" means here.
+//
+// `currentReceiverOfGiver` reflects the run's live state (mutate it between
+// calls when resolving several stuck givers in sequence, so each search
+// sees what the previous one already claimed). Returns null when no chain
+// exists at all, even one that breaks everything reachable.
+export function findMinimalBreakChain(
+  stuckGiverId: string,
+  participants: MatchParticipant[],
+  currentReceiverOfGiver: Map<string, string>,
+  excludePairs: Set<string>
+): ChainStep[] | null {
+  const byId = new Map(participants.map((p) => [p.id, p]));
+  const currentGiverOfReceiver = new Map<string, string>();
+  for (const [giverId, receiverId] of currentReceiverOfGiver) {
+    currentGiverOfReceiver.set(receiverId, giverId);
+  }
+
+  const stuckGiver = byId.get(stuckGiverId);
+  if (!stuckGiver) return null;
+
+  // Parent pointers to reconstruct the path once a free receiver is found:
+  // for each visited giver node, which receiver got them there and which
+  // giver proposed it.
+  const arrivedVia = new Map<string, { fromGiverId: string; receiverId: string }>();
+  const visitedGivers = new Set<string>([stuckGiverId]);
+  const visitedReceivers = new Set<string>();
+  const ownCurrentReceiver = currentReceiverOfGiver.get(stuckGiverId) ?? null;
+  if (ownCurrentReceiver) visitedReceivers.add(ownCurrentReceiver);
+
+  const queue: string[] = [stuckGiverId];
+
+  // Walks parent pointers from the giver who just found a free receiver
+  // back to stuckGiverId, collecting one step per giver along the way. Each
+  // step says "this giver moves from whatever they currently hold to the
+  // receiver the next giver down the chain wanted from them."
+  function buildChain(lastGiverId: string, lastReceiverId: string): ChainStep[] {
+    const steps: ChainStep[] = [];
+    let giverId: string | null = lastGiverId;
+    let receiverId = lastReceiverId;
+    while (giverId) {
+      steps.unshift({
+        giverId,
+        previousReceiverId: currentReceiverOfGiver.get(giverId) ?? null,
+        newReceiverId: receiverId,
+      });
+      const arrival = arrivedVia.get(giverId);
+      if (!arrival) break;
+      receiverId = arrival.receiverId;
+      giverId = arrival.fromGiverId;
+    }
+    return steps;
+  }
+
+  while (queue.length > 0) {
+    const giverId = queue.shift()!;
+    const giver = byId.get(giverId)!;
+
+    for (const receiver of participants) {
+      if (receiver.id === giverId) continue;
+      if (visitedReceivers.has(receiver.id)) continue;
+      if (giverId === stuckGiverId && receiver.id === ownCurrentReceiver) continue;
+      if (excludePairs.has(`${giverId}:${receiver.id}`)) continue;
+      if (!canGiveTo(giver, receiver)) continue;
+
+      visitedReceivers.add(receiver.id);
+      const holder = currentGiverOfReceiver.get(receiver.id);
+
+      if (!holder) {
+        // Free receiver (a "No giver" orphan) — chain complete.
+        return buildChain(giverId, receiver.id);
+      }
+      if (!visitedGivers.has(holder)) {
+        visitedGivers.add(holder);
+        arrivedVia.set(holder, { fromGiverId: giverId, receiverId: receiver.id });
+        queue.push(holder);
+      }
+    }
+  }
+
+  return null;
+}

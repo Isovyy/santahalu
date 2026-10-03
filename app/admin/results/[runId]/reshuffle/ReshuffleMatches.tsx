@@ -30,6 +30,27 @@ interface RemoveResult {
   formerGiverTwt: string | null;
 }
 
+interface AutoStep {
+  giverTwt: string;
+  previousReceiverTwt: string | null;
+  newReceiverTwt: string;
+  newReceiverOshiName: string;
+  newReceiverFandomYume: string;
+  wasConfirmed: boolean;
+}
+
+interface AutoChain {
+  stuckGiverTwt: string;
+  steps: AutoStep[];
+}
+
+interface AutoResult {
+  dryRun: boolean;
+  chains: AutoChain[];
+  unresolvable: string[];
+  blocked: { giverTwt: string; wouldBeReceiverTwt: string }[];
+}
+
 export default function ReshuffleMatches({
   runId,
   rows,
@@ -46,6 +67,10 @@ export default function ReshuffleMatches({
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ReshuffleResult | null>(null);
   const [removeResult, setRemoveResult] = useState<RemoveResult | null>(null);
+  const [autoResult, setAutoResult] = useState<AutoResult | null>(null);
+  const [autoGiverIds, setAutoGiverIds] = useState<string[]>([]);
+  const [autoRunning, setAutoRunning] = useState(false);
+  const [autoError, setAutoError] = useState<string | null>(null);
 
   function toggleOne(id: string) {
     setSelected((prev) => {
@@ -99,6 +124,31 @@ export default function ReshuffleMatches({
       setError("Network error, coba lagi.");
     } finally {
       setRunning(false);
+    }
+  }
+
+  async function runAuto(giverIds: string[], dryRun: boolean) {
+    setAutoRunning(true);
+    setAutoError(null);
+    setAutoGiverIds(giverIds);
+
+    try {
+      const res = await fetch(`/api/admin/matches/${runId}/reshuffle/auto`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ giverIds, dryRun }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setAutoError(data.error || "Gagal mencari solusi otomatis.");
+        return;
+      }
+      setAutoResult(data);
+      if (!dryRun) router.refresh();
+    } catch {
+      setAutoError("Network error, coba lagi.");
+    } finally {
+      setAutoRunning(false);
     }
   }
 
@@ -216,11 +266,86 @@ export default function ReshuffleMatches({
             </>
           )}
           {result.unresolved.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-amber-700">
+                {result.unresolved.length} tidak bisa dipasangkan (tidak ada kandidat yang cocok):{" "}
+                {result.unresolved.map((u) => u.twtUser).join(", ")}. Coba tambahkan lebih banyak
+                pasangan ke pilihan lalu reshuffle lagi, atau cari solusi otomatis di bawah.
+              </p>
+              <button
+                type="button"
+                onClick={() => runAuto(result.unresolved.map((u) => u.id), true)}
+                disabled={autoRunning}
+                className="rounded-lg border border-teal-200 bg-white px-4 py-2 text-sm text-teal-600 hover:bg-teal-50 disabled:opacity-50"
+              >
+                {autoRunning ? "Mencari..." : "Cari solusi otomatis"}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {autoError && <p className="text-sm text-red-500">{autoError}</p>}
+
+      {autoResult && (
+        <div
+          className={`space-y-3 rounded-2xl border p-4 text-sm ${
+            autoResult.dryRun
+              ? "border-amber-200 bg-amber-50 text-amber-700"
+              : "border-teal-100 bg-teal-50 text-teal-700"
+          }`}
+        >
+          <p className="font-medium">
+            {autoResult.dryRun
+              ? "Preview solusi otomatis, belum disimpan."
+              : "Solusi otomatis diterapkan dan tersimpan."}
+          </p>
+
+          {autoResult.chains.length === 0 && autoResult.unresolvable.length === 0 && (
+            <p>Tidak ada yang perlu diselesaikan.</p>
+          )}
+
+          {autoResult.chains.map((chain, i) => (
+            <div key={i} className="rounded-lg bg-white p-3">
+              <p className="font-medium text-gray-700">
+                Solusi untuk {chain.stuckGiverTwt} ({chain.steps.length} langkah):
+              </p>
+              <ul className="mt-2 divide-y divide-teal-100">
+                {chain.steps.map((step, j) => (
+                  <li key={j} className="flex flex-wrap items-center justify-between gap-2 py-2">
+                    <span className="font-medium text-gray-700">{step.giverTwt}</span>
+                    <span className="text-gray-500">
+                      {step.previousReceiverTwt ?? "(belum punya pasangan)"} &rarr;{" "}
+                      <span className="font-medium text-teal-700">{step.newReceiverTwt}</span> (
+                      {step.newReceiverFandomYume} &middot; {step.newReceiverOshiName})
+                    </span>
+                    {step.wasConfirmed && (
+                      <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700">
+                        ⚠ Memutus pasangan yang sudah dikonfirmasi
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+
+          {autoResult.unresolvable.length > 0 && (
             <p className="text-amber-700">
-              {result.unresolved.length} tidak bisa dipasangkan (tidak ada kandidat yang cocok):{" "}
-              {result.unresolved.map((u) => u.twtUser).join(", ")}. Coba tambahkan lebih banyak
-              pasangan ke pilihan lalu reshuffle lagi.
+              Tidak ada solusi sama sekali untuk: {autoResult.unresolvable.join(", ")} &mdash;
+              bahkan dengan membongkar pasangan lain.
             </p>
+          )}
+
+          {autoResult.dryRun && autoResult.chains.length > 0 && (
+            <button
+              type="button"
+              onClick={() => runAuto(autoGiverIds, false)}
+              disabled={autoRunning}
+              className="rounded-lg bg-teal-400 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-500 disabled:opacity-50"
+            >
+              {autoRunning ? "Menerapkan..." : "Terapkan semua"}
+            </button>
           )}
         </div>
       )}

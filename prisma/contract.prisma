@@ -106,7 +106,9 @@ model MatchReshuffleLog {
   matchRunId   String
   matchRun     MatchRun @relation(fields: [matchRunId], references: [id], onDelete: Cascade)
   reshuffledAt temporal.createdAt()
-  seed         Int
+  // Null for an auto-resolved chain (findMinimalBreakChain is deterministic,
+  // not randomized), set for a manual seeded reshuffle.
+  seed         Int?
 
   giverTwt                   String
   previousReceiverTwt        String

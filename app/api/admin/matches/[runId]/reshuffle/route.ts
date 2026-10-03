@@ -29,8 +29,15 @@ export async function POST(
   // A seed makes the shuffle reproducible, so admins can preview a few
   // attempts and re-apply whichever one they liked. No seed given (first
   // preview of a batch) gets a random one, reported back so the UI can pin
-  // it for a follow-up preview or the real apply.
-  const seed = typeof body.seed === "number" && Number.isFinite(body.seed) ? body.seed : Date.now();
+  // it for a follow-up preview or the real apply. Bounded well under 2^31-1
+  // since MatchReshuffleLog.seed is a 32-bit Postgres int — Date.now() would
+  // overflow it.
+  const seed =
+    typeof body.seed === "number" &&
+    Number.isFinite(body.seed) &&
+    Math.abs(body.seed) <= 2_000_000_000
+      ? body.seed
+      : Math.floor(Math.random() * 2_000_000_000);
   const dryRun = body.dryRun === true;
 
   const run = await db.orm.public.MatchRun

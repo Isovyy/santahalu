@@ -74,7 +74,7 @@ export default async function ReshufflePage({
                     ({h.newReceiverFandomYume} &middot; {h.newReceiverOshiName})
                   </span>
                 </td>
-                <td className="px-4 py-2 text-gray-400">{h.seed}</td>
+                <td className="px-4 py-2 text-gray-400">{h.seed ?? "Auto"}</td>
               </tr>
             ))}
             {history.length === 0 && (

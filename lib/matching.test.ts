@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { canGiveTo, matchParticipants, matchBipartite, MatchParticipant } from "./matching";
+import {
+  canGiveTo,
+  matchParticipants,
+  matchBipartite,
+  findMinimalBreakChain,
+  MatchParticipant,
+} from "./matching";
 import { AVOID_WHOLE_FANDOM } from "./avoidList";
 
 function participant(overrides: Partial<MatchParticipant> & { id: string }): MatchParticipant {
@@ -302,5 +308,68 @@ describe("matchParticipants (maximum matching)", () => {
       expect(stats.matchedPairs).toBe(4);
       expect(stats.unmatched).toBe(0);
     }
+  });
+});
+
+describe("findMinimalBreakChain", () => {
+  it("resolves in one step when a free compatible receiver exists directly", () => {
+    const giver = participant({ id: "g", fandomGive: "Apa saja" });
+    const free = participant({ id: "free" });
+    const chain = findMinimalBreakChain("g", [giver, free], new Map(), new Set());
+    expect(chain).toEqual([{ giverId: "g", previousReceiverId: null, newReceiverId: "free" }]);
+  });
+
+  it("chains through one other giver when the direct candidate is taken but reroutable", () => {
+    // g can only reach r1 (fandom-restricted). r1 is currently held by g1,
+    // who (unlike g) accepts anything and can reroute to the free receiver
+    // f once r1 is no longer an option. g and g1 share an oshi so g1 can't
+    // just take over g's own slot as a shortcut around the real chain.
+    const g = participant({ id: "g", oshiName: "same", fandomGive: "Fandom A" });
+    const r1 = participant({ id: "r1", fandomYume: "Fandom A" });
+    const g1 = participant({ id: "g1", oshiName: "same", fandomGive: "Apa saja", fandomYume: "Fandom B" });
+    const f = participant({ id: "f", fandomYume: "Fandom C" });
+
+    const chain = findMinimalBreakChain(
+      "g",
+      [g, r1, g1, f],
+      new Map([["g1", "r1"]]),
+      new Set(),
+    );
+    expect(chain).toEqual([
+      { giverId: "g", previousReceiverId: null, newReceiverId: "r1" },
+      { giverId: "g1", previousReceiverId: "r1", newReceiverId: "f" },
+    ]);
+  });
+
+  it("returns null when truly no chain exists, even one that breaks everything reachable", () => {
+    // g and g1 can only ever give to fandom-A receivers; r1 is the only one
+    // in the pool, and it's already taken by g1 with nowhere else to go.
+    const g = participant({ id: "g", fandomGive: "Fandom A", fandomYume: "Fandom Z" });
+    const r1 = participant({ id: "r1", fandomYume: "Fandom A" });
+    const g1 = participant({ id: "g1", fandomGive: "Fandom A", fandomYume: "Fandom Z" });
+
+    const chain = findMinimalBreakChain("g", [g, r1, g1], new Map([["g1", "r1"]]), new Set());
+    expect(chain).toBeNull();
+  });
+
+  it("respects excludePairs mid-chain, not just on the stuck giver's first hop", () => {
+    // Same shape as the one-break case, but g1's usual escape (f) was
+    // already rejected, so the chain has to route through f2 instead.
+    const g = participant({ id: "g", oshiName: "same", fandomGive: "Fandom A" });
+    const r1 = participant({ id: "r1", fandomYume: "Fandom A" });
+    const g1 = participant({ id: "g1", oshiName: "same", fandomGive: "Apa saja", fandomYume: "Fandom B" });
+    const f = participant({ id: "f", fandomYume: "Fandom C" });
+    const f2 = participant({ id: "f2", fandomYume: "Fandom D" });
+
+    const chain = findMinimalBreakChain(
+      "g",
+      [g, r1, g1, f, f2],
+      new Map([["g1", "r1"]]),
+      new Set(["g1:f"]),
+    );
+    expect(chain).toEqual([
+      { giverId: "g", previousReceiverId: null, newReceiverId: "r1" },
+      { giverId: "g1", previousReceiverId: "r1", newReceiverId: "f2" },
+    ]);
   });
 });
