@@ -155,7 +155,7 @@ export default function SendMatchEmails({
                   <td className="px-4 py-2">
                     {row.reportedAt ? (
                       <span className="text-amber-600" title={row.reportNote ?? undefined}>
-                        Lapor masalah: {row.reportNote}
+                        {row.reportNote}
                       </span>
                     ) : row.confirmedAt ? (
                       <span className="text-teal-600">Dikonfirmasi {formatSentAt(row.confirmedAt)}</span>
