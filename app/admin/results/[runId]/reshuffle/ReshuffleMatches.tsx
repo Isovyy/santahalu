@@ -22,6 +22,12 @@ interface ReshuffleResult {
   rulesVerified: boolean;
 }
 
+interface RemoveResult {
+  removedTwt: string;
+  formerReceiverTwt: string | null;
+  formerGiverTwt: string | null;
+}
+
 export default function ReshuffleMatches({
   runId,
   rows,
@@ -36,6 +42,7 @@ export default function ReshuffleMatches({
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ReshuffleResult | null>(null);
+  const [removeResult, setRemoveResult] = useState<RemoveResult | null>(null);
 
   function toggleOne(id: string) {
     setSelected((prev) => {
@@ -44,6 +51,16 @@ export default function ReshuffleMatches({
       else next.add(id);
       return next;
     });
+  }
+
+  function handleRemoved(matchId: string, removed: RemoveResult) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.delete(matchId);
+      return next;
+    });
+    setRemoveResult(removed);
+    router.refresh();
   }
 
   async function handleReshuffle() {
@@ -93,6 +110,20 @@ export default function ReshuffleMatches({
       </div>
 
       {error && <p className="text-sm text-red-500">{error}</p>}
+
+      {removeResult && (
+        <div className="space-y-1 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
+          <p className="font-medium">{removeResult.removedTwt} dihapus dari matching ini.</p>
+          <ul className="list-disc space-y-1 pl-5">
+            {removeResult.formerReceiverTwt && (
+              <li>{removeResult.formerReceiverTwt} sekarang butuh giver baru (No giver).</li>
+            )}
+            {removeResult.formerGiverTwt && (
+              <li>{removeResult.formerGiverTwt} sekarang butuh receiver baru (No receiver).</li>
+            )}
+          </ul>
+        </div>
+      )}
 
       {result && result.blocked.length > 0 && (
         <div className="space-y-2 rounded-2xl border border-red-300 bg-red-50 p-4 text-sm text-red-700">
@@ -172,6 +203,14 @@ export default function ReshuffleMatches({
               {row.reportNote && (
                 <p className="mt-1 break-words text-gray-500">Catatan: {row.reportNote}</p>
               )}
+              <div className="mt-2">
+                <RemoveButton
+                  runId={runId}
+                  matchId={row.matchId}
+                  giverTwt={row.giverTwt}
+                  onRemoved={(r) => handleRemoved(row.matchId, r)}
+                />
+              </div>
             </div>
           </label>
         ))}
@@ -193,6 +232,7 @@ export default function ReshuffleMatches({
               <th className="px-4 py-2 text-left font-medium">Fandom &amp; oshi</th>
               <th className="px-4 py-2 text-left font-medium">Status</th>
               <th className="px-4 py-2 text-left font-medium">Catatan</th>
+              <th className="px-4 py-2 text-left font-medium"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-teal-100">
@@ -216,11 +256,19 @@ export default function ReshuffleMatches({
                 <td className="max-w-[16rem] break-words px-4 py-2 text-gray-500">
                   {row.reportNote || "-"}
                 </td>
+                <td className="px-4 py-2">
+                  <RemoveButton
+                    runId={runId}
+                    matchId={row.matchId}
+                    giverTwt={row.giverTwt}
+                    onRemoved={(r) => handleRemoved(row.matchId, r)}
+                  />
+                </td>
               </tr>
             ))}
             {rows.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-gray-400">
+                <td colSpan={7} className="px-4 py-6 text-center text-gray-400">
                   Tidak ada pasangan pada hasil matching ini.
                 </td>
               </tr>
@@ -236,4 +284,92 @@ function StatusBadge({ row }: { row: NotifyRow }) {
   if (row.reportedAt) return <span className="text-amber-600">Lapor masalah</span>;
   if (row.confirmedAt) return <span className="text-teal-600">Dikonfirmasi</span>;
   return <span className="text-gray-400">Belum konfirmasi</span>;
+}
+
+// Removes this row's giver from the match run entirely (both the giving and
+// receiving side), without running any rematching — for someone who's gone
+// unresponsive. Their former receiver/giver fall into the No giver / No
+// receiver pools shown on the results page, to be reshuffled whenever there's
+// enough of a pool.
+function RemoveButton({
+  runId,
+  matchId,
+  giverTwt,
+  onRemoved,
+}: {
+  runId: string;
+  matchId: string;
+  giverTwt: string;
+  onRemoved: (result: RemoveResult) => void;
+}) {
+  const [confirming, setConfirming] = useState(false);
+  const [removing, setRemoving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function remove(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setRemoving(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/admin/matches/${runId}/remove-participant`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ matchId }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Gagal menghapus.");
+        setRemoving(false);
+        return;
+      }
+      onRemoved(data);
+    } catch {
+      setError("Network error, coba lagi.");
+      setRemoving(false);
+    }
+  }
+
+  if (confirming) {
+    return (
+      <div className="flex flex-wrap items-center gap-2 text-xs">
+        <span className="text-red-600">Hapus {giverTwt} dari matching?</span>
+        <button
+          type="button"
+          onClick={remove}
+          disabled={removing}
+          className="rounded-lg bg-red-500 px-2 py-1 font-semibold text-white hover:bg-red-600 disabled:opacity-50"
+        >
+          {removing ? "Menghapus..." : "Ya, hapus"}
+        </button>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setConfirming(false);
+          }}
+          disabled={removing}
+          className="rounded-lg border border-gray-300 px-2 py-1 text-gray-700 hover:bg-gray-50"
+        >
+          Batal
+        </button>
+        {error && <span className="text-red-600">{error}</span>}
+      </div>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setConfirming(true);
+      }}
+      className="text-xs text-red-500 hover:underline"
+    >
+      Hapus dari matching
+    </button>
+  );
 }
