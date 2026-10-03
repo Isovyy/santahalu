@@ -204,14 +204,6 @@ export default function EditParticipantForm({
         />
       </Field>
 
-      <Field label="Bahasa yang bersedia kamu terima" required>
-        <CheckboxGroup
-          options={LANGUAGE_OPTIONS}
-          values={languageReceive}
-          onChange={setLanguageReceive}
-        />
-      </Field>
-
       {contentType.includes("Writing") && (
         <Field label="Bahasa yang bersedia kamu tulis" required>
           <CheckboxGroup
@@ -221,6 +213,14 @@ export default function EditParticipantForm({
           />
         </Field>
       )}
+
+      <Field label="Bahasa yang bersedia kamu terima" required>
+        <CheckboxGroup
+          options={LANGUAGE_OPTIONS}
+          values={languageReceive}
+          onChange={setLanguageReceive}
+        />
+      </Field>
 
       <Field label="Fandom yang bersedia kamu buatkan hadiah" required>
         <FandomMultiSelect values={fandomGive} onChange={setFandomGive} />

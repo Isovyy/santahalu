@@ -554,19 +554,6 @@ export default function RegisterForm({ copy }: { copy: FormCopy }) {
           />
         </Field>
 
-        <Field
-          label={copy["field.languageReceive.label"]}
-          required
-          hint={copy["field.languageReceive.hint"]}
-        >
-          <CheckboxGroup
-            options={LANGUAGE_OPTIONS}
-            values={form.languageReceive}
-            onChange={(v) => update("languageReceive", v)}
-            renderLabel={languageLabel}
-          />
-        </Field>
-
         {form.contentType.includes("Writing") && (
           <Field
             label={copy["field.languageGive.label"]}
@@ -581,6 +568,19 @@ export default function RegisterForm({ copy }: { copy: FormCopy }) {
             />
           </Field>
         )}
+
+        <Field
+          label={copy["field.languageReceive.label"]}
+          required
+          hint={copy["field.languageReceive.hint"]}
+        >
+          <CheckboxGroup
+            options={LANGUAGE_OPTIONS}
+            values={form.languageReceive}
+            onChange={(v) => update("languageReceive", v)}
+            renderLabel={languageLabel}
+          />
+        </Field>
 
         <Field
           label={copy["field.fandomGive.label"]}
