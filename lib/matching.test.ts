@@ -260,6 +260,29 @@ describe("matchBipartite", () => {
       expect(stats.matchedPairs).toBe(2);
     }
   });
+
+  it("never re-proposes a pairing listed in excludePairs, even though canGiveTo allows it", () => {
+    const giver = participant({ id: "g1", fandomGive: "Apa saja" });
+    const rejected = participant({ id: "r1", oshiName: "Rejected", fandomYume: "Fandom A" });
+    const other = participant({ id: "r2", oshiName: "Other", fandomYume: "Fandom A" });
+    const exclude = new Set([`g1:r1`]);
+
+    for (let seed = 0; seed < 20; seed++) {
+      const { matches } = matchBipartite([giver], [rejected, other], seed, exclude);
+      // Only "other" is a legal pick; "rejected" must never appear.
+      expect(matches).toEqual([[0, 1]]);
+    }
+  });
+
+  it("leaves a giver unmatched rather than reunite them with an excluded pair that's their only option", () => {
+    const giver = participant({ id: "g1" });
+    const onlyOption = participant({ id: "r1" });
+    const exclude = new Set([`g1:r1`]);
+
+    const { matches, stats } = matchBipartite([giver], [onlyOption], 1, exclude);
+    expect(matches).toEqual([]);
+    expect(stats.unmatchedGivers).toBe(1);
+  });
 });
 
 describe("matchParticipants (maximum matching)", () => {

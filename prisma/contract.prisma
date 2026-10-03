@@ -44,6 +44,7 @@ model MatchRun {
   totalParticipants Int
   matchedPairs      Int
   matches           Match[]
+  reshuffleLogs     MatchReshuffleLog[]
 
   // Manually set by an admin to close /confirm/[token] for every match in
   // this run (no more confirms or reports accepted). Null means still open.
@@ -94,6 +95,28 @@ model Match {
 
   @@unique([matchRunId, giverId])
   @@map("Match")
+}
+
+// One row per giver per reshuffle apply, recording what their pairing was
+// right before it changed. A frozen snapshot (not FKs to Participant) on
+// purpose: history should show what the pairing said back then, not get
+// silently rewritten by a later edit to that participant's data.
+model MatchReshuffleLog {
+  id           String   @id @default(cuid(2))
+  matchRunId   String
+  matchRun     MatchRun @relation(fields: [matchRunId], references: [id], onDelete: Cascade)
+  reshuffledAt temporal.createdAt()
+  seed         Int
+
+  giverTwt                   String
+  previousReceiverTwt        String
+  previousReceiverOshiName   String
+  previousReceiverFandomYume String
+  newReceiverTwt             String
+  newReceiverOshiName        String
+  newReceiverFandomYume      String
+
+  @@map("MatchReshuffleLog")
 }
 
 // Admin-editable overrides for the public registration form's own wording

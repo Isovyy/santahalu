@@ -13,6 +13,8 @@ interface ResolvedPairing {
 }
 
 interface ReshuffleResult {
+  seed: number;
+  dryRun: boolean;
   poolSize: number;
   matched: number;
   unmatched: number;
@@ -39,6 +41,7 @@ export default function ReshuffleMatches({
   const [selected, setSelected] = useState<Set<string>>(
     () => new Set(rows.filter((r) => r.reportedAt).map((r) => r.matchId)),
   );
+  const [seed, setSeed] = useState("");
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ReshuffleResult | null>(null);
@@ -63,20 +66,23 @@ export default function ReshuffleMatches({
     router.refresh();
   }
 
-  async function handleReshuffle() {
+  async function runReshuffle(dryRun: boolean) {
     if (selected.size < 2) {
       setError("Pilih minimal 2 pasangan untuk di-reshuffle.");
       return;
     }
     setRunning(true);
     setError(null);
-    setResult(null);
 
     try {
       const res = await fetch(`/api/admin/matches/${runId}/reshuffle`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ matchIds: Array.from(selected) }),
+        body: JSON.stringify({
+          matchIds: Array.from(selected),
+          seed: seed.trim() ? Number(seed) : undefined,
+          dryRun,
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -84,7 +90,11 @@ export default function ReshuffleMatches({
         return;
       }
       setResult(data);
-      router.refresh();
+      // Pin the seed actually used (including a freshly-rolled random one),
+      // so re-clicking Preview tries again fresh but Terapkan right after a
+      // preview reproduces exactly what was shown.
+      setSeed(String(data.seed));
+      if (!dryRun) router.refresh();
     } catch {
       setError("Network error, coba lagi.");
     } finally {
@@ -99,15 +109,40 @@ export default function ReshuffleMatches({
           {selected.size} dipilih &middot; pasangan yang melapor masalah sudah dicentang
           otomatis, tambahkan pasangan lain kalau perlu lebih banyak opsi.
         </p>
-        <button
-          type="button"
-          onClick={handleReshuffle}
-          disabled={running || selected.size < 2}
-          className="rounded-lg bg-teal-400 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-500 disabled:opacity-50"
-        >
-          {running ? "Mereshuffle..." : `Reshuffle ${selected.size} pasangan`}
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <label className="flex items-center gap-1.5 text-xs text-gray-500">
+            Seed
+            <input
+              type="number"
+              value={seed}
+              onChange={(e) => setSeed(e.target.value)}
+              placeholder="acak"
+              className="w-20 rounded-lg border border-teal-200 px-2 py-1 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-300"
+            />
+          </label>
+          <button
+            type="button"
+            onClick={() => runReshuffle(true)}
+            disabled={running || selected.size < 2}
+            className="rounded-lg border border-teal-200 px-4 py-2 text-sm text-teal-600 hover:bg-teal-50 disabled:opacity-50"
+          >
+            {running ? "Mencoba..." : "Coba dulu (preview)"}
+          </button>
+          <button
+            type="button"
+            onClick={() => runReshuffle(false)}
+            disabled={running || selected.size < 2}
+            className="rounded-lg bg-teal-400 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-500 disabled:opacity-50"
+          >
+            {running ? "Mereshuffle..." : `Reshuffle ${selected.size} pasangan`}
+          </button>
+        </div>
       </div>
+
+      <p className="text-xs text-gray-400">
+        Seed sama + pasangan terpilih sama = hasil yang sama. &quot;Coba dulu&quot; cuma
+        menampilkan hasilnya, tidak disimpan sampai klik Reshuffle.
+      </p>
 
       {error && <p className="text-sm text-red-500">{error}</p>}
 
@@ -142,10 +177,23 @@ export default function ReshuffleMatches({
       )}
 
       {result && (
-        <div className="space-y-3 rounded-2xl border border-teal-100 bg-teal-50 p-4 text-sm text-teal-700">
+        <div
+          className={`space-y-3 rounded-2xl border p-4 text-sm ${
+            result.dryRun
+              ? "border-amber-200 bg-amber-50 text-amber-700"
+              : "border-teal-100 bg-teal-50 text-teal-700"
+          }`}
+        >
+          <p className="font-medium">
+            {result.dryRun
+              ? `Preview (seed ${result.seed}), belum disimpan.`
+              : `Tersimpan (seed ${result.seed}).`}
+          </p>
           <p>
-            {result.matched} dari {result.poolSize} berhasil dipasangkan ulang. Semua yang
-            berhasil sudah direset statusnya (perlu kirim email pasangan lagi).
+            {result.matched} dari {result.poolSize} berhasil dipasangkan ulang.{" "}
+            {result.dryRun
+              ? "Klik Reshuffle dengan seed yang sama di atas untuk menyimpan hasil ini."
+              : "Semua yang berhasil sudah direset statusnya (perlu kirim email pasangan lagi)."}
           </p>
           {result.resolved.length > 0 && (
             <>

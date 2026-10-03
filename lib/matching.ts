@@ -286,10 +286,14 @@ export function matchParticipants(
 // A person can legitimately appear in both lists (e.g. they're the giver in
 // one pulled-in row and the receiver in another), so self-pairing is guarded
 // by id, not array identity.
+// `excludePairs` keys are `${giverId}:${receiverId}` — pairings that must
+// never be proposed even if canGiveTo would otherwise allow them (e.g. a
+// giver who already reported a problem with that specific receiver).
 export function matchBipartite(
   givers: MatchParticipant[],
   receivers: MatchParticipant[],
-  seed?: number | null
+  seed?: number | null,
+  excludePairs?: Set<string>
 ): BipartiteResult {
   const rng = seedRandom(seed ?? Date.now());
 
@@ -297,7 +301,11 @@ export function matchBipartite(
   givers.forEach((giver, i) => {
     candidates[i] = [];
     receivers.forEach((receiver, j) => {
-      if (giver.id !== receiver.id && canGiveTo(giver, receiver)) {
+      if (
+        giver.id !== receiver.id &&
+        canGiveTo(giver, receiver) &&
+        !excludePairs?.has(`${giver.id}:${receiver.id}`)
+      ) {
         candidates[i].push(j);
       }
     });

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Temporal } from "temporal-polyfill";
 import { db } from "@/lib/db";
 import { matchBipartite, canGiveTo } from "@/lib/matching";
 
@@ -8,7 +9,7 @@ export async function POST(
 ) {
   const { runId } = await params;
 
-  let body: { matchIds?: unknown };
+  let body: { matchIds?: unknown; seed?: unknown; dryRun?: unknown };
   try {
     body = await req.json();
   } catch {
@@ -24,6 +25,13 @@ export async function POST(
       { status: 400 },
     );
   }
+
+  // A seed makes the shuffle reproducible, so admins can preview a few
+  // attempts and re-apply whichever one they liked. No seed given (first
+  // preview of a batch) gets a random one, reported back so the UI can pin
+  // it for a follow-up preview or the real apply.
+  const seed = typeof body.seed === "number" && Number.isFinite(body.seed) ? body.seed : Date.now();
+  const dryRun = body.dryRun === true;
 
   const run = await db.orm.public.MatchRun
     .include("matches", (m) => m.include("giver").include("receiver"))
@@ -43,7 +51,15 @@ export async function POST(
   const givers = selected.map((m) => m.giver);
   const receivers = selected.map((m) => m.receiver);
 
-  const { matches: pairs, stats } = matchBipartite(givers, receivers);
+  // A giver who reported a problem with their current receiver must never
+  // get reassigned back to that same person by the reshuffle — the report
+  // IS a rejection of that specific pairing, not just a generic "something's
+  // wrong" flag.
+  const rejectedPairs = new Set(
+    selected.filter((m) => m.reportedAt).map((m) => `${m.giverId}:${m.receiverId}`),
+  );
+
+  const { matches: pairs, stats } = matchBipartite(givers, receivers, seed, rejectedPairs);
 
   const resolvedGiverIds = new Set<string>();
   const resolved: {
@@ -73,19 +89,33 @@ export async function POST(
     const row = selected.find((m) => m.giverId === giver.id);
     if (!row) continue;
 
-    await db.orm.public.Match.where({ id: row.id }).update({
-      receiverId: newReceiver.id,
-      notifiedAt: null,
-      folderNotifiedAt: null,
-      confirmToken: null,
-      confirmedAt: null,
-      reportedAt: null,
-      reportNote: null,
-      submittedAt: null,
-      extensionDays: null,
-      extensionRequestedAt: null,
-      extensionReason: null,
-    });
+    if (!dryRun) {
+      await db.orm.public.MatchReshuffleLog.create({
+        matchRunId: runId,
+        reshuffledAt: Temporal.Now.instant(),
+        seed,
+        giverTwt: giver.twtUser,
+        previousReceiverTwt: row.receiver.twtUser,
+        previousReceiverOshiName: row.receiver.oshiName,
+        previousReceiverFandomYume: row.receiver.fandomYume,
+        newReceiverTwt: newReceiver.twtUser,
+        newReceiverOshiName: newReceiver.oshiName,
+        newReceiverFandomYume: newReceiver.fandomYume,
+      });
+      await db.orm.public.Match.where({ id: row.id }).update({
+        receiverId: newReceiver.id,
+        notifiedAt: null,
+        folderNotifiedAt: null,
+        confirmToken: null,
+        confirmedAt: null,
+        reportedAt: null,
+        reportNote: null,
+        submittedAt: null,
+        extensionDays: null,
+        extensionRequestedAt: null,
+        extensionReason: null,
+      });
+    }
     resolvedGiverIds.add(giver.id);
     resolved.push({
       giverTwt: giver.twtUser,
@@ -102,6 +132,8 @@ export async function POST(
 
   return NextResponse.json({
     ok: true,
+    seed,
+    dryRun,
     poolSize: givers.length,
     matched: stats.matchedPairs,
     unmatched: stats.unmatchedGivers,

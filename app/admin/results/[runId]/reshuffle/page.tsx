@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getNotifyRows } from "@/lib/notify";
+import { db } from "@/lib/db";
 import ReshuffleMatches from "./ReshuffleMatches";
 
 export const dynamic = "force-dynamic";
@@ -13,6 +14,11 @@ export default async function ReshufflePage({
   const { runId } = await params;
   const data = await getNotifyRows(runId);
   if (!data) notFound();
+
+  const history = await db.orm.public.MatchReshuffleLog
+    .where({ matchRunId: runId })
+    .orderBy((h) => h.reshuffledAt.desc())
+    .all();
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10">
@@ -30,6 +36,56 @@ export default async function ReshufflePage({
 
       <div className="mt-6">
         <ReshuffleMatches runId={runId} rows={data.rows} />
+      </div>
+
+      <h2 className="mt-10 text-lg font-medium text-gray-800">
+        Riwayat reshuffle ({history.length})
+      </h2>
+      <p className="mt-1 text-xs text-gray-400">
+        Pasangan sebelum setiap reshuffle yang pernah diterapkan pada hasil matching ini.
+      </p>
+      <div className="mt-3 overflow-x-auto rounded-2xl border border-teal-100 bg-white shadow-sm">
+        <table className="min-w-full divide-y divide-teal-100 text-sm">
+          <thead className="bg-teal-50 text-teal-600">
+            <tr>
+              <th className="px-4 py-2 text-left font-medium">Waktu</th>
+              <th className="px-4 py-2 text-left font-medium">Giver</th>
+              <th className="px-4 py-2 text-left font-medium">Pasangan sebelumnya</th>
+              <th className="px-4 py-2 text-left font-medium">Pasangan baru</th>
+              <th className="px-4 py-2 text-left font-medium">Seed</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-teal-100">
+            {history.map((h) => (
+              <tr key={h.id} className="text-gray-600">
+                <td className="whitespace-nowrap px-4 py-2 text-gray-400">
+                  {h.reshuffledAt.toLocaleString()}
+                </td>
+                <td className="px-4 py-2">{h.giverTwt}</td>
+                <td className="px-4 py-2">
+                  {h.previousReceiverTwt}{" "}
+                  <span className="text-gray-400">
+                    ({h.previousReceiverFandomYume} &middot; {h.previousReceiverOshiName})
+                  </span>
+                </td>
+                <td className="px-4 py-2">
+                  {h.newReceiverTwt}{" "}
+                  <span className="text-gray-400">
+                    ({h.newReceiverFandomYume} &middot; {h.newReceiverOshiName})
+                  </span>
+                </td>
+                <td className="px-4 py-2 text-gray-400">{h.seed}</td>
+              </tr>
+            ))}
+            {history.length === 0 && (
+              <tr>
+                <td colSpan={5} className="px-4 py-6 text-center text-gray-400">
+                  Belum ada reshuffle yang diterapkan pada hasil matching ini.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
     </main>
   );
