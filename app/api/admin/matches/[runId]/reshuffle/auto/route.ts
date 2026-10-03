@@ -109,6 +109,13 @@ export async function POST(
       const wasConfirmed = Boolean(row?.confirmedAt);
 
       if (!dryRun) {
+        // Riwayat shows each giver's current pairing history, not a full
+        // audit trail — reshuffling the same giver again replaces their
+        // earlier entry rather than piling up now-stale ones.
+        await db.orm.public.MatchReshuffleLog
+          .where({ matchRunId: runId })
+          .where({ giverTwt: giver.twtUser })
+          .delete();
         await db.orm.public.MatchReshuffleLog.create({
           matchRunId: runId,
           reshuffledAt: Temporal.Now.instant(),

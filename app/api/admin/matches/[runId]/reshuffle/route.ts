@@ -69,6 +69,11 @@ export async function POST(
   const { matches: pairs, stats } = matchBipartite(givers, receivers, seed, rejectedPairs);
 
   const resolvedGiverIds = new Set<string>();
+  // A receiver whose original row's giver didn't end up with it (someone
+  // else in the batch got matched to them instead) — that original giver's
+  // row needs cleaning up afterward, or two rows end up claiming the same
+  // receiver.
+  const stolenFromGiverIds = new Set<string>();
   const resolved: {
     giverTwt: string;
     previousReceiverTwt: string;
@@ -96,7 +101,20 @@ export async function POST(
     const row = selected.find((m) => m.giverId === giver.id);
     if (!row) continue;
 
+    const originalRow = selected.find((m) => m.receiverId === newReceiver.id);
+    if (originalRow && originalRow.giverId !== giver.id) {
+      stolenFromGiverIds.add(originalRow.giverId);
+    }
+
     if (!dryRun) {
+      // Riwayat shows each giver's current pairing history, not a full
+      // audit trail — reshuffling the same giver again (e.g. trying a few
+      // seeds before settling on one) replaces their earlier entry rather
+      // than piling up now-stale ones.
+      await db.orm.public.MatchReshuffleLog
+        .where({ matchRunId: runId })
+        .where({ giverTwt: giver.twtUser })
+        .delete();
       await db.orm.public.MatchReshuffleLog.create({
         matchRunId: runId,
         reshuffledAt: Temporal.Now.instant(),
@@ -133,6 +151,24 @@ export async function POST(
     });
   }
 
+  // Anyone whose receiver got reassigned to someone else, but who didn't
+  // themselves land a new receiver, no longer has anyone to give to — their
+  // row has to go (receiverId is required, can't just null it out), or
+  // they'd keep claiming the receiver who's now also claimed elsewhere.
+  const orphaned: { giverTwt: string; formerReceiverTwt: string }[] = [];
+  for (const row of selected) {
+    if (resolvedGiverIds.has(row.giverId) || !stolenFromGiverIds.has(row.giverId)) continue;
+    orphaned.push({ giverTwt: row.giver.twtUser, formerReceiverTwt: row.receiver.twtUser });
+    if (!dryRun) {
+      await db.orm.public.Match.where({ id: row.id }).delete();
+    }
+  }
+  if (!dryRun && orphaned.length > 0) {
+    await db.orm.public.MatchRun.where({ id: runId }).update({
+      matchedPairs: Math.max(0, run.matchedPairs - orphaned.length),
+    });
+  }
+
   const unresolved = givers
     .filter((g) => !resolvedGiverIds.has(g.id))
     .map((g) => ({ id: g.id, twtUser: g.twtUser }));
@@ -147,6 +183,7 @@ export async function POST(
     resolved,
     unresolved,
     blocked,
+    orphaned,
     rulesVerified: true,
   });
 }

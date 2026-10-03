@@ -21,6 +21,7 @@ interface ReshuffleResult {
   resolved: ResolvedPairing[];
   unresolved: { id: string; twtUser: string }[];
   blocked: { giverTwt: string; wouldBeReceiverTwt: string }[];
+  orphaned: { giverTwt: string; formerReceiverTwt: string }[];
   rulesVerified: boolean;
 }
 
@@ -220,6 +221,24 @@ export default function ReshuffleMatches({
             {result.blocked.map((b, i) => (
               <li key={i}>
                 {b.giverTwt} &rarr; {b.wouldBeReceiverTwt}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {result && result.orphaned.length > 0 && (
+        <div className="space-y-2 rounded-2xl border border-red-300 bg-red-50 p-4 text-sm text-red-700">
+          <p className="font-semibold">
+            {result.orphaned.length} giver kehilangan receiver-nya (direbut pasangan lain di
+            batch ini, tapi mereka sendiri tidak dapat pasangan baru) &mdash; pasangannya dihapus
+            supaya tidak ada receiver yang punya 2 giver sekaligus. Mereka sekarang butuh
+            reshuffle lagi:
+          </p>
+          <ul className="list-disc space-y-1 pl-5">
+            {result.orphaned.map((o, i) => (
+              <li key={i}>
+                {o.giverTwt} (sebelumnya &rarr; {o.formerReceiverTwt})
               </li>
             ))}
           </ul>
