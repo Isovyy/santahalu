@@ -98,6 +98,8 @@ const SECTIONS: CopySection[] = [
       { key: "field.avoidList.label", label: "Avoid list - label" },
       { key: "field.avoidList.hint", label: "Avoid list - hint", multiline: true },
       { key: "field.notes.label", label: "Notes - label" },
+      { key: "field.password.label", label: "Kata sandi - label" },
+      { key: "field.password.hint", label: "Kata sandi - hint", multiline: true },
     ],
   },
   {

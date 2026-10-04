@@ -46,6 +46,7 @@ interface FormState {
   avoidList: AvoidEntry[];
   yumeDocuLink: string;
   notes: string;
+  password: string;
   yumeTypeGive: string[];
   yumeTypeGiveOther: string;
   yumeTypeReceive: string;
@@ -67,6 +68,7 @@ const initialState: FormState = {
   avoidList: [],
   yumeDocuLink: "",
   notes: "",
+  password: "",
   yumeTypeGive: [],
   yumeTypeGiveOther: "",
   yumeTypeReceive: "",
@@ -111,6 +113,7 @@ function participantToForm(p: LookupParticipant): FormState {
     avoidList: parseAvoidListValue(p.avoidList ?? ""),
     yumeDocuLink: p.yumeDocuLink,
     notes: p.notes ?? "",
+    password: "",
     ...splitYumeTypeGive(p.yumeTypeGive),
     ...splitYumeTypeReceive(p.yumeTypeReceive),
   };
@@ -287,6 +290,7 @@ export default function RegisterForm({ copy }: { copy: FormCopy }) {
       avoidList: form.avoidList.map((a) => `${a.character} | ${a.fandom}`).join("; "),
       yumeDocuLink: form.yumeDocuLink,
       notes: form.notes,
+      password: form.password,
       editCode,
     };
 
@@ -634,6 +638,16 @@ export default function RegisterForm({ copy }: { copy: FormCopy }) {
             placeholder="Opsional"
             value={form.notes}
             onChange={(e) => update("notes", e.target.value)}
+          />
+        </Field>
+
+        <Field label={copy["field.password.label"]} required hint={copy["field.password.hint"]}>
+          <input
+            type="password"
+            required
+            className={inputClass}
+            value={form.password}
+            onChange={(e) => update("password", e.target.value)}
           />
         </Field>
 

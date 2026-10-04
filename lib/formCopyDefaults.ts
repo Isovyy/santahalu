@@ -75,6 +75,8 @@ export const FORM_COPY_DEFAULTS = {
   "field.avoidList.hint":
     "Opsional. Karakter atau fandom tertentu yang tidak ingin kamu buatkan hadiah. Isi fandom dan nama karakter, lalu klik Tambah (bisa lebih dari satu).",
   "field.notes.label": "Notes",
+  "field.password.label": "Kata sandi",
+  "field.password.hint": "Masukkan kata sandi event untuk memverifikasi pendaftaranmu.",
 
   "option.relationshipType.Romantic": "Romantic",
   "option.relationshipType.Platonic": "Platonic",

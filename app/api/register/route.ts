@@ -18,6 +18,8 @@ const REQUIRED_FIELDS = [
   "yumeTypeGive",
 ] as const;
 
+const EVENT_PASSWORD = "mlytselalu";
+
 function str(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
 }
@@ -35,6 +37,10 @@ export async function POST(req: NextRequest) {
       { error: "You must confirm you understand the event rules." },
       { status: 400 }
     );
+  }
+
+  if (str(body.password) !== EVENT_PASSWORD) {
+    return NextResponse.json({ error: "Kata sandi salah." }, { status: 400 });
   }
 
   for (const field of REQUIRED_FIELDS) {
