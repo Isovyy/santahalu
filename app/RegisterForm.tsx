@@ -643,7 +643,7 @@ export default function RegisterForm({ copy }: { copy: FormCopy }) {
 
         <Field label={copy["field.password.label"]} required hint={copy["field.password.hint"]}>
           <input
-            type="password"
+            type="text"
             required
             className={inputClass}
             value={form.password}
