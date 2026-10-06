@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { matchParticipants } from "@/lib/matching";
+import { loadRejectedPairs } from "@/lib/rejectedPairs";
 
 export async function POST(req: NextRequest) {
   let body: Record<string, unknown> = {};
@@ -27,7 +28,9 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { matches, stats } = matchParticipants(participants, seed ?? undefined);
+  // Nobody gets handed a receiver they already rejected in an earlier run.
+  const rejectedPairs = await loadRejectedPairs();
+  const { matches, stats } = matchParticipants(participants, seed ?? undefined, rejectedPairs);
 
   const run = await db.orm.public.MatchRun.create({
     seed,

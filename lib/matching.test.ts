@@ -207,6 +207,17 @@ describe("matchParticipants", () => {
     const { matches } = matchParticipants(pool, 1);
     expect(matches).toEqual([]);
   });
+
+  it("never repeats an excluded (previously rejected) pairing", () => {
+    const pool = makePool(6);
+    const exclude = new Set(["p0:p1", "p2:p3"]);
+    for (let seed = 1; seed <= 30; seed++) {
+      const { matches } = matchParticipants(pool, seed, exclude);
+      for (const [giverIdx, receiverIdx] of matches) {
+        expect(exclude.has(`${pool[giverIdx].id}:${pool[receiverIdx].id}`)).toBe(false);
+      }
+    }
+  });
 });
 
 describe("matchBipartite", () => {

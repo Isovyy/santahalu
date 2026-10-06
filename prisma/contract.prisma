@@ -126,6 +126,25 @@ model MatchReshuffleLog {
   @@map("MatchReshuffleLog")
 }
 
+// Every giver → receiver pairing that was ever reported, in any run. A report
+// lives on the Match row itself (reportedAt), but a reshuffle clears it when
+// it moves the giver to someone new — without this table the next reshuffle
+// (or a fresh run) has no memory of the rejection and can pair them right
+// back together. Plain ids rather than FKs, on purpose: deleting a run must
+// not take its rejections with it, and a participant edit shouldn't either.
+model RejectedPair {
+  id         String   @id @default(cuid(2))
+  createdAt  temporal.createdAt()
+  // The run the report was made in — kept for history only.
+  matchRunId String
+  giverId    String
+  receiverId String
+  note       String?
+
+  @@unique([matchRunId, giverId, receiverId])
+  @@map("RejectedPair")
+}
+
 // Admin-editable overrides for the public registration form's own wording
 // (field labels, hints, rules text, option labels). A missing row means
 // "use the hardcoded default" (see lib/formCopy.ts) — this table only ever

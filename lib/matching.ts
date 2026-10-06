@@ -243,9 +243,12 @@ function maxBipartiteMatch(
   return matchOfGiver;
 }
 
+// `excludePairs` works the same as in matchBipartite below — pairings
+// rejected in an earlier run that a fresh run must not repeat.
 export function matchParticipants(
   participants: MatchParticipant[],
-  seed?: number | null
+  seed?: number | null,
+  excludePairs?: Set<string>
 ): MatchResult {
   const rng = seedRandom(seed ?? Date.now());
 
@@ -254,7 +257,11 @@ export function matchParticipants(
   participants.forEach((giver, i) => {
     candidates[i] = [];
     participants.forEach((receiver, j) => {
-      if (i !== j && canGiveTo(giver, receiver)) {
+      if (
+        i !== j &&
+        canGiveTo(giver, receiver) &&
+        !excludePairs?.has(`${giver.id}:${receiver.id}`)
+      ) {
         candidates[i].push(j);
       }
     });

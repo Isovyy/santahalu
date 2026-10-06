@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Temporal } from "temporal-polyfill";
 import { db } from "@/lib/db";
 import { matchBipartite, canGiveTo } from "@/lib/matching";
+import { loadRejectedPairs } from "@/lib/rejectedPairs";
 
 export async function POST(
   req: NextRequest,
@@ -58,13 +59,12 @@ export async function POST(
   const givers = selected.map((m) => m.giver);
   const receivers = selected.map((m) => m.receiver);
 
-  // A giver who reported a problem with their current receiver must never
-  // get reassigned back to that same person by the reshuffle — the report
-  // IS a rejection of that specific pairing, not just a generic "something's
-  // wrong" flag.
-  const rejectedPairs = new Set(
-    selected.filter((m) => m.reportedAt).map((m) => `${m.giverId}:${m.receiverId}`),
-  );
+  // A giver who reported a problem with a receiver must never get reassigned
+  // back to that same person by the reshuffle — the report IS a rejection of
+  // that specific pairing, not just a generic "something's wrong" flag. This
+  // includes pairs reported before an earlier reshuffle cleared the flag, or
+  // in an earlier run, not just the selected rows' current reports.
+  const rejectedPairs = await loadRejectedPairs();
 
   const { matches: pairs, stats } = matchBipartite(givers, receivers, seed, rejectedPairs);
 

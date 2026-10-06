@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Temporal } from "temporal-polyfill";
 import { db } from "@/lib/db";
 import { findMinimalBreakChain, canGiveTo, type ChainStep } from "@/lib/matching";
+import { loadRejectedPairs } from "@/lib/rejectedPairs";
 
 interface StepOut {
   giverTwt: string;
@@ -64,9 +65,9 @@ export async function POST(
   // narrow overlap case.
   const rowOfGiver = new Map(run.matches.map((m) => [m.giverId, m]));
 
-  const excludePairs = new Set(
-    run.matches.filter((m) => m.reportedAt).map((m) => `${m.giverId}:${m.receiverId}`),
-  );
+  // Every pairing ever reported, in this run or an earlier one, including
+  // ones a reshuffle already cleared off the Match row.
+  const excludePairs = await loadRejectedPairs();
 
   const chains: { stuckGiverId: string; steps: ChainStep[] }[] = [];
   const unresolvable: string[] = [];
