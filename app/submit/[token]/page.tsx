@@ -21,7 +21,7 @@ export default async function SubmitPage({
       <div className="rounded-2xl border border-teal-100 bg-white p-6 shadow-sm">
         <h1 className="text-2xl font-bold text-teal-500">Konfirmasi Hadiah Sudah Diupload</h1>
         <p className="mt-2 text-sm text-gray-600">
-          Untuk {match.receiver.twtUser} &middot; fandom {match.receiver.fandomYume}.
+          Untuk {match.receiver.yumeshipName} - {match.receiver.fandomYume}.
         </p>
         <div className="mt-4 rounded-lg bg-gray-50 p-4 text-sm text-gray-600">
           <p className="font-medium text-gray-700">Ketentuan karya:</p>
