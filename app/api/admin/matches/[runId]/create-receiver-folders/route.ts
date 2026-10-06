@@ -32,6 +32,9 @@ export async function POST(
   }
 
   const results: Record<string, CreateOutcome> = {};
+  // Why a "failed" row failed (Drive's own message), so the admin page can
+  // show it instead of a bare "Gagal".
+  const errors: Record<string, string> = {};
 
   for (const matchId of matchIds) {
     const match = run.matches.find((m) => m.id === matchId);
@@ -44,15 +47,16 @@ export async function POST(
       continue;
     }
     try {
-      const folderName = `${match.receiver.oshiName} - ${match.receiver.fandomYume}`;
+      const folderName = `${match.receiver.yumeshipName} - ${match.receiver.fandomYume}`;
       const link = await createDriveFolder(folderName);
       await db.orm.public.Participant.where({ id: match.receiver.id }).update({ folderLink: link });
       results[matchId] = "created";
     } catch (err) {
       console.error("create-receiver-folder failed", match.receiver.id, err);
       results[matchId] = "failed";
+      errors[matchId] = err instanceof Error ? err.message : String(err);
     }
   }
 
-  return NextResponse.json({ ok: true, results });
+  return NextResponse.json({ ok: true, results, errors });
 }

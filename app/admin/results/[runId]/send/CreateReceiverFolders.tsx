@@ -18,6 +18,7 @@ export default function CreateReceiverFolders({
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastResults, setLastResults] = useState<Record<string, string> | null>(null);
+  const [rowErrors, setRowErrors] = useState<Record<string, string>>({});
 
   const eligibleIds = useMemo(
     () => rows.filter((r) => !r.receiverFolderLink).map((r) => r.matchId),
@@ -50,13 +51,23 @@ export default function CreateReceiverFolders({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ matchIds: Array.from(selected) }),
       });
-      const data = await res.json();
+      // Read as text first: a crashed or timed-out request comes back as an
+      // HTML/plain-text error page, not JSON, and its body is the only clue.
+      const text = await res.text();
+      let data: { error?: string; results?: Record<string, string>; errors?: Record<string, string> } = {};
+      try {
+        data = JSON.parse(text);
+      } catch {
+        // not JSON, fall through with the raw text below
+      }
       if (!res.ok) {
-        setError(data.error || "Gagal membuat folder.");
+        setError(
+          `Gagal membuat folder (HTTP ${res.status}): ${data.error || text.slice(0, 200) || "tanpa keterangan"}`,
+        );
         return;
       }
-      const results: Record<string, string> = data.results;
-      setLastResults(results);
+      setLastResults(data.results ?? {});
+      setRowErrors(data.errors ?? {});
       setSelected(new Set());
       router.refresh();
     } catch {
@@ -137,7 +148,12 @@ export default function CreateReceiverFolders({
                         Buka folder
                       </a>
                     ) : result === "failed" ? (
-                      <span className="text-red-500">Gagal, coba lagi</span>
+                      <span className="text-red-500">
+                        Gagal, coba lagi
+                        {rowErrors[row.matchId] && (
+                          <span className="block text-xs">{rowErrors[row.matchId]}</span>
+                        )}
+                      </span>
                     ) : (
                       <span className="text-gray-400">Belum ada</span>
                     )}
