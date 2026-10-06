@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { createDriveFolder } from "@/lib/drive";
+import { createDriveFolder, shareFolder, unshareFolder } from "@/lib/drive";
 
-type CreateOutcome = "created" | "already_has_folder" | "not_found" | "failed";
+// "created": new folder made (and shared). "shared": folder already existed,
+// access granted to the current giver (and taken from an old one, if any).
+// "already_done": folder exists and is already shared with the current giver.
+type CreateOutcome = "created" | "shared" | "already_done" | "not_found" | "failed";
 
 export async function POST(
   req: NextRequest,
@@ -25,7 +28,7 @@ export async function POST(
   }
 
   const run = await db.orm.public.MatchRun
-    .include("matches", (m) => m.include("receiver"))
+    .include("matches", (m) => m.include("giver").include("receiver"))
     .first({ id: runId });
   if (!run) {
     return NextResponse.json({ error: "Match run not found" }, { status: 404 });
@@ -42,17 +45,44 @@ export async function POST(
       results[matchId] = "not_found";
       continue;
     }
-    if (match.receiver.folderLink) {
-      results[matchId] = "already_has_folder";
-      continue;
-    }
+    const receiver = match.receiver;
+    const giverEmail = match.giver.email.trim();
+    // Saved after each step, so a failure halfway (folder made, share
+    // failed) is retried from where it stopped instead of making a second
+    // folder.
+    let folderLink = receiver.folderLink;
+    let sharedWith = receiver.folderSharedWith;
+
     try {
-      const folderName = `${match.receiver.yumeshipName} - ${match.receiver.fandomYume}`;
-      const link = await createDriveFolder(folderName);
-      await db.orm.public.Participant.where({ id: match.receiver.id }).update({ folderLink: link });
-      results[matchId] = "created";
+      let created = false;
+      if (!folderLink) {
+        const folderName = `${receiver.yumeshipName} - ${receiver.fandomYume}`;
+        folderLink = await createDriveFolder(folderName);
+        await db.orm.public.Participant.where({ id: receiver.id }).update({ folderLink });
+        created = true;
+      }
+
+      if (sharedWith?.toLowerCase() === giverEmail.toLowerCase()) {
+        results[matchId] = created ? "created" : "already_done";
+        continue;
+      }
+
+      // Folder still open to a giver from before a reshuffle — they're not
+      // this receiver's giver anymore, so close it before opening it to the
+      // new one.
+      if (sharedWith) {
+        await unshareFolder(folderLink, sharedWith);
+        sharedWith = null;
+        await db.orm.public.Participant.where({ id: receiver.id }).update({ folderSharedWith: null });
+      }
+
+      await shareFolder(folderLink, giverEmail);
+      await db.orm.public.Participant.where({ id: receiver.id }).update({
+        folderSharedWith: giverEmail,
+      });
+      results[matchId] = created ? "created" : "shared";
     } catch (err) {
-      console.error("create-receiver-folder failed", match.receiver.id, err);
+      console.error("create-receiver-folder failed", receiver.id, err);
       results[matchId] = "failed";
       errors[matchId] = err instanceof Error ? err.message : String(err);
     }

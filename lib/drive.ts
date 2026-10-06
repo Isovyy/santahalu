@@ -21,6 +21,10 @@ function getAuth() {
   return auth;
 }
 
+function getDrive() {
+  return google.drive({ version: "v3", auth: getAuth() });
+}
+
 // Creates a subfolder inside the shared parent folder (GOOGLE_DRIVE_PARENT_FOLDER_ID)
 // and returns its shareable view link. The parent must already be shared with the
 // service account (Editor access) so the folder lands inside the real owner's Drive.
@@ -30,8 +34,7 @@ export async function createDriveFolder(name: string): Promise<string> {
     throw new Error("GOOGLE_DRIVE_PARENT_FOLDER_ID is not set. Add it to .env before creating folders.");
   }
 
-  const drive = google.drive({ version: "v3", auth: getAuth() });
-  const res = await drive.files.create({
+  const res = await getDrive().files.create({
     requestBody: {
       name,
       mimeType: "application/vnd.google-apps.folder",
@@ -44,4 +47,45 @@ export async function createDriveFolder(name: string): Promise<string> {
     throw new Error("Drive folder created without a webViewLink");
   }
   return res.data.webViewLink;
+}
+
+// Folder links are stored as webViewLinks (".../drive/folders/<id>?usp=..."),
+// the permissions API wants the bare id.
+function folderIdFromLink(link: string): string {
+  const id = link.match(/\/folders\/([\w-]+)/)?.[1];
+  if (!id) throw new Error(`Bukan link folder Google Drive: ${link}`);
+  return id;
+}
+
+// Gives `email` editor access to the folder. Silent by default — the folder
+// email we send already carries the link, so Google's own "shared with you"
+// mail would just be noise. Google refuses a silent share to an address with
+// no Google account, so that one case falls back to letting Google notify
+// them (the notification is how a non-Google address gets in at all).
+export async function shareFolder(folderLink: string, email: string): Promise<void> {
+  const fileId = folderIdFromLink(folderLink);
+  const requestBody = { type: "user", role: "writer", emailAddress: email };
+  try {
+    await getDrive().permissions.create({ fileId, requestBody, sendNotificationEmail: false });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    if (!/notif/i.test(message)) throw err;
+    await getDrive().permissions.create({ fileId, requestBody, sendNotificationEmail: true });
+  }
+}
+
+// Removes whatever access `email` has on the folder (no-op if none). Never
+// touches the owner.
+export async function unshareFolder(folderLink: string, email: string): Promise<void> {
+  const fileId = folderIdFromLink(folderLink);
+  const drive = getDrive();
+  const res = await drive.permissions.list({
+    fileId,
+    fields: "permissions(id,emailAddress,role)",
+  });
+  const target = email.trim().toLowerCase();
+  for (const p of res.data.permissions ?? []) {
+    if (p.role === "owner" || p.emailAddress?.toLowerCase() !== target || !p.id) continue;
+    await drive.permissions.delete({ fileId, permissionId: p.id });
+  }
 }

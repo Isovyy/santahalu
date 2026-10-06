@@ -9,9 +9,11 @@ export interface NotifyRow {
   receiverOshiName: string;
   receiverFandomYume: string;
   receiverRelationshipType: string;
+  receiverYumeTypeReceive: string | null;
   receiverLanguageReceive: string;
   receiverYumeDocuLink: string;
   receiverFolderLink: string;
+  receiverFolderSharedWith: string | null;
   notifiedAt: string | null;
   folderNotifiedAt: string | null;
   confirmToken: string | null;
@@ -41,9 +43,11 @@ export async function getNotifyRows(
       receiverOshiName: m.receiver.oshiName,
       receiverFandomYume: m.receiver.fandomYume,
       receiverRelationshipType: m.receiver.relationshipType,
+      receiverYumeTypeReceive: m.receiver.yumeTypeReceive,
       receiverLanguageReceive: m.receiver.languageReceive,
       receiverYumeDocuLink: m.receiver.yumeDocuLink,
       receiverFolderLink: m.receiver.folderLink ?? "",
+      receiverFolderSharedWith: m.receiver.folderSharedWith,
       notifiedAt: m.notifiedAt ? m.notifiedAt.toString() : null,
       folderNotifiedAt: m.folderNotifiedAt ? m.folderNotifiedAt.toString() : null,
       confirmToken: m.confirmToken,

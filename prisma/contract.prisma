@@ -29,6 +29,10 @@ model Participant {
   languageGive     String?
   notes            String?
   folderLink       String?
+  // Email that currently has editor access to folderLink (the giver of this
+  // participant at the time it was shared). Lets the admin page spot a folder
+  // still shared with an old giver after a reshuffle, and revoke it on re-share.
+  folderSharedWith String?
   avoidList        String?
 
   givingMatches    Match[]  @relation("giver")
