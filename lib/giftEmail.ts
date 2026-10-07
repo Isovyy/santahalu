@@ -1,7 +1,7 @@
 import type { NotifyRow } from "@/lib/notify";
 import { escapeHtml } from "@/lib/emailHtml";
 
-export const GIFT_EMAIL_SUBJECT = "SantaHalu26: Hadiahmu sudah sampai!";
+export const GIFT_EMAIL_SUBJECT = "SANTAHALU26: YOU HAVE RECEIVED A GIFT!!";
 
 export const POST_EVENT_ANNOUNCEMENT_URL = "https://x.com/mlytfess/postsantahalu26";
 
