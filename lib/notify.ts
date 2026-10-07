@@ -6,6 +6,7 @@ export interface NotifyRow {
   giverEmail: string;
   giverTwt: string;
   receiverTwt: string;
+  receiverEmail: string;
   receiverOshiName: string;
   receiverFandomYume: string;
   receiverRelationshipType: string;
@@ -40,6 +41,7 @@ export async function getNotifyRows(
       giverEmail: m.giver.email,
       giverTwt: m.giver.twtUser,
       receiverTwt: m.receiver.twtUser,
+      receiverEmail: m.receiver.email,
       receiverOshiName: m.receiver.oshiName,
       receiverFandomYume: m.receiver.fandomYume,
       receiverRelationshipType: m.receiver.relationshipType,

@@ -6,8 +6,9 @@ import SendMatchEmails from "./SendMatchEmails";
 import CreateReceiverFolders from "./CreateReceiverFolders";
 import SendFolderEmails from "../send-folder/SendFolderEmails";
 import SendReminderEmails from "../send-reminder/SendReminderEmails";
+import SendGiftEmails from "../send-gift/SendGiftEmails";
 
-type Tab = "pasangan" | "buatfolder" | "folder" | "reminder";
+type Tab = "pasangan" | "buatfolder" | "folder" | "reminder" | "hadiah";
 
 export default function SendEmailTabs({
   runId,
@@ -34,6 +35,9 @@ export default function SendEmailTabs({
         <TabButton active={tab === "reminder"} onClick={() => setTab("reminder")}>
           Kirim reminder H-5
         </TabButton>
+        <TabButton active={tab === "hadiah"} onClick={() => setTab("hadiah")}>
+          Kirim hadiah
+        </TabButton>
       </div>
 
       {tab === "pasangan" && <SendMatchEmails runId={runId} rows={rows} />}
@@ -51,6 +55,8 @@ export default function SendEmailTabs({
       )}
 
       {tab === "reminder" && <SendReminderEmails runId={runId} rows={rows} />}
+
+      {tab === "hadiah" && <SendGiftEmails runId={runId} rows={confirmedRows} />}
     </div>
   );
 }
