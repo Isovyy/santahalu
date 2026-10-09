@@ -39,6 +39,7 @@ const SECTIONS: CopySection[] = [
     fields: [
       { key: "rules.heading", label: "Judul" },
       { key: "rules.fullLink.label", label: "Rules lengkap - Teks" },
+      { key: "rules.fullLink.text", label: "Rules lengkap - Teks link" },
       { key: "rules.fullLink.url", label: "Rules lengkap - Link" },
       { key: "rules.section1.title", label: "I - Judul bagian" },
       { key: "rules.section1.intro", label: "I - Intro", multiline: true },

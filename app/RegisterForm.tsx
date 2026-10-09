@@ -402,9 +402,9 @@ export default function RegisterForm({ copy }: { copy: FormCopy }) {
               href={copy["rules.fullLink.url"]}
               target="_blank"
               rel="noopener noreferrer"
-              className="break-all text-teal-500 hover:underline"
+              className="text-teal-500 hover:underline"
             >
-              {copy["rules.fullLink.url"]}
+              {copy["rules.fullLink.text"]}
             </a>
           </p>
         )}
@@ -666,9 +666,9 @@ export default function RegisterForm({ copy }: { copy: FormCopy }) {
                   href={copy["rules.fullLink.url"]}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="break-all text-teal-500 hover:underline"
+                  className="text-teal-500 hover:underline"
                 >
-                  {copy["rules.fullLink.url"]}
+                  {copy["rules.fullLink.text"]}
                 </a>
               )}
             </>

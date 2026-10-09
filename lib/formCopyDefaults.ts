@@ -19,6 +19,7 @@ export const FORM_COPY_DEFAULTS = {
 
   "rules.heading": "#SantaHalu: Secret Santa EVENT RULES",
   "rules.fullLink.label": "Rules lengkap:",
+  "rules.fullLink.text": "Rules and Form Guide",
   "rules.fullLink.url":
     "https://docs.google.com/document/d/1Ik2SjVYHblYsMt_N0cIb21dSiKNTBzdhWepDRUeIzd0/edit?usp=sharing",
   "rules.section1.title": "I - Registration",
@@ -70,7 +71,7 @@ export const FORM_COPY_DEFAULTS = {
   "field.languageGive.hint": "Centang semua yang termasuk",
   "field.fandomGive.label": "Fandom yang bersedia kamu buatkan hadiah",
   "field.fandomGive.hint":
-    "Bila semua cukup centang 'Apa saja'. Cari fandom lalu klik untuk menambah. Fandom yang tidak ada di daftar bisa ditambahkan dengan mengetik namanya.",
+    "Bila semua cukup centang 'Apa saja'. Cari fandom lalu klik untuk menambah. Fandom yang tidak ada di daftar bisa ditambahkan secara manual.",
   "field.yumeDocuLink.label": "Dokumen Yumeship",
   "field.yumeDocuLink.hint":
     "Tempel link ke Google Doc/Drive yang berisi referensi yumeshipmu. Tidak wajib menggunakan template yang disediakan. Template (bila butuh):",
