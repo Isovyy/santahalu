@@ -80,15 +80,15 @@ export function normalizeTwitterHandle(raw: string): string {
 
 const POPULAR_FANDOMS = [
   "Genshin Impact",
-  "Honkai Star Rail",
+  "Honkai: Star Rail",
   "Ensemble Stars",
   "Twisted Wonderland",
   "Tokyo Debunker",
-  "Hypnosis Mic",
-  "Project Sekai",
+  "Hypnosis Microphone",
+  "Project Sekai: Colorful Stage",
   "Touken Ranbu",
-  "Love and Deep Space",
-  "Obey Me!",
+  "Love and Deepspace",
+  "Obey Me",
 ];
 
 export interface AvoidEntry {

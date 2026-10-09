@@ -54,14 +54,25 @@ export const OSHI_DATA: OshiFandom[] = [
       "Azami Izumida",
       "Azuma Yukishiro",
       "Banri Settsu",
+      "Chikage Utsuki",
+      "Citron",
+      "Guy",
+      "Hisoka Mikage",
+      "Homare Arisugawa",
       "Itaru Chigasaki",
+      "Juza Hyodo",
+      "Kazunari Miyoshi",
+      "Kumon Hyodo",
       "Masumi Usui",
+      "Misumi Ikaruga",
       "Muku Sakisaka",
       "Omi Fushimi",
       "Sakuya Sakuma",
+      "Sakyo Furuichi",
       "Taichi Nanao",
       "Tenma Sumeragi",
       "Tsumugi Tsukioka",
+      "Tsuzuru Minagi",
       "Yuki Rurikawa"
     ]
   },
@@ -70,7 +81,9 @@ export const OSHI_DATA: OshiFandom[] = [
     "characters": [
       "Kawakami Hanamaru",
       "Lamli Bennett",
-      "Miyaji"
+      "Miyaji",
+      "Fennesz Oswald",
+      "Flure Garcia"
     ]
   },
   {
@@ -83,7 +96,10 @@ export const OSHI_DATA: OshiFandom[] = [
     "fandom": "Amnesia",
     "characters": [
       "Ikki",
-      "Toma"
+      "Toma",
+      "Shin",
+      "Kent",
+      "Ukyo"
     ]
   },
   {
@@ -128,6 +144,7 @@ export const OSHI_DATA: OshiFandom[] = [
     "fandom": "Arknights: Endfield",
     "characters": [
       "Ardashir",
+      "Camille",
       "Endministrator",
       "Wulfgard",
       "Zhuang Fangyi"
@@ -189,7 +206,9 @@ export const OSHI_DATA: OshiFandom[] = [
       "Ishida Uryu",
       "Jugram Haschwalth",
       "Quilge Opie",
-      "Yhwach"
+      "Yhwach",
+      "Hitsugaya Toushiro",
+      "Kurosaki Ichigo"
     ]
   },
   {
@@ -214,19 +233,32 @@ export const OSHI_DATA: OshiFandom[] = [
   {
     "fandom": "Blue Lock",
     "characters": [
+      "Alexis Ness",
+      "Jyubei Aryu",
       "Bachira Meguru",
       "Barou Shoei",
       "Chigiri Hyoma",
+      "Gagamura Gin",
+      "Hiori Yo",
+      "Hugo Vivian",
       "Isagi Yoichi",
       "Itoshi Rin",
       "Itoshi Sae",
+      "Julian Loki",
       "Karasu Tabito",
+      "Kiyora Jin",
       "Kunigami Rensuke",
       "Kurona Ranze",
       "Michael Kaiser",
       "Mikage Reo",
       "Nagi Seishiro",
-      "Reo Mikage",
+      "Niko Ikki",
+      "Oliver Aiku",
+      "Otoya Eita",
+      "Raichi Jingo",
+      "Sendou Shuto",
+      "Shidou Ryusei",
+      "Tsurugi Zantetsu",
       "Yukimiya Kenyu"
     ]
   },
@@ -256,12 +288,31 @@ export const OSHI_DATA: OshiFandom[] = [
   {
     "fandom": "Break My Case",
     "characters": [
+      "Ai Kosaka",
+      "Yuzuru Kise",
+      "Roka Suoh",
+      "Kou Ayato",
+      "Mao Ukyo",
       "Akehoshi Hinomiya",
-      "Ichikawa Haruhi",
-      "Kamiya",
-      "Kosaka Ai",
+      "Yuragi Kanno",
+      "Taiga Tsukimoto",
+      "Haruhi Ichikawa",
+      "Sei Okiya",
       "Shizuka Fushimi",
-      "Yuzuru Kise"
+      "Takeru Mikado",
+      "Shinobu Aizawa",
+      "Soyogu Shinkai",
+      "Kiho Arima",
+      "Riku Tateshina",
+      "Kyoya Shido",
+      "Tomose Onda",
+      "Yu Nina",
+      "Kamiya",
+      "Urara Manami",
+      "Togo Yashiro",
+      "Ito Yashiro",
+      "Yukimura Date",
+      "Ran Amo"
     ]
   },
   {
@@ -271,7 +322,7 @@ export const OSHI_DATA: OshiFandom[] = [
     ]
   },
   {
-    "fandom": "Bungo Stray Dogs",
+    "fandom": "Bungou Stray Dogs",
     "characters": [
       "Akutagawa Ryunosuke",
       "Atsushi Nakajima",
@@ -297,7 +348,11 @@ export const OSHI_DATA: OshiFandom[] = [
   {
     "fandom": "Bustafellows",
     "characters": [
-      "Shu Lyn O'Keefe"
+      "Shu Lyn O'Keefe",
+      "Limbo Scott Fitzgerald",
+      "Helvetica Orsted",
+      "Mozu Nile Shepherd",
+      "Scarecrow"
     ]
   },
   {
@@ -324,7 +379,11 @@ export const OSHI_DATA: OshiFandom[] = [
   {
     "fandom": "Collar x Malice",
     "characters": [
-      "Takeru Sasazuka"
+      "Takeru Sasazuka",
+      "Kei Okazaki",
+      "Kageyuki Shiraishi",
+      "Aiji Yanagi",
+      "Mineo Enomoto"
     ]
   },
   {
@@ -334,6 +393,16 @@ export const OSHI_DATA: OshiFandom[] = [
       "Black Sapphire Cookie",
       "Burnt Cheese Cookie",
       "Shadow Milk Cookie"
+    ]
+  },
+  {
+    "fandom": "DC",
+    "characters": [
+      "Billy Batson",
+      "Bruce Wayne",
+      "Dick Grayson",
+      "Jason Todd",
+      "Tim Drake"
     ]
   },
   {
@@ -357,19 +426,14 @@ export const OSHI_DATA: OshiFandom[] = [
     ]
   },
   {
-    "fandom": "DC",
-    "characters": [
-      "Billy Batson",
-      "Bruce Wayne",
-      "Dick Grayson",
-      "Jason Todd",
-      "Tim Drake"
-    ]
-  },
-  {
     "fandom": "Dear Vocalist",
     "characters": [
-      "A’"
+      "A’",
+      "Reodo",
+      "Judah",
+      "Joshua",
+      "Momochi",
+      "(2)You"
     ]
   },
   {
@@ -381,11 +445,16 @@ export const OSHI_DATA: OshiFandom[] = [
   {
     "fandom": "Degrees Of Lewdity",
     "characters": [
-      "Alex the Farmhand (male)",
-      "Remy the Farmer (Male)",
+      "Alex the Farmhand",
+      "Avery the Businessman / Businesswoman",
+      "Bailey the Caretaker",
+      "Eden the Hunter / Huntress",
+      "Kylar the Loner",
+      "Remy the Farmer",
+      "Robin the Orphan",
       "Sydney the Faithful",
       "Whitney the Bully",
-      "Whitney the Bully (Male)"
+      "Wren the Gambler"
     ]
   },
   {
@@ -419,13 +488,6 @@ export const OSHI_DATA: OshiFandom[] = [
     ]
   },
   {
-    "fandom": "Devil Butler with Black Cat",
-    "characters": [
-      "Fennesz Oswald",
-      "Flure Garcia"
-    ]
-  },
-  {
     "fandom": "Devil May Cry",
     "characters": [
       "Dante",
@@ -438,13 +500,51 @@ export const OSHI_DATA: OshiFandom[] = [
     "characters": [
       "Ayato Sakamaki",
       "Azusa Mukami",
-      "Yuma Mukami"
+      "Yuma Mukami",
+      "Shu Sakamaki",
+      "Reiji Sakamaki",
+      "Laito Sakamaki",
+      "Kanato Sakamaki",
+      "Ruki Mukami",
+      "Kou Mukami",
+      "Carla Tsukinami",
+      "Shin Tsukinami",
+      "Kino",
+      "Karlheinz"
     ]
   },
   {
     "fandom": "Diamond of ace",
     "characters": [
-      "Miyuki Kazuya"
+      "Miyuki Kazuya",
+      "Sawamura Eijun",
+      "Narumiya Mei",
+      "Yuuki Tetsuya",
+      "Kominato Haruichi",
+      "Kominato Ryousuke",
+      "Kuramochi Youichi",
+      "Furuya Satoru"
+    ]
+  },
+  {
+    "fandom": "DIG-ROCK",
+    "characters": [
+      "Nonaka Tsugumi",
+      "Mizukawa Toki",
+      "Hayama Mitsuru",
+      "Shibasaki Hibari",
+      "Tobikura Sora",
+      "Higurashi Akane",
+      "Tokito Kurono",
+      "Fuyuki Mashiro",
+      "Sumizome Haiji",
+      "Iwahara Shiki",
+      "Kouno Hibiki",
+      "Endo Shoma",
+      "Onozato Shion",
+      "Hayama Toya",
+      "Kido Sogo",
+      "Kasuga Taakaki"
     ]
   },
   {
@@ -453,7 +553,8 @@ export const OSHI_DATA: OshiFandom[] = [
       "Ryusui Nanami",
       "Senku Ishigami",
       "Stanley Snyder",
-      "Ukyo Saionji"
+      "Ukyo Saionji",
+      "Xeno Houston Wingfield"
     ]
   },
   {
@@ -492,7 +593,20 @@ export const OSHI_DATA: OshiFandom[] = [
   {
     "fandom": "Elsword",
     "characters": [
-      "Noah Ebalon"
+      "Elsword",
+      "Elesis",
+      "Rena",
+      "Aisha Landarr",
+      "Eve",
+      "Add",
+      "Luciella R. Sourcream",
+      "Ciel",
+      "Laby",
+      "Nisha",
+      "Lilith",
+      "Noah Ebalon",
+      "Harque Ebalon",
+      "Clamor Ventus"
     ]
   },
   {
@@ -509,10 +623,10 @@ export const OSHI_DATA: OshiFandom[] = [
       "Hakaze Kaoru",
       "Harukawa Sora",
       "Hasumi Keito",
+      "HiMERU",
       "Hibiki Wataru",
       "Hidaka Hokuto",
       "Himemiya Tori",
-      "HiMERU",
       "Isara Mao",
       "Itsuki Shu",
       "Juis Kojika",
@@ -553,36 +667,184 @@ export const OSHI_DATA: OshiFandom[] = [
     ]
   },
   {
-    "fandom": "Fate Grand Order",
+    "fandom": "FREE!",
+    "characters": [
+      "Kirishima Ikuya",
+      "Sousuke Yamazaki",
+      "Tachibana Makoto"
+    ]
+  },
+  {
+    "fandom": "Fate/Grand Order",
     "characters": [
       "Arjuna",
+      "Arthur Pendragon",
+      "Altria Pendragon",
+      "Altera",
       "Asclepius",
+      "Astolfo",
       "Barghest",
+      "BB",
+      "Beni-Emma",
+      "Charlemagne",
       "Dante Alighieri",
       "Daybit Sem Void",
+      "Dioscuri",
       "Enkidu",
       "Ereshkigal",
+      "Gawain",
+      "Gareth",
       "Gilgamesh",
       "Hajime Saito",
+      "Ibuki Douji",
       "Indra",
+      "Jason",
+      "Karna",
+      "Kingu",
+      "Kurohime",
+      "Lanling Wang",
       "Merlin",
       "Napoleon Bonaparte",
+      "Nemo",
+      "Noah",
       "Oberon Vortigern",
+      "Okita Souji",
+      "Passionlip",
+      "Queen Medb",
+      "Roland",
       "Richard I the Lionheart",
       "Romani Archaman",
       "Sherlock Holmes",
-      "Yan Qing"
+      "Senji Muramasa",
+      "Siegurd",
+      "Sigfried",
+      "Theseus",
+      "Yan Qing",
+      "Lancelot",
+      "Nero Claudius",
+      "Gaius Julius Caesar",
+      "Modred",
+      "Jacques de Molay (Saber)",
+      "Jacques de Molay (Foreigner)",
+      "Gray Lily",
+      "Kondo Isami",
+      "Miyamoto Iori",
+      "Yamato Takeru",
+      "Medusa",
+      "Sétanta",
+      "Yamanami Keisuke",
+      "Trưng Trắc",
+      "Trưng Nhị",
+      "Watanabe no Tsuna",
+      "Tomoe Gozen",
+      "Katsushika Hokusai",
+      "Lakshmibai",
+      "Diarmuid Ua Duibhne",
+      "Yagyuu Munenori",
+      "Frankenstein",
+      "Suzuka Gozen",
+      "Bedivere",
+      "Elizabeth Báthory",
+      "Rama",
+      "Ryougi Shiki",
+      "Fergus mac Róich",
+      "Chevalier d'Eon",
+      "Gilles de Rais",
+      "EMIYA",
+      "EMIYA Alter",
+      "Robin Hood",
+      "Atalanta",
+      "Euryale",
+      "Arash",
+      "Orion",
+      "David",
+      "Oda Nobunaga",
+      "Nikola Tesla",
+      "Billy the Kid",
+      "Tristan",
+      "Tawara Touta",
+      "Anne Bonny",
+      "Mary Read",
+      "Chloe von Einzbern",
+      "Helena Blavatsky",
+      "Asagami Fujino",
+      "Chiron",
+      "Napoléon",
+      "Jeanne d'Arc",
+      "William Tell",
+      "Aśvatthāman",
+      "Paris",
+      "Osakabehime",
+      "Calamity Jane",
+      "Nightingale",
+      "Sei Shounagon",
+      "Illyasviel von Einzbern",
+      "Oda Nobukatsu",
+      "Baobhan Sith",
+      "Anastasia",
+      "Zenobia",
+      "Minamoto no Tametomo",
+      "Takasugi Shinsaku",
+      "Durga",
+      "Ptolemaios",
+      "Sugitani Zenjuubou",
+      "Saika Magoichi",
+      "Tutankhamun",
+      "Tiamat",
+      "Urðr (Urdr)",
+      "Ono no Komachi",
+      "Cú Chulainn",
+      "Musashibou Benkei",
+      "Leonidas I",
+      "Romulus",
+      "Scáthach",
+      "Fionn mac Cumhaill",
+      "Brynhildr",
+      "Li Shuwen",
+      "Tamamo no Mae",
+      "Kiyohime",
+      "Vlad III (EXTRA)",
+      "Jaguar Man",
+      "Parvati",
+      "Minamoto no Raikou",
+      "Hōzōin Inshun",
+      "Nezha",
+      "Valkyrie",
+      "Ibaraki Dōji",
+      "Qin Liangyu",
+      "Bradamante",
+      "Nagao Kagetora",
+      "Mysterious Alter Ego Λ",
+      "Caenis",
+      "Romulus-Quirinus",
+      "Utsumi Erice",
+      "Consort Yu",
+      "Vritra",
+      "Percival",
+      "Sakamoto Ryōma",
+      "Mary Anning",
+      "Don Quixote",
+      "Britomart",
+      "Bhima",
+      "Miyu Edelfelt",
+      "Harada Sanosuke",
+      "Demeter"
     ]
   },
   {
     "fandom": "Fate/Strange Fake",
     "characters": [
-      "Ishtar"
+      "Philia",
+      "Enkidu",
+      "Gilgamesh",
+      "Tine"
     ]
   },
   {
     "fandom": "Final Fantasy XIV",
     "characters": [
+      "Aymeric",
+      "Emet-selch",
       "Erenville",
       "Haurchefant Greystone"
     ]
@@ -595,11 +857,18 @@ export const OSHI_DATA: OshiFandom[] = [
     ]
   },
   {
-    "fandom": "Fire Emblem",
+    "fandom": "Fire Emblem: Awakening",
+    "characters": [
+      "Grima"
+    ]
+  },
+  {
+    "fandom": "Fire Emblem: Three Houses",
     "characters": [
       "Dimitri Alexandre Blaiddyd",
+      "Claude von Riegan",
       "Edelgard von Hresvelg",
-      "Grima",
+      "Female Byleth",
       "Male Byleth"
     ]
   },
@@ -622,34 +891,25 @@ export const OSHI_DATA: OshiFandom[] = [
     ]
   },
   {
-    "fandom": "FREE!",
-    "characters": [
-      "Kirishima Ikuya",
-      "Sousuke Yamazaki",
-      "Tachibana Makoto"
-    ]
-  },
-  {
-    "fandom": "from ARGONAVIS",
-    "characters": [
-      "Reiji Karasuma",
-      "Ryo Akebono",
-      "Wataru Matoba"
-    ]
-  },
-  {
     "fandom": "Full metal Alchemist",
     "characters": [
       "Edward Elric"
     ]
   },
   {
+    "fandom": "GTA V",
+    "characters": [
+      "Wade Hebert"
+    ]
+  },
+  {
     "fandom": "Gachiakuta",
     "characters": [
       "Fu Orostor",
-      "gris rubion",
       "Nijiku Zanka",
-      "Tamsy Caines"
+      "Tamsy Caines",
+      "Gris Rubion",
+      "Enjin"
     ]
   },
   {
@@ -659,10 +919,14 @@ export const OSHI_DATA: OshiFandom[] = [
       "Albedo",
       "Alhaitham",
       "Alice",
+      "Alyosha",
+      "Anastasya Tsaritsa",
       "Arlecchino",
+      "Baizhu",
       "Capitano",
       "Chiori",
       "Chongyun",
+      "Clorinde",
       "Columbina Hyposelenia",
       "Cyno",
       "Diluc",
@@ -670,6 +934,7 @@ export const OSHI_DATA: OshiFandom[] = [
       "Durin",
       "Flins",
       "Freminet",
+      "Furina",
       "Hu tao",
       "Ifa",
       "Illuga",
@@ -678,19 +943,34 @@ export const OSHI_DATA: OshiFandom[] = [
       "Kaveh",
       "Kazuha",
       "Kinich",
+      "Kuki Shinobu",
       "Lohen",
       "Lumine",
       "Lyney",
+      "Lynette",
       "Mavuika",
       "Mona",
+      "Mitya",
+      "Nahida",
       "Navia",
+      "Nefer",
       "Neuvillette",
+      "Nicole",
+      "Nilou",
+      "Odette",
+      "Ororon",
       "Pantalone",
+      "Raiden Ei",
+      "Sandrone",
+      "Sara",
       "Shikanoin Heizou",
       "Tartaglia",
       "Tighnari",
+      "Valeriy",
       "Varka",
       "Venti",
+      "Vesna",
+      "Vodyanista",
       "Wanderer",
       "Wriothesley",
       "Xiao",
@@ -728,7 +1008,9 @@ export const OSHI_DATA: OshiFandom[] = [
     "characters": [
       "Belial",
       "Galleon",
-      "Lucilius"
+      "Lucilius",
+      "Sandalphon",
+      "Lucifer"
     ]
   },
   {
@@ -738,40 +1020,89 @@ export const OSHI_DATA: OshiFandom[] = [
     ]
   },
   {
-    "fandom": "GTA V",
+    "fandom": "Handsome Laundering",
     "characters": [
-      "Wade Hebert"
+      "Hanaoka Makio",
+      "Uto Zen",
+      "Kazami Luka",
+      "Tsukishiro Chigaya",
+      "Higano Shun",
+      "Kaise Hayato",
+      "Tsukishiro Yoshiya",
+      "Kuga Tomoe"
+    ]
+  },
+  {
+    "fandom": "HELIOS Rising Heroes",
+    "characters": [
+      "Asch Albright",
+      "Marion Blythe",
+      "Nico",
+      "Will Sprout",
+      "Brad Beams",
+      "Faith Beams",
+      "Ootori Akira"
     ]
   },
   {
     "fandom": "Haikyuu!!",
     "characters": [
+      "Akagi Michinari",
       "Akaashi Keiji",
+      "Aone Takanobu",
+      "Aran Ojiro",
       "Bokuto Koutarou",
       "Daichi Sawamura",
+      "Futakuchi Kenji",
+      "Fukunaga Shouhei",
+      "Goshiki Tsutomu",
+      "Hakuba Gao",
+      "Hanamaki Takahiro",
       "Hinata Shouyou",
       "Hirugami Sachiro",
       "Hoshiumi Kourai",
       "Iwaizumi Hajime",
+      "Kai Nobuyuki",
       "Kageyama Tobio",
+      "Kawanishi Taichi",
       "Keishin Ukai",
+      "Kindaichi Yuutaro",
       "Kita Shinsuke",
+      "Konoha Akinori",
+      "Komori Motoya",
       "Kozume Kenma",
       "Kuroo Tetsurou",
+      "Kunimi Akira",
+      "Matsukawa Issei",
       "Miya Atsumu",
       "Miya Osamu",
+      "Nishinoya Yuu",
       "Oikawa Tooru",
+      "Omimi Ren",
+      "Reon Ohira",
+      "Sakunami Kousuke",
+      "Sarukui Yamato",
+      "Semi Eita",
+      "Shirabu Kenjiro",
       "Sugawara Koushi",
       "Suna Rintaro",
+      "Tanaka Ryunosuke",
+      "Tendou Satori",
       "Tsukishima Kei",
+      "Ushijima Wakatoshi",
+      "Watari Shinji",
+      "Washio Tatsuki",
       "Yachi Hitoka",
-      "Yaku Morisuke"
+      "Yaku Morisuke",
+      "Yamagata Hayato",
+      "Yamamoto Taketora"
     ]
   },
   {
     "fandom": "Hakuouki",
     "characters": [
       "Harada Sanosuke",
+      "Hijikata Toshizou",
       "Okita Souji",
       "Susumu Yamazaki"
     ]
@@ -788,7 +1119,8 @@ export const OSHI_DATA: OshiFandom[] = [
     "fandom": "Hazbin Hotel",
     "characters": [
       "Lucifer Morningstar",
-      "Vox"
+      "Vox",
+      "Alastor"
     ]
   },
   {
@@ -801,15 +1133,6 @@ export const OSHI_DATA: OshiFandom[] = [
     "fandom": "Heaven Burns Red",
     "characters": [
       "Yuina Shirakawa"
-    ]
-  },
-  {
-    "fandom": "Helios Rising Heroes",
-    "characters": [
-      "Asch Albright",
-      "Marion Blythe",
-      "Nico",
-      "Will Sprout"
     ]
   },
   {
@@ -848,39 +1171,70 @@ export const OSHI_DATA: OshiFandom[] = [
       "Kevin Kaslana",
       "Kiana Kaslana",
       "Raiden Mei",
+      "Seele Vollerei",
+      "Otto Apocalypse",
       "Void Archives"
     ]
   },
   {
-    "fandom": "Honkai Star Rail",
+    "fandom": "Honkai: Star Rail",
     "characters": [
       "Acheron",
+      "Aglaea",
       "Anaxa",
       "Argenti",
       "Ashveil",
       "Aventurine",
+      "Black Swan",
       "Blade",
       "Boothill",
       "Caelus",
+      "Castorice",
+      "Cerydra",
+      "Cypher",
+      "Cyrene",
+      "Evanescia",
+      "Evernight",
+      "Dahlia",
+      "Dan Feng",
       "Dan Heng",
       "Dr. Ratio",
+      "Elio",
       "Feixiao",
+      "Firefly",
       "Fugue",
+      "Fu Xuan",
       "Gallagher",
       "Gepard",
+      "Guinafen",
+      "Himeko",
+      "Huohuo",
+      "Hyacine",
+      "Hysilens",
       "Jiaoqiu",
+      "Jingliu",
       "Jing Yuan",
+      "Kafka",
+      "Lingsha",
       "Luka",
       "Luocha",
       "Lygus",
+      "March 7th",
+      "Misha",
+      "Moze",
+      "Nihilux",
       "Mr. Reca",
       "Mydei",
+      "Pearl",
       "Phainon",
       "Robin",
       "Ruan Mei",
       "Sampo",
+      "Silver Wolf",
+      "Sparkle",
       "Stelle",
       "Sunday",
+      "Tingyun",
       "The Herta",
       "Welt"
     ]
@@ -910,26 +1264,17 @@ export const OSHI_DATA: OshiFandom[] = [
     ]
   },
   {
-    "fandom": "Hypnosis Mic",
+    "fandom": "Hypnosis Microphone",
     "characters": [
-      "Amaguni Hitoya",
       "Arisugawa Dice",
       "Jinguji Jakurai",
       "Jyuto Iruma",
+      "Amaguni Hitoya",
       "Kuko Harai",
       "Ramuda Amemura",
       "Samatoki Aohitsugi",
       "Yamada Ichiro",
       "Yamada Saburo"
-    ]
-  },
-  {
-    "fandom": "Identity V",
-    "characters": [
-      "Andrew Kreiss",
-      "Finsen Hunter",
-      "Ithaqua",
-      "Jose Baden"
     ]
   },
   {
@@ -955,36 +1300,121 @@ export const OSHI_DATA: OshiFandom[] = [
     ]
   },
   {
+    "fandom": "Identity V",
+    "characters": [
+      "Andrew Kreiss",
+      "Finsen Hunter",
+      "Ithaqua",
+      "Jose Baden"
+    ]
+  },
+  {
     "fandom": "Idolm@ster SideM",
     "characters": [
       "Kyousuke Aoi"
     ]
   },
   {
-    "fandom": "Ikemen Series",
+    "fandom": "Ikemen Prince",
     "characters": [
-      "Akechi Mitsuhide",
-      "Alfons Sylvatica",
       "Clavis Lelouch",
-      "Comte de Saint-Germain",
-      "Darius Vogel",
       "Gilbert Von Obsidian",
-      "Harrison Gray",
-      "Hideyoshi Toyotomi",
-      "Ishida Mitsunari",
-      "Johann Georg Faust",
-      "Jude Jazza",
-      "Kicho",
       "Leon Dompteur",
-      "Liam Evans",
+      "Chevalier Michel",
       "Licht Klein",
-      "Loki Genetta",
+      "Yves Kloss",
       "Matias Asbrink",
       "Nokto Klein",
-      "Oda Nobunaga",
-      "Ring Schwartz",
-      "Sanada Yukimura",
+      "Sariel Noir",
+      "Luke Randolph",
+      "Jin Grandet",
+      "Rio Ortiz",
       "Silvio Ricci",
+      "Keith Howell",
+      "Kagari Amagase",
+      "Azel Radwan"
+    ]
+  },
+  {
+    "fandom": "Ikemen Revolution",
+    "characters": [
+      "Lancelot Kingsley",
+      "Jonah Clemence",
+      "Edgar Bright",
+      "Zero",
+      "Kyle Ash",
+      "Ray Blackwell",
+      "Sirius Oswald",
+      "Luka Clemence",
+      "Fenrir Godspeed",
+      "Seth Hyde",
+      "Harr Silver",
+      "Loki Genetta",
+      "Blanc Lapin",
+      "Oliver Knight"
+    ]
+  },
+  {
+    "fandom": "Ikemen Sengoku",
+    "characters": [
+      "Akechi Mitsuhide",
+      "Hideyoshi Toyotomi",
+      "Ishida Mitsunari",
+      "Kicho",
+      "Oda Nobunaga",
+      "Sanada Yukimura",
+      "Date Masamune",
+      "Mori Ranmaru",
+      "Kennyo",
+      "Takeda Shingen",
+      "Tokugawa Ieyasu",
+      "Maeda Keiji",
+      "Uesugi Kenshin",
+      "Naoe Kanetsugu",
+      "Imagawa Yoshimoto",
+      "Mouri Motonari",
+      "Ashikaga Yoshiteru",
+      "Kuroda Kanbei",
+      "Matsunaga Hisahide",
+      "Kirigakure Saizo",
+      "Sen no Rikyu"
+    ]
+  },
+  {
+    "fandom": "Ikemen Vampire",
+    "characters": [
+      "Napoleon Bonaparte",
+      "Wolfgang Amadeus Mozart",
+      "Arthur Conan Doyle",
+      "Isaac Newton",
+      "Leonardo da Vinci",
+      "Dazai Osamu",
+      "Vincent van Gogh",
+      "Theodorus van Gogh",
+      "Jean d’Arc",
+      "Comte de Saint-Germain",
+      "Sebastian",
+      "William Shakespeare",
+      "Vlad",
+      "Johann Georg Faust",
+      "Charles Henri Sanson",
+      "Galileo Galilei",
+      "Francis Drake"
+    ]
+  },
+  {
+    "fandom": "Ikemen Villains",
+    "characters": [
+      "Alfons Sylvatica",
+      "Elbert Greetia",
+      "Roger Barel",
+      "Darius Vogel",
+      "Harrison Gray",
+      "Jude Jazza",
+      "Ellis Twilight",
+      "Liam Evans",
+      "Ring Schwartz",
+      "Nica Schwartz",
       "Victor",
       "William Rex"
     ]
@@ -1017,7 +1447,6 @@ export const OSHI_DATA: OshiFandom[] = [
       "Fushiguro Megumi",
       "Geto Suguru",
       "Gojo Satoru",
-      "higuruma hiromi",
       "Inumaki toge",
       "Itadori Yuji",
       "Kusakabe Atsuya",
@@ -1027,7 +1456,8 @@ export const OSHI_DATA: OshiFandom[] = [
       "Ryomen Sukuna",
       "Takuma Ino",
       "Toji Fushiguro",
-      "Yuta Okkotsu"
+      "Yuta Okkotsu",
+      "higuruma hiromi"
     ]
   },
   {
@@ -1100,6 +1530,21 @@ export const OSHI_DATA: OshiFandom[] = [
     ]
   },
   {
+    "fandom": "LOOKISM",
+    "characters": [
+      "Ahn Hyunseong",
+      "Kang Dagyeom",
+      "Kim Gimyung",
+      "Kwon Roy",
+      "Na Jaegyeon",
+      "Oh Changsu",
+      "PARK JONGGUN",
+      "Seo Seongeun",
+      "Yoo Jin",
+      "Yuk Seongji"
+    ]
+  },
+  {
     "fandom": "League of Legends",
     "characters": [
       "Yone"
@@ -1130,7 +1575,15 @@ export const OSHI_DATA: OshiFandom[] = [
       "Lei Heng",
       "Meursault",
       "Vespa",
-      "Yi Sang"
+      "Yi Sang",
+      "Faust",
+      "Dante",
+      "Ryoshu",
+      "Rodeon",
+      "Sinclair",
+      "Heathcliff",
+      "Vergillius",
+      "Bamboo-Hatted Kim"
     ]
   },
   {
@@ -1141,40 +1594,100 @@ export const OSHI_DATA: OshiFandom[] = [
     ]
   },
   {
-    "fandom": "LOOKISM",
-    "characters": [
-      "Ahn Hyunseong",
-      "Kang Dagyeom",
-      "Kim Gimyung",
-      "Kwon Roy",
-      "Na Jaegyeon",
-      "Oh Changsu",
-      "PARK JONGGUN",
-      "Seo Seongeun",
-      "Yoo Jin",
-      "Yuk Seongji"
-    ]
-  },
-  {
     "fandom": "Lout of The Count's Family",
     "characters": [
       "Cale Henituse"
     ]
   },
   {
-    "fandom": "Love and Deep Space",
+    "fandom": "Love Live",
+    "characters": [
+      "Ai Miyashita",
+      "Akira Goto",
+      "Aoi Reisawa",
+      "Aurora Konohana",
+      "Ceras Yanagida Lilienfeld",
+      "Ginko Momose",
+      "Hanamaru Kunikida",
+      "Hanayo Koizumi",
+      "Hikaru Amakusa",
+      "Izumi Katsuragi",
+      "Kaho Hinoshita",
+      "Kanan Matsuura",
+      "Kanata Konoe",
+      "Kanon Shibuya",
+      "Karin Asaka",
+      "Kasumi Nakasu",
+      "Keke Tang",
+      "Kosuzu Kachimachi",
+      "Kozue Otomune",
+      "Lanzhu Zong",
+      "Leah Kazuno",
+      "Mai Azabu",
+      "Maika Kinjo",
+      "Mao Hiiragi",
+      "Mari Ohara",
+      "Maya Mikasa",
+      "Megumi Fujishima",
+      "Mei Yoneme",
+      "Mia Taylor",
+      "Midori Yamada",
+      "Mion Shinowa",
+      "Miracle Kanazawa",
+      "Misuzu Wakatsuki",
+      "Nanami Nanakusa",
+      "Noriko Chofu",
+      "Polka Takahashi",
+      "Ren Hazuki",
+      "Rena Suzuka",
+      "Riko Sakurauchi",
+      "Rin Hoshizora",
+      "Rina Tennoji",
+      "Rurika Tsubaki",
+      "Rurino Osawa",
+      "Sachi Ogami",
+      "Sarah Kazuno",
+      "Sayaka Harukaze",
+      "Sayaka Murano",
+      "Setsuna Yuki",
+      "Shiki Wakana",
+      "Shioriko Mifune",
+      "Sumire Heanna",
+      "Toa Kurusu",
+      "Tomari Onitsuka",
+      "Tsuki Watanabe",
+      "Tsuzuri Yugiri",
+      "Umi Sonoda",
+      "Wien Margarete",
+      "Yoshiko Tsushima",
+      "You Watanabe",
+      "Yu Takasaki",
+      "Yukino Hojo",
+      "Yukuri Harumiya",
+      "Yuna Hijirisawa",
+      "Yuzuha Sumeragi",
+      "Honoka Kosaka",
+      "Kotori Minami",
+      "Nico Yazawa",
+      "Maki Nishikino",
+      "Eli Ayase",
+      "Nozomi Tojo",
+      "Ruby Kurosawa",
+      "Dia Kurosawa",
+      "Osaka Shizuku",
+      "Ayumu Uehara",
+      "Emma Verde",
+      "Chisato Arashi"
+    ]
+  },
+  {
+    "fandom": "Love and Deepspace",
     "characters": [
       "Caleb",
       "Rafayel",
       "Sylus",
       "Xavier",
       "Zayne"
-    ]
-  },
-  {
-    "fandom": "Love Live",
-    "characters": [
-      "Osaka Shizuku"
     ]
   },
   {
@@ -1185,6 +1698,13 @@ export const OSHI_DATA: OshiFandom[] = [
       "Cael Anselm",
       "Clarence Clayden",
       "Lars Rorschach"
+    ]
+  },
+  {
+    "fandom": "MILGRAM",
+    "characters": [
+      "Kayano Mikoto",
+      "Kotoko Yuzuriha"
     ]
   },
   {
@@ -1218,14 +1738,9 @@ export const OSHI_DATA: OshiFandom[] = [
     "fandom": "Mashle",
     "characters": [
       "Orter Madl",
-      "Rayne Ames"
-    ]
-  },
-  {
-    "fandom": "MILGRAM",
-    "characters": [
-      "Kayano Mikoto",
-      "Kotoko Yuzuriha"
+      "Rayne Ames",
+      "Renatus Revol",
+      "Abel Walker"
     ]
   },
   {
@@ -1245,14 +1760,18 @@ export const OSHI_DATA: OshiFandom[] = [
     "characters": [
       "Aamon Paxley",
       "Floryn",
-      "Marcel Paxley"
+      "Marcel Paxley",
+      "Fredrinn",
+      "Granger"
     ]
   },
   {
     "fandom": "Moriarty The Patriot",
     "characters": [
       "Albert James Moriarty",
-      "Louis James Moriarty"
+      "Louis James Moriarty",
+      "William James Moriarty",
+      "Mycroft Holmes"
     ]
   },
   {
@@ -1297,7 +1816,8 @@ export const OSHI_DATA: OshiFandom[] = [
       "Obito Uchiha",
       "Sasori",
       "Uchiha Shisui",
-      "Uzumaki Naruto"
+      "Uzumaki Naruto",
+      "Gaara"
     ]
   },
   {
@@ -1325,7 +1845,7 @@ export const OSHI_DATA: OshiFandom[] = [
     ]
   },
   {
-    "fandom": "Obey Me!",
+    "fandom": "Obey Me",
     "characters": [
       "Asmodeus",
       "Barbatos",
@@ -1337,7 +1857,8 @@ export const OSHI_DATA: OshiFandom[] = [
       "Mammon",
       "Satan",
       "Simeon",
-      "Solomon"
+      "Solomon",
+      "Raphael"
     ]
   },
   {
@@ -1349,9 +1870,9 @@ export const OSHI_DATA: OshiFandom[] = [
       "Shamrock Figarland",
       "Shanks",
       "Trafalgar Law",
-      "uta",
       "Vinsmoke Niji",
-      "Vinsmoke Sanji"
+      "Vinsmoke Sanji",
+      "uta"
     ]
   },
   {
@@ -1377,13 +1898,11 @@ export const OSHI_DATA: OshiFandom[] = [
   {
     "fandom": "Over RequiemZ",
     "characters": [
-      "Yuhiru"
-    ]
-  },
-  {
-    "fandom": "Pandavva",
-    "characters": [
-      "Sadewa Sagara"
+      "Yuhiru",
+      "Claude Grain",
+      "Molly Woodland",
+      "Kaize Ozma",
+      "Noil Bestia"
     ]
   },
   {
@@ -1399,7 +1918,9 @@ export const OSHI_DATA: OshiFandom[] = [
       "Kei Miyama",
       "Satsuki Ito",
       "Shogo Yamato",
-      "Sugasano Allen"
+      "Sugasano Allen",
+      "Nayuta Yatonokami",
+      "Kanata Yatonokami"
     ]
   },
   {
@@ -1410,22 +1931,33 @@ export const OSHI_DATA: OshiFandom[] = [
     ]
   },
   {
-    "fandom": "Persona",
+    "fandom": "Persona 3",
     "characters": [
-      "Akechi Goro",
       "Akihiko Sanada",
       "Makoto Yuki",
-      "Ren Amamiya",
-      "Shinjiro Aragaki",
+      "Shinjiro Aragaki"
+    ]
+  },
+  {
+    "fandom": "Persona 4",
+    "characters": [
       "Yosuke Hanamura",
-      "Yu Narukami",
+      "Yu Narukami"
+    ]
+  },
+  {
+    "fandom": "Persona 5",
+    "characters": [
+      "Akechi Goro",
+      "Ren Amamiya",
       "Yusuke Kitagawa"
     ]
   },
   {
     "fandom": "Phantom Busters",
     "characters": [
-      "Korekishi Eugene"
+      "Korekishi Eugene",
+      "Charles De Noir Mamoru"
     ]
   },
   {
@@ -1440,7 +1972,8 @@ export const OSHI_DATA: OshiFandom[] = [
     "characters": [
       "Dante Falzone",
       "Nicola Francesca",
-      "Yuan"
+      "Yuan",
+      "Yang"
     ]
   },
   {
@@ -1449,7 +1982,9 @@ export const OSHI_DATA: OshiFandom[] = [
       "Amethio",
       "Corbeau",
       "Friede",
-      "Penny"
+      "Penny",
+      "N",
+      "Steven Stone"
     ]
   },
   {
@@ -1459,7 +1994,7 @@ export const OSHI_DATA: OshiFandom[] = [
     ]
   },
   {
-    "fandom": "Project Sekai",
+    "fandom": "Project Sekai: Colorful Stage",
     "characters": [
       "Airi Momoi",
       "Aoyagi Toya",
@@ -1504,7 +2039,8 @@ export const OSHI_DATA: OshiFandom[] = [
   {
     "fandom": "Ragnarok Online",
     "characters": [
-      "Eremes Guile"
+      "Eremes Guile",
+      "Seyren Windsor"
     ]
   },
   {
@@ -1541,6 +2077,12 @@ export const OSHI_DATA: OshiFandom[] = [
       "Shamane",
       "Voyager",
       "Windsong"
+    ]
+  },
+  {
+    "fandom": "SEVENTH HEAVEN",
+    "characters": [
+      "Shion"
     ]
   },
   {
@@ -1582,12 +2124,6 @@ export const OSHI_DATA: OshiFandom[] = [
     ]
   },
   {
-    "fandom": "SEVENTH HEAVEN",
-    "characters": [
-      "Shion"
-    ]
-  },
-  {
     "fandom": "Shokugeki no Soma",
     "characters": [
       "Takumi Aldini"
@@ -1615,6 +2151,20 @@ export const OSHI_DATA: OshiFandom[] = [
     "fandom": "South Park",
     "characters": [
       "Kenny Mccormick"
+    ]
+  },
+  {
+    "fandom": "Stardew Valley",
+    "characters": [
+      "Alex",
+      "Elliot",
+      "Haley",
+      "Harvey",
+      "Leah",
+      "Sam",
+      "Sebastian",
+      "Shane",
+      "Maru"
     ]
   },
   {
@@ -1689,8 +2239,8 @@ export const OSHI_DATA: OshiFandom[] = [
     "fandom": "The Moonlit Oath",
     "characters": [
       "Hua Chen",
-      "xuan wangjun",
-      "Xuan Xingcong"
+      "Xuan Xingcong",
+      "xuan wangjun"
     ]
   },
   {
@@ -1756,7 +2306,48 @@ export const OSHI_DATA: OshiFandom[] = [
   {
     "fandom": "Tokyo Ghoul",
     "characters": [
-      "Arima Kisho"
+      "Kisho Arima",
+      "Ken Kaneki",
+      "Haise Sasaki",
+      "Kuki Urie",
+      "Furuta Nimura",
+      "Hairu Ihei",
+      "Akira Mado",
+      "Kohtaro Amon",
+      "Chie Hori",
+      "Ginshi Shirazu",
+      "Hanbee Abara",
+      "Hinami Fueguchi",
+      "Ichika Kaneki",
+      "Mitsuki Toru",
+      "Toka Kirishima",
+      "Ayato Kirishima",
+      "Juzo Suzuya",
+      "Hideyoshi Nagachika",
+      "Uta",
+      "Rize Kamishiro",
+      "Eto Yoshimura",
+      "Nishio Nishiki",
+      "Take Hirako",
+      "Saiko Kobayashi",
+      "Karren Von Rosewald",
+      "Koori Ui",
+      "Kureo Mado",
+      "Nashiro Yasushisa",
+      "Kurona Yasushisa",
+      "Naki",
+      "Nico",
+      "Noro",
+      "Renji Yomo",
+      "Seido Takizawa",
+      "Shio Ihei",
+      "Shuu Tsukiyama",
+      "Taishi Fura",
+      "Tatara",
+      "Yakumo Oomori",
+      "Yusa Arima",
+      "Uruka Minami",
+      "Rikai Souzu"
     ]
   },
   {
@@ -1773,7 +2364,9 @@ export const OSHI_DATA: OshiFandom[] = [
   {
     "fandom": "Tougen Anki",
     "characters": [
-      "Oiranzaka Kyoya"
+      "Oiranzaka Kyoya",
+      "Namikido Kaoru",
+      "Yodogawa Masumi"
     ]
   },
   {
@@ -1803,7 +2396,9 @@ export const OSHI_DATA: OshiFandom[] = [
       "Tsurumaru Kuninaga",
       "Yamanbagiri Chougi",
       "Yamanbagiri Kunihiro",
-      "Yamatonokami Yasuda"
+      "Yamatonokami Yasuda",
+      "Jiroutachi",
+      "Taroutachi"
     ]
   },
   {
@@ -1815,7 +2410,17 @@ export const OSHI_DATA: OshiFandom[] = [
   {
     "fandom": "Tsukiuta",
     "characters": [
-      "Satsuki Aoi"
+      "Shiawasu Kakeru",
+      "Mutsuki Hajime",
+      "Kisaragi Koi",
+      "Yayoi Haru",
+      "Uduki Arata",
+      "Satsuki Api",
+      "Minaduki Rui",
+      "Fuduki Kai",
+      "Haduki You",
+      "Nagatsuki Yoru",
+      "Shimotsuki Shun"
     ]
   },
   {
@@ -1867,12 +2472,164 @@ export const OSHI_DATA: OshiFandom[] = [
       "Agnes Tachyon",
       "Dicta Striker",
       "Fenomeno",
-      "Fuji Kiseki",
       "Nice Nature",
       "Oguri Cap",
       "Still in Love",
       "Super Creek",
-      "Symboli Rudolf"
+      "Symboli Rudolf",
+      "Admire Groove",
+      "Admire vega",
+      "Agnes Digital",
+      "Air Groove",
+      "Air Messiah",
+      "Air Shakur",
+      "Almond Eye",
+      "Aston Macchan",
+      "Bamboo Memory",
+      "Believe",
+      "Biko Pegasus",
+      "Biwa Hayahide",
+      "Bubble Gum Fellow",
+      "Buena Vista",
+      "Calstone Light O",
+      "Cesario",
+      "Cheval Grand",
+      "Chrono Genesis",
+      "Copano Rickey",
+      "Curren Bouquetd’or",
+      "Curren chan",
+      "Daiichi Ruby",
+      "Daitaku Helios",
+      "Daiwa Scarlet",
+      "Dantsu Flame",
+      "Daring Heart",
+      "Daring Tact",
+      "Dream Journey",
+      "Duramente",
+      "Durandal",
+      "Eishin Flash",
+      "El Condor Pasa",
+      "Epihaneia",
+      "Espoir City",
+      "Fine Motion",
+      "Fuji Kiseki",
+      "Furioso",
+      "Fusaichi Pandora",
+      "Gentildonna",
+      "Gold City",
+      "Gold Ship",
+      "Gran Alegria",
+      "Grass Wonder",
+      "Haru Urara",
+      "Hishi Akebono",
+      "Hishi Amazon",
+      "Hishi Miracle",
+      "Hokko Tarumar",
+      "Ikuno Dictus",
+      "Inari One",
+      "Ines Fujin",
+      "Jungle Pocket",
+      "K.S Miracle",
+      "Katsuragi Ace",
+      "Kawakami Princess",
+      "King Halo",
+      "Kiseki",
+      "Kitasan Black",
+      "Loves Only You",
+      "Lucky Lilac",
+      "Manhattan Cafe",
+      "Maruzensky",
+      "Marvelous Sunday",
+      "Matikanefukukitaru",
+      "Matikanetannhauser",
+      "Mayano Top Gun",
+      "Meisho Doto",
+      "Mejiro Ardan",
+      "Mejiro Bright",
+      "Mejiro Dober",
+      "Mejiro McQueen",
+      "Mejiro Ramonu",
+      "Mejiro Palmer",
+      "Mejiro Ryan",
+      "Mihono Bourbon",
+      "Mr. C.B",
+      "Nakayama Festa",
+      "Narita Brian",
+      "Narita Taishin",
+      "Narita Top Road",
+      "Neo Universe",
+      "Nishino Flower",
+      "No Reason",
+      "North Flight",
+      "Orfevre",
+      "Phalaenopsis",
+      "Red Desire",
+      "Rhein Kraft",
+      "Rice Shower",
+      "Rose Kingdom",
+      "Royce and Royce",
+      "Rulership",
+      "Sakura Bakushin O",
+      "Sakura Chiyono O",
+      "Sakura Laurel",
+      "Satono Crown",
+      "Satono Diamond",
+      "Seeking the Pearl",
+      "Seiun Sky",
+      "Shinko Windy",
+      "Silence Suzuka",
+      "Sirius Symboli",
+      "Smart Falcon",
+      "Sounds Of Earth",
+      "Special Week",
+      "Stay Gold",
+      "Sweep Tosho",
+      "Symboli Kris S",
+      "Taiki Shuttle",
+      "Tamamo Cross",
+      "Tanino Gimlet",
+      "Titleholder",
+      "Tokai Teio",
+      "Tosen Jordan",
+      "Transcend",
+      "Tsurumaru Tsuyoshi",
+      "Twin Turbo",
+      "Verxina",
+      "Victoire Pisa",
+      "Vivlos",
+      "Vodka",
+      "Win Variation",
+      "Winning Ticket",
+      "Wonder Acute",
+      "Yaeno Muteki",
+      "Yamanin Zephyr",
+      "Yukino Bijin",
+      "Zenno Rob Roy",
+      "Marche Lorraine",
+      "Logotype",
+      "Sakura Chitose O",
+      "Efforia",
+      "Light Halo",
+      "Forever Young",
+      "Casino Drive",
+      "Happy Meek",
+      "Little Cocon",
+      "Montjeu",
+      "Venus Paques",
+      "Etsuko Otonashi",
+      "Rigantona",
+      "Sonon Elfie",
+      "ST-2",
+      "Tazuna Hayakawa",
+      "Yayoi Akikawa",
+      "Aoi Kiryuin",
+      "Riko Kashimoto",
+      "Beauty Anshinzawa",
+      "Mei Satake",
+      "Haiseiko",
+      "Speed Symboli",
+      "Sugar Lights",
+      "Darley Arabian"
     ]
   },
   {
@@ -1893,8 +2650,8 @@ export const OSHI_DATA: OshiFandom[] = [
   {
     "fandom": "Vocaloid",
     "characters": [
-      "Kaito",
       "KYO (ZOLA Project)",
+      "Kaito",
       "VY2"
     ]
   },
@@ -1917,7 +2674,18 @@ export const OSHI_DATA: OshiFandom[] = [
       "Asmodeus",
       "Leviathan",
       "Min Hyeok",
-      "Satan"
+      "Satan",
+      "Lucifer",
+      "Beelzebub",
+      "Mammon",
+      "Raphael"
+    ]
+  },
+  {
+    "fandom": "Where Winds Meet",
+    "characters": [
+      "Jiang Yan",
+      "Zhao Guangyi"
     ]
   },
   {
@@ -1955,13 +2723,18 @@ export const OSHI_DATA: OshiFandom[] = [
       "Female Rover",
       "Galbrena",
       "Geshu Lin",
+      "Hiyuki",
+      "Hsin",
+      "Jingran",
+      "Jiyan",
       "Luuk Herssen",
       "Male Rover",
       "Phrolova",
       "Qiuyuan",
       "Rover",
       "Scar",
-      "Xiangli Yao"
+      "Xiangli Yao",
+      "Zani"
     ]
   },
   {
@@ -1983,12 +2756,6 @@ export const OSHI_DATA: OshiFandom[] = [
     ]
   },
   {
-    "fandom": "Yu Yu Hakusho",
-    "characters": [
-      "Kurama"
-    ]
-  },
-  {
     "fandom": "Yuri on ICE!!!",
     "characters": [
       "Yuri Plisetsky"
@@ -2002,9 +2769,32 @@ export const OSHI_DATA: OshiFandom[] = [
       "Hugo Vlad",
       "Komano Manato",
       "Lighter",
+      "Lycaon",
+      "Miyabi",
       "Sarah",
+      "Seth",
+      "Severian",
       "Wise",
+      "Yanagi",
       "Ye Shiyuan"
+    ]
+  },
+  {
+    "fandom": "from ARGONAVIS",
+    "characters": [
+      "Reiji Karasuma",
+      "Ryo Akebono",
+      "Wataru Matoba",
+      "Banri Shiroishi",
+      "Kenta Satozuka",
+      "Daimon Kusunoki",
+      "Koharu Mitsurugi"
+    ]
+  },
+  {
+    "fandom": "Yu Yu Hakusho",
+    "characters": [
+      "Kurama"
     ]
   }
 ];
