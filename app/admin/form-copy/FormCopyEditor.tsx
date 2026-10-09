@@ -35,6 +35,13 @@ const SECTIONS: CopySection[] = [
     ],
   },
   {
+    title: "Pendaftaran ditutup (kuota penuh)",
+    fields: [
+      { key: "closed.title", label: "Judul" },
+      { key: "closed.body", label: "Isi", multiline: true },
+    ],
+  },
+  {
     title: "Peraturan",
     fields: [
       { key: "rules.heading", label: "Judul" },

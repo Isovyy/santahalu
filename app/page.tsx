@@ -1,9 +1,10 @@
 import { getFormCopy } from "@/lib/formCopy";
+import { isRegistrationFull } from "@/lib/registrationLimit";
 import RegisterForm from "./RegisterForm";
 
 export const dynamic = "force-dynamic";
 
 export default async function RegisterPage() {
-  const copy = await getFormCopy();
-  return <RegisterForm copy={copy} />;
+  const [copy, registrationClosed] = await Promise.all([getFormCopy(), isRegistrationFull()]);
+  return <RegisterForm copy={copy} registrationClosed={registrationClosed} />;
 }

@@ -203,7 +203,13 @@ function EditLookupPanel({
   );
 }
 
-export default function RegisterForm({ copy }: { copy: FormCopy }) {
+export default function RegisterForm({
+  copy,
+  registrationClosed,
+}: {
+  copy: FormCopy;
+  registrationClosed: boolean;
+}) {
   const [form, setForm] = useState<FormState>(initialState);
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
@@ -392,6 +398,13 @@ export default function RegisterForm({ copy }: { copy: FormCopy }) {
         }}
       />
 
+      {registrationClosed && !editCode ? (
+        <section className="space-y-2 rounded-lg border border-teal-100 bg-white p-6 text-center shadow-sm">
+          <h2 className="text-lg font-medium text-gray-800">{copy["closed.title"]}</h2>
+          <p className="text-sm text-gray-500">{copy["closed.body"]}</p>
+        </section>
+      ) : (
+      <>
       <section className="space-y-3 rounded-lg border border-teal-100 bg-white shadow-sm p-6 text-sm text-gray-500">
         <h2 className="text-base font-medium text-gray-700">{copy["rules.heading"]}</h2>
 
@@ -704,6 +717,8 @@ export default function RegisterForm({ copy }: { copy: FormCopy }) {
           </button>
         </div>
       </form>
+      </>
+      )}
       </div>
     </main>
   );

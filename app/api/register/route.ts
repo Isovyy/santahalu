@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { generateEditCode, hashEditCode } from "@/lib/editCode";
 import { sendEmail } from "@/lib/email";
 import { REGISTRATION_EMAIL_SUBJECT, registrationEmailHtml } from "@/lib/registrationEmail";
+import { isRegistrationFull } from "@/lib/registrationLimit";
 
 const REQUIRED_FIELDS = [
   "email",
@@ -129,8 +130,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, id: participant.id });
   }
 
-  // No code supplied: a fresh registration, but guard against silently
-  // overwriting someone else's existing entry via a duplicate email.
+  // No code supplied: a fresh registration. Refuse once the quota is reached
+  // (edits above are still allowed).
+  if (await isRegistrationFull()) {
+    return NextResponse.json(
+      { error: "Pendaftaran sudah ditutup karena kuota peserta sudah penuh." },
+      { status: 403 }
+    );
+  }
+
+  // Guard against silently overwriting someone else's existing entry via a
+  // duplicate email.
   const emailTaken = await db.orm.public.Participant.first({ email });
   if (emailTaken) {
     return NextResponse.json(

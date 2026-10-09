@@ -17,6 +17,10 @@ export const FORM_COPY_DEFAULTS = {
   "editLookup.submitLoading": "Memuat...",
   "editLookup.cancelLabel": "Batal",
 
+  "closed.title": "Pendaftaran sudah ditutup",
+  "closed.body":
+    "Kuota peserta Secret Santa sudah penuh. Terima kasih atas minatnya! Sudah terdaftar? Kamu masih bisa mengedit jawabanmu lewat tombol di atas.",
+
   "rules.heading": "#SantaHalu: Secret Santa EVENT RULES",
   "rules.fullLink.label": "Rules lengkap:",
   "rules.fullLink.text": "Rules and Form Guide",

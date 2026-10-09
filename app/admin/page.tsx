@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
+import { MAX_REGISTRATIONS } from "@/lib/registrationLimit";
 import RunMatchingForm from "./RunMatchingForm";
 import LogoutButton from "./LogoutButton";
 import DeleteMatchRun from "./results/[runId]/DeleteMatchRun";
@@ -24,8 +25,13 @@ export default async function AdminDashboard() {
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         <section className="rounded-2xl border border-teal-100 bg-white shadow-sm p-5">
           <h2 className="text-lg font-medium text-gray-800">Participants</h2>
-          <p className="mt-1 text-3xl font-semibold text-teal-500">{participantCount}</p>
-          <p className="mt-1 text-sm text-gray-400">registered so far</p>
+          <p className="mt-1 text-3xl font-semibold text-teal-500">
+            {participantCount}
+            <span className="text-lg font-normal text-gray-400"> / {MAX_REGISTRATIONS}</span>
+          </p>
+          <p className="mt-1 text-sm text-gray-400">
+            {participantCount >= MAX_REGISTRATIONS ? "registration closed (quota full)" : "registered so far"}
+          </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <Link
               href="/admin/responses"
