@@ -38,6 +38,8 @@ const SECTIONS: CopySection[] = [
     title: "Peraturan",
     fields: [
       { key: "rules.heading", label: "Judul" },
+      { key: "rules.fullLink.label", label: "Rules lengkap - Teks" },
+      { key: "rules.fullLink.url", label: "Rules lengkap - Link" },
       { key: "rules.section1.title", label: "I - Judul bagian" },
       { key: "rules.section1.intro", label: "I - Intro", multiline: true },
       {
@@ -99,7 +101,7 @@ const SECTIONS: CopySection[] = [
       { key: "field.avoidList.hint", label: "Avoid list - hint", multiline: true },
       { key: "field.notes.label", label: "Notes - label" },
       { key: "field.password.label", label: "Kata sandi - label" },
-      { key: "field.password.hint", label: "Kata sandi - hint", multiline: true },
+      { key: "field.password.hint", label: "Kata sandi - hint (diikuti link Rules lengkap)", multiline: true },
     ],
   },
   {

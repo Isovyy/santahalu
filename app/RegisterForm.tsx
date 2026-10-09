@@ -395,6 +395,20 @@ export default function RegisterForm({ copy }: { copy: FormCopy }) {
       <section className="space-y-3 rounded-lg border border-teal-100 bg-white shadow-sm p-6 text-sm text-gray-500">
         <h2 className="text-base font-medium text-gray-700">{copy["rules.heading"]}</h2>
 
+        {copy["rules.fullLink.url"] && (
+          <p>
+            {copy["rules.fullLink.label"]}{" "}
+            <a
+              href={copy["rules.fullLink.url"]}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="break-all text-teal-500 hover:underline"
+            >
+              {copy["rules.fullLink.url"]}
+            </a>
+          </p>
+        )}
+
         <div>
           <p className="font-medium text-gray-600">{copy["rules.section1.title"]}</p>
           <p className="mt-1">{copy["rules.section1.intro"]}</p>
@@ -641,7 +655,25 @@ export default function RegisterForm({ copy }: { copy: FormCopy }) {
           />
         </Field>
 
-        <Field label={copy["field.password.label"]} required hint={copy["field.password.hint"]}>
+        <Field
+          label={copy["field.password.label"]}
+          required
+          hint={
+            <>
+              {copy["field.password.hint"]}{" "}
+              {copy["rules.fullLink.url"] && (
+                <a
+                  href={copy["rules.fullLink.url"]}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="break-all text-teal-500 hover:underline"
+                >
+                  {copy["rules.fullLink.url"]}
+                </a>
+              )}
+            </>
+          }
+        >
           <input
             type="text"
             required

@@ -18,6 +18,9 @@ export const FORM_COPY_DEFAULTS = {
   "editLookup.cancelLabel": "Batal",
 
   "rules.heading": "#SantaHalu: Secret Santa EVENT RULES",
+  "rules.fullLink.label": "Rules lengkap:",
+  "rules.fullLink.url":
+    "https://docs.google.com/document/d/1Ik2SjVYHblYsMt_N0cIb21dSiKNTBzdhWepDRUeIzd0/edit?usp=sharing",
   "rules.section1.title": "I - Registration",
   "rules.section1.intro":
     "Kuota pendaftaran 150 orang. Pada saat pendaftaran, harus menyertakan hal hal berikut:",
@@ -48,9 +51,9 @@ export const FORM_COPY_DEFAULTS = {
 
   "field.email.label": "Email",
   "field.email.hint": "Pengumuman penerima, konfirmasi, dan hadiah akan dikirim lewat email.",
-  "field.twtUser.label": "Username twitter",
+  "field.twtUser.label": "Username twitter (PASTIKAN AKTIF)",
   "field.twtUser.hint":
-    "Sertakan @ (bila ingin mengganti username selama event berlangsung mohon lapor ke @FATUIUWU)",
+    "Sertakan @ (bila ingin mengganti username selama event berlangsung mohon lapor ke @FATUIUWU). Yumefess dapat menghubungimu sewaktu-waktu bila santamu memiliki pertanyaan mengenai yumeshipmu.",
   "field.yumeshipName.label": "Nama yumeship",
   "field.fandomYume.label": "Fandom yumeshipmu",
   "field.oshiName.label": "Nama cc/oshi",
@@ -76,7 +79,8 @@ export const FORM_COPY_DEFAULTS = {
     "Opsional. Karakter atau fandom tertentu yang tidak ingin kamu buatkan hadiah. Isi fandom dan nama karakter, lalu klik Tambah (bisa lebih dari satu).",
   "field.notes.label": "Notes",
   "field.password.label": "Kata sandi",
-  "field.password.hint": "Masukkan kata sandi event untuk memverifikasi pendaftaranmu.",
+  "field.password.hint":
+    "Masukkan kata sandi event untuk memverifikasi bahwa rules sudah dibaca. Kata sandi dapat ditemukan di salah satu tab di doc rules:",
 
   "option.relationshipType.Romantic": "Romantic",
   "option.relationshipType.Platonic": "Platonic",
