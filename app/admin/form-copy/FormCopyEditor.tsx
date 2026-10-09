@@ -81,7 +81,7 @@ const SECTIONS: CopySection[] = [
       { key: "field.oshiName.label", label: "Nama cc/oshi - label" },
       { key: "field.oshiName.hint", label: "Nama cc/oshi - hint" },
       { key: "field.relationshipType.label", label: "Tipe Yumeship - label" },
-      { key: "field.yumeTypeReceive.label", label: "Tipe Yumeship (2) - label" },
+      { key: "field.yumeTypeReceive.label", label: "Orientasi Yumeship - label" },
       { key: "field.yumeTypeGive.label", label: "Tipe yume diterima - label" },
       { key: "field.yumeTypeGive.hint", label: "Tipe yume diterima - hint" },
       { key: "field.contentType.label", label: "Karya - label" },
@@ -119,7 +119,7 @@ const SECTIONS: CopySection[] = [
       { key: "option.contentType.Writing", label: "Karya: Writing" },
       { key: "option.language.Indonesia", label: "Bahasa: Indonesia" },
       { key: "option.language.English", label: "Bahasa: English" },
-      { key: "option.other.label", label: '"Yang lain" (Tipe Yumeship (2))' },
+      { key: "option.other.label", label: '"Yang lain" (Orientasi Yumeship)' },
     ],
   },
   {

@@ -170,7 +170,7 @@ export default function EditParticipantForm({
       </Field>
 
       {showsYumeTypeReceive(relationshipType) && (
-        <Field label="Tipe Yumeship (2)">
+        <Field label="Orientasi Yumeship">
           <RadioGroup
             name="edit-yumeTypeReceive"
             options={YUME_TYPE_OPTIONS}
@@ -214,7 +214,7 @@ export default function EditParticipantForm({
         </Field>
       )}
 
-      <Field label="Bahasa yang bersedia kamu terima" required>
+      <Field label="Bahasa yang bersedia kamu terima sebagai hadiah" required>
         <CheckboxGroup
           options={LANGUAGE_OPTIONS}
           values={languageReceive}

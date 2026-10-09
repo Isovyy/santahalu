@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // yumeTypeReceive ("Tipe Yumeship (2)") only applies to ships with a
+  // yumeTypeReceive ("Orientasi Yumeship") only applies to ships with a
   // romantic dimension.
   const relationshipType = str(body.relationshipType);
   if (

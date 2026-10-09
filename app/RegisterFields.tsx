@@ -18,7 +18,7 @@ export const ALL_YUME_TYPES = "All";
 export const YUME_TYPE_GIVE_OPTIONS = [ALL_YUME_TYPES, ...YUME_TYPE_OPTIONS];
 export const OTHER = "Yang lain";
 
-// "Tipe Yumeship (2)" (what your own ship actually is) only applies to
+// "Orientasi Yumeship" (what your own ship actually is) only applies to
 // ships with a romantic dimension.
 export function showsYumeTypeReceive(relationshipType: string): boolean {
   return relationshipType === "Romantic" || relationshipType === "Queerplatonic";
@@ -301,6 +301,8 @@ export function AvoidListInput({
     if (!characterQ) return suggestions;
     return suggestions.filter((c) => matchesCharacterName(c, characterQ));
   }, [characterQ, suggestions]);
+  const characterExactExists = suggestions.some((c) => c.toLowerCase() === characterQ);
+  const showCharacterHint = characterQ !== "" && !characterExactExists;
 
   const fandomQ = fandom.trim().toLowerCase();
   const fandomResults = useMemo(() => {
@@ -401,7 +403,7 @@ export function AvoidListInput({
               ))}
               {!fandomExactExists && (
                 <li className="border-t border-teal-100 px-3 py-2 text-left text-sm text-gray-400">
-                  Fandom tidak ada di daftar? Tetap ketik namanya.
+                  Fandom tidak ada di sugesti? Tetap ketik namanya, jawabanmu akan tersimpan.
                 </li>
               )}
             </ul>
@@ -429,7 +431,7 @@ export function AvoidListInput({
                 }
               }}
             />
-            {characterOpen && characterResults.length > 0 && (
+            {characterOpen && (characterResults.length > 0 || showCharacterHint) && (
               <ul className="absolute z-20 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-teal-200 bg-white shadow-lg">
                 {characterResults.map((c) => (
                   <li key={c}>
@@ -446,6 +448,11 @@ export function AvoidListInput({
                     </button>
                   </li>
                 ))}
+                {showCharacterHint && (
+                  <li className="border-t border-teal-100 px-3 py-2 text-left text-sm text-gray-400">
+                    Karakter tidak ada di sugesti? Tetap ketik namanya, jawabanmu akan tersimpan.
+                  </li>
+                )}
               </ul>
             )}
           </div>
@@ -664,7 +671,7 @@ export function FandomSingleSelect({
           ))}
           {!exactExists && (
             <li className="border-t border-teal-100 px-3 py-2 text-left text-sm text-gray-400">
-              Fandom tidak ada di sugesti? Tetap ketik namanya, jawabanmu akan tersimpan apa adanya.
+              Fandom tidak ada di sugesti? Tetap ketik namanya, jawabanmu akan tersimpan.
             </li>
           )}
         </ul>
@@ -696,6 +703,8 @@ export function OshiNameSelect({
     return suggestions.filter((s) => matchesCharacterName(s.name, q)).slice(0, 20);
   }, [q, suggestions]);
 
+  const exactExists = suggestions.some((s) => s.name.toLowerCase() === q);
+
   return (
     <div className="relative">
       <input
@@ -714,7 +723,7 @@ export function OshiNameSelect({
           if (e.key === "Escape") setOpen(false);
         }}
       />
-      {open && q && results.length > 0 && (
+      {open && q && (results.length > 0 || !exactExists) && (
         <ul className="absolute z-20 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-teal-200 bg-white shadow-lg">
           {results.map((s) => (
             <li key={`${s.fandom}:${s.name}`}>
@@ -731,6 +740,11 @@ export function OshiNameSelect({
               </button>
             </li>
           ))}
+          {!exactExists && (
+            <li className="border-t border-teal-100 px-3 py-2 text-left text-sm text-gray-400">
+              Oshi tidak ada di sugesti? Tetap ketik namanya, jawabanmu akan tersimpan.
+            </li>
+          )}
         </ul>
       )}
     </div>
