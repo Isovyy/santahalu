@@ -1,7 +1,7 @@
 import type { NotifyRow } from "@/lib/notify";
 import { escapeHtml, ADMIN_CONTACT_HANDLE } from "@/lib/emailHtml";
 
-export const MATCH_EMAIL_SUBJECT = "RESHUFFLE #1: Your Santahalu26 Match!";
+export const MATCH_EMAIL_SUBJECT = "Your Santahalu26 Match!";
 
 export function matchEmailHtml(row: NotifyRow, confirmUrl: string, extendUrl: string): string {
   return `
@@ -15,16 +15,15 @@ export function matchEmailHtml(row: NotifyRow, confirmUrl: string, extendUrl: st
   <li>Languages: ${escapeHtml(row.receiverLanguageReceive)}</li>
   <li>Docs: <a href="${escapeHtml(row.receiverYumeDocuLink)}">${escapeHtml(row.receiverYumeDocuLink)}</a></li>
 </ul>
+<p>Tolong pastikan juga docs kalian sendiri sudah terbuka!!</p>
 <p>Mohon diperhatikan terutama fandom dan preferensi bahasa bagi para penulis, lalu
 konfirmasi bila tidak ada masalah. Dihimbau untuk tidak membuat hadiah terlebih dahulu, karena
-kita akan memberi waktu 2x24 jam bagi semua peserta untuk konfirmasi ulang. Disini masih dapat
-terjadi reshuffle pasangan dan akan diumumkan sekitar pertengahan hingga akhir minggu depan
-tergantung situasi dan kondisi.</p>
-<p>Bila ada kesalahan dari pihak kami (mendapat doubles/fandom tidak sesuai, dll) mohon
+kami akan memberi waktu sampai tanggal 20 Oktober pk 13:00 WIB bagi semua peserta untuk konfirmasi ulang. Disini masih dapat
+terjadi reshuffle pasangan bila ada yang melaporkan masalah, jadi mohon bersabar dan menunggu konfirmasi ulang dari pihak kami.</p>
+<p>Bila ada kesalahan dari pihak kami (mendapat doubles/fandom tidak sesuai, dll) atau penerima dirasa kurang cocok mohon
 langsung lapor melalui link dibawah.</p>
 <p>Konfirmasi ulang di link ini: <a href="${escapeHtml(confirmUrl)}">${escapeHtml(confirmUrl)}</a></p>
-<p>Butuh perpanjangan waktu (maks 3 hari)? Ajukan di link ini: <a href="${escapeHtml(extendUrl)}">${escapeHtml(extendUrl)}</a></p>
-<p>Jika ada pertanyaan atau perkara silahkan menghubungi ${escapeHtml(ADMIN_CONTACT_HANDLE)}.</p>
+<p>Jika ada pertanyaan atau perkara silahkan menghubungi @FATUIUWU (X) atau Minkou di discord channel. Untuk link discord silahkan cek @mlytfess (X).</p>
 <p>Happy gifting! \u{1F496}</p>
 `.trim();
 }
