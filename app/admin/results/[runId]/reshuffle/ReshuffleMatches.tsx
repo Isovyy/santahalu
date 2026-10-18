@@ -62,6 +62,17 @@ export default function ReshuffleMatches({
   ruleBreakingMatchIds: string[];
 }) {
   const ruleBreaking = new Set(ruleBreakingMatchIds);
+  const [query, setQuery] = useState("");
+  const q = query.trim().toLowerCase();
+  // Filtering only hides rows; ticked pairs stay selected while hidden.
+  const visibleRows = q
+    ? rows.filter((r) =>
+        [r.giverTwt, r.giverEmail, r.receiverTwt, r.receiverEmail, r.receiverOshiName, r.receiverFandomYume]
+          .join(" ")
+          .toLowerCase()
+          .includes(q),
+      )
+    : rows;
   const router = useRouter();
   const [selected, setSelected] = useState<Set<string>>(
     () => new Set(rows.filter((r) => r.reportedAt).map((r) => r.matchId)),
@@ -372,9 +383,24 @@ export default function ReshuffleMatches({
         </div>
       )}
 
+      <div className="flex flex-wrap items-center gap-3">
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Cari username, email, oshi, atau fandom..."
+          className="w-full max-w-sm rounded-lg border border-teal-200 bg-white px-3 py-1.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-300"
+        />
+        {q && (
+          <span className="text-sm text-gray-500">
+            {visibleRows.length} dari {rows.length} pasangan
+          </span>
+        )}
+      </div>
+
       {/* Mobile: stacked cards, no horizontal scroll needed. */}
       <div className="space-y-2 sm:hidden">
-        {rows.map((row) => (
+        {visibleRows.map((row) => (
           <label
             key={row.matchId}
             className="flex gap-3 rounded-2xl border border-teal-100 bg-white p-4 shadow-sm"
@@ -410,9 +436,9 @@ export default function ReshuffleMatches({
             </div>
           </label>
         ))}
-        {rows.length === 0 && (
+        {visibleRows.length === 0 && (
           <p className="rounded-2xl border border-teal-100 bg-white p-6 text-center text-sm text-gray-400 shadow-sm">
-            Tidak ada pasangan pada hasil matching ini.
+            {q ? "Tidak ada pasangan yang cocok dengan pencarian." : "Tidak ada pasangan pada hasil matching ini."}
           </p>
         )}
       </div>
@@ -432,7 +458,7 @@ export default function ReshuffleMatches({
             </tr>
           </thead>
           <tbody className="divide-y divide-teal-100">
-            {rows.map((row) => (
+            {visibleRows.map((row) => (
               <tr key={row.matchId} className="text-gray-600">
                 <td className="px-4 py-2">
                   <input
@@ -463,10 +489,10 @@ export default function ReshuffleMatches({
                 </td>
               </tr>
             ))}
-            {rows.length === 0 && (
+            {visibleRows.length === 0 && (
               <tr>
                 <td colSpan={7} className="px-4 py-6 text-center text-gray-400">
-                  Tidak ada pasangan pada hasil matching ini.
+                  {q ? "Tidak ada pasangan yang cocok dengan pencarian." : "Tidak ada pasangan pada hasil matching ini."}
                 </td>
               </tr>
             )}

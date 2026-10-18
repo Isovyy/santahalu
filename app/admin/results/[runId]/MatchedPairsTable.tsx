@@ -47,6 +47,22 @@ const COLUMNS: Column[] = [
   { label: "Receiver email", width: 200, render: (r) => r.receiver_email },
 ];
 
+// Fields the search box matches against, on either side of the pair.
+function searchText(r: ResultRow): string {
+  return [
+    r.giver_twt_user,
+    r.giver_email,
+    r.giver_oshi_name,
+    r.giver_fandom_give,
+    r.receiver_twt_user,
+    r.receiver_email,
+    r.receiver_oshi_name,
+    r.receiver_fandom_yume,
+  ]
+    .join(" ")
+    .toLowerCase();
+}
+
 const MIN_WIDTH = 60;
 const PAGE_SIZE = 20;
 
@@ -54,11 +70,15 @@ export default function MatchedPairsTable({ rows }: { rows: ResultRow[] }) {
   const [widths, setWidths] = useState<number[]>(COLUMNS.map((c) => c.width));
   const [isDragging, setIsDragging] = useState(false);
   const [page, setPage] = useState(1);
+  const [query, setQuery] = useState("");
   const drag = useRef<{ index: number; startX: number; startWidth: number } | null>(null);
 
-  const pageCount = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  const q = query.trim().toLowerCase();
+  const filteredRows = q ? rows.filter((r) => searchText(r).includes(q)) : rows;
+
+  const pageCount = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
   const clampedPage = Math.min(page, pageCount);
-  const pageRows = rows.slice((clampedPage - 1) * PAGE_SIZE, clampedPage * PAGE_SIZE);
+  const pageRows = filteredRows.slice((clampedPage - 1) * PAGE_SIZE, clampedPage * PAGE_SIZE);
 
   // Prevent text selection and show a consistent cursor for the whole page
   // while dragging. Without this, fast mouse movement during the drag can
@@ -131,6 +151,23 @@ export default function MatchedPairsTable({ rows }: { rows: ResultRow[] }) {
 
   return (
     <div className="space-y-3">
+      <div className="flex flex-wrap items-center gap-3">
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setPage(1);
+          }}
+          placeholder="Cari username, email, oshi, atau fandom..."
+          className="w-full max-w-sm rounded-lg border border-teal-200 bg-white px-3 py-1.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-300"
+        />
+        {q && (
+          <span className="text-sm text-gray-500">
+            {filteredRows.length} dari {rows.length} pasangan
+          </span>
+        )}
+      </div>
       <div className="overflow-x-auto rounded-2xl border border-teal-100 bg-white shadow-sm">
         <table
           className="divide-y divide-teal-100 text-xs"
@@ -176,10 +213,10 @@ export default function MatchedPairsTable({ rows }: { rows: ResultRow[] }) {
                 })}
               </tr>
             ))}
-            {rows.length === 0 && (
+            {filteredRows.length === 0 && (
               <tr>
                 <td colSpan={COLUMNS.length} className="px-2 py-6 text-center text-gray-400">
-                  No matched pairs.
+                  {q ? "Tidak ada pasangan yang cocok dengan pencarian." : "No matched pairs."}
                 </td>
               </tr>
             )}
@@ -189,7 +226,7 @@ export default function MatchedPairsTable({ rows }: { rows: ResultRow[] }) {
       {pageCount > 1 && (
         <div className="flex items-center justify-between gap-3 text-sm text-gray-600">
           <span>
-            {rows.length} pasangan &middot; halaman {clampedPage} dari {pageCount}
+            {filteredRows.length} pasangan &middot; halaman {clampedPage} dari {pageCount}
           </span>
           <div className="flex items-center gap-2">
             <button
