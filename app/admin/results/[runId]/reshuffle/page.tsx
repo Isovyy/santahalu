@@ -2,9 +2,39 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getNotifyRows } from "@/lib/notify";
 import { db } from "@/lib/db";
+import { canGiveTo } from "@/lib/matching";
 import ReshuffleMatches from "./ReshuffleMatches";
+import ForceMatch, { type ForceOption } from "./ForceMatch";
 
 export const dynamic = "force-dynamic";
+
+function toForceOption(p: {
+  id: string;
+  twtUser: string;
+  oshiName: string;
+  fandomYume: string;
+  fandomGive: string | null;
+  languageGive: string | null;
+  languageReceive: string | null;
+  yumeTypeGive: string | null;
+  yumeTypeReceive: string | null;
+  contentType: string;
+  avoidList: string | null;
+}): ForceOption {
+  return {
+    id: p.id,
+    twtUser: p.twtUser,
+    oshiName: p.oshiName,
+    fandomYume: p.fandomYume,
+    fandomGive: p.fandomGive,
+    languageGive: p.languageGive,
+    languageReceive: p.languageReceive,
+    yumeTypeGive: p.yumeTypeGive,
+    yumeTypeReceive: p.yumeTypeReceive,
+    contentType: p.contentType,
+    avoidList: p.avoidList,
+  };
+}
 
 export default async function ReshufflePage({
   params,
@@ -15,10 +45,29 @@ export default async function ReshufflePage({
   const data = await getNotifyRows(runId);
   if (!data) notFound();
 
-  const history = await db.orm.public.MatchReshuffleLog
-    .where({ matchRunId: runId })
-    .orderBy((h) => h.reshuffledAt.desc())
-    .all();
+  const [history, run, participants] = await Promise.all([
+    db.orm.public.MatchReshuffleLog
+      .where({ matchRunId: runId })
+      .orderBy((h) => h.reshuffledAt.desc())
+      .all(),
+    db.orm.public.MatchRun
+      .include("matches", (m) => m.include("giver").include("receiver"))
+      .first({ id: runId }),
+    db.orm.public.Participant.orderBy((p) => p.twtUser.asc()).all(),
+  ]);
+  if (!run) notFound();
+
+  // Pairs that break the matching rules against everyone's *current* answers:
+  // forced pairs, or valid pairs that went stale after someone edited their
+  // entry. Flagged in the table so they can be ticked into a reshuffle.
+  const ruleBreakingMatchIds = run.matches
+    .filter((m) => !canGiveTo(m.giver, m.receiver))
+    .map((m) => m.id);
+
+  const giverIds = new Set(run.matches.map((m) => m.giverId));
+  const receiverIds = new Set(run.matches.map((m) => m.receiverId));
+  const noReceiver = participants.filter((p) => !giverIds.has(p.id)).map(toForceOption);
+  const noGiver = participants.filter((p) => !receiverIds.has(p.id)).map(toForceOption);
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10">
@@ -35,7 +84,15 @@ export default async function ReshufflePage({
       </p>
 
       <div className="mt-6">
-        <ReshuffleMatches runId={runId} rows={data.rows} />
+        <ForceMatch runId={runId} givers={noReceiver} receivers={noGiver} />
+      </div>
+
+      <div className="mt-6">
+        <ReshuffleMatches
+          runId={runId}
+          rows={data.rows}
+          ruleBreakingMatchIds={ruleBreakingMatchIds}
+        />
       </div>
 
       <h2 className="mt-10 text-lg font-medium text-gray-800">

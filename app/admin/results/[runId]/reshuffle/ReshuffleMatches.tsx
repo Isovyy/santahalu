@@ -55,10 +55,13 @@ interface AutoResult {
 export default function ReshuffleMatches({
   runId,
   rows,
+  ruleBreakingMatchIds,
 }: {
   runId: string;
   rows: NotifyRow[];
+  ruleBreakingMatchIds: string[];
 }) {
+  const ruleBreaking = new Set(ruleBreakingMatchIds);
   const router = useRouter();
   const [selected, setSelected] = useState<Set<string>>(
     () => new Set(rows.filter((r) => r.reportedAt).map((r) => r.matchId)),
@@ -391,6 +394,7 @@ export default function ReshuffleMatches({
               </p>
               <p className="mt-1">
                 <StatusBadge row={row} />
+                {ruleBreaking.has(row.matchId) && <RuleBreakingBadge />}
               </p>
               {row.reportNote && (
                 <p className="mt-1 break-words text-gray-500">Catatan: {row.reportNote}</p>
@@ -444,6 +448,7 @@ export default function ReshuffleMatches({
                 </td>
                 <td className="px-4 py-2">
                   <StatusBadge row={row} />
+                  {ruleBreaking.has(row.matchId) && <RuleBreakingBadge />}
                 </td>
                 <td className="max-w-[16rem] break-words px-4 py-2 text-gray-500">
                   {row.reportNote || "-"}
@@ -469,6 +474,16 @@ export default function ReshuffleMatches({
         </table>
       </div>
     </div>
+  );
+}
+
+// Pair doesn't satisfy the matching rules against current answers: forced by
+// hand, or broken by an edit after matching.
+function RuleBreakingBadge() {
+  return (
+    <span className="ml-2 whitespace-nowrap rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700">
+      ⚠ Melanggar aturan
+    </span>
   );
 }
 
