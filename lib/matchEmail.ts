@@ -1,12 +1,12 @@
 import type { NotifyRow } from "@/lib/notify";
 import { escapeHtml, ADMIN_CONTACT_HANDLE } from "@/lib/emailHtml";
 
-export const MATCH_EMAIL_SUBJECT = "Your Santahalu26 Match!";
+export const MATCH_EMAIL_SUBJECT = "RESFHUFFLE #1: Your Santahalu26 Match!";
 
 export function matchEmailHtml(row: NotifyRow, confirmUrl: string, extendUrl: string): string {
   return `
 <p>Halo ${escapeHtml(row.giverTwt)},</p>
-<p>Inilah penerima hadiah anda untuk Santahalu! \u{1F381}</p>
+<p>Inilah penerima hadiah hasil reshuffle #1 anda untuk Santahalu! \u{1F381}</p>
 <p><strong>Receiver's details:</strong></p>
 <ul>
   <li>Fandom: ${escapeHtml(row.receiverFandomYume)}</li>
@@ -18,7 +18,7 @@ export function matchEmailHtml(row: NotifyRow, confirmUrl: string, extendUrl: st
 <p>Tolong pastikan juga docs kalian sendiri sudah terbuka!!</p>
 <p>Mohon diperhatikan terutama fandom dan preferensi bahasa bagi para penulis, lalu
 konfirmasi bila tidak ada masalah. Dihimbau untuk tidak membuat hadiah terlebih dahulu, karena
-kami akan memberi waktu sampai tanggal 20 Oktober pk 13:00 WIB bagi semua peserta untuk konfirmasi ulang. Disini masih dapat
+kami akan memberi waktu sampai tanggal 21 Oktober pk 15:00 WIB bagi semua peserta untuk konfirmasi ulang. Disini masih dapat
 terjadi reshuffle pasangan bila ada yang melaporkan masalah, jadi mohon bersabar dan menunggu konfirmasi ulang dari pihak kami.</p>
 <p>Bila ada kesalahan dari pihak kami (mendapat doubles/fandom tidak sesuai, dll) atau penerima dirasa kurang cocok mohon
 langsung lapor melalui link dibawah.</p>

@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { NotifyRow } from "@/lib/notify";
+import type { ForceOption } from "./ForceMatch";
+import ReassignControl from "./ReassignControl";
 
 interface ResolvedPairing {
   giverTwt: string;
@@ -56,10 +58,12 @@ export default function ReshuffleMatches({
   runId,
   rows,
   ruleBreakingMatchIds,
+  participants,
 }: {
   runId: string;
   rows: NotifyRow[];
   ruleBreakingMatchIds: string[];
+  participants: ForceOption[];
 }) {
   const ruleBreaking = new Set(ruleBreakingMatchIds);
   const [query, setQuery] = useState("");
@@ -426,7 +430,8 @@ export default function ReshuffleMatches({
               {row.reportNote && (
                 <p className="mt-1 break-words text-gray-500">Catatan: {row.reportNote}</p>
               )}
-              <div className="mt-2">
+              <div className="mt-2 space-y-2">
+                <ReassignControl runId={runId} row={row} rows={rows} participants={participants} />
                 <RemoveButton
                   runId={runId}
                   matchId={row.matchId}
@@ -481,7 +486,8 @@ export default function ReshuffleMatches({
                 <td className="max-w-[16rem] break-words px-4 py-2 text-gray-500">
                   {row.reportNote || "-"}
                 </td>
-                <td className="px-4 py-2">
+                <td className="space-y-2 px-4 py-2">
+                  <ReassignControl runId={runId} row={row} rows={rows} participants={participants} />
                   <RemoveButton
                     runId={runId}
                     matchId={row.matchId}

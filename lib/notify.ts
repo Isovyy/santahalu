@@ -4,6 +4,8 @@ import { confirmRoundOf, reassignedGiverTwts, type ConfirmRound } from "@/lib/co
 
 export interface NotifyRow {
   matchId: string;
+  giverId: string;
+  receiverId: string;
   giverEmail: string;
   giverTwt: string;
   receiverTwt: string;
@@ -41,6 +43,8 @@ export async function getNotifyRows(
   const rows: NotifyRow[] = run.matches
     .map((m) => ({
       matchId: m.id,
+      giverId: m.giverId,
+      receiverId: m.receiverId,
       giverEmail: m.giver.email,
       giverTwt: m.giver.twtUser,
       receiverTwt: m.receiver.twtUser,

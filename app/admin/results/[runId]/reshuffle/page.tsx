@@ -113,6 +113,7 @@ export default async function ReshufflePage({
           runId={runId}
           rows={data.rows}
           ruleBreakingMatchIds={ruleBreakingMatchIds}
+          participants={participants.filter((p) => !removedIds.has(p.id)).map(toForceOption)}
         />
       </div>
 
