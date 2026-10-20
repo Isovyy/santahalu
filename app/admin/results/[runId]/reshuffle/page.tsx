@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { canGiveTo } from "@/lib/matching";
 import ReshuffleMatches from "./ReshuffleMatches";
 import ForceMatch, { type ForceOption } from "./ForceMatch";
+import RemovedParticipants from "./RemovedParticipants";
 
 export const dynamic = "force-dynamic";
 
@@ -45,7 +46,7 @@ export default async function ReshufflePage({
   const data = await getNotifyRows(runId);
   if (!data) notFound();
 
-  const [history, run, participants] = await Promise.all([
+  const [history, run, participants, removals] = await Promise.all([
     db.orm.public.MatchReshuffleLog
       .where({ matchRunId: runId })
       .orderBy((h) => h.reshuffledAt.desc())
@@ -54,6 +55,10 @@ export default async function ReshufflePage({
       .include("matches", (m) => m.include("giver").include("receiver"))
       .first({ id: runId }),
     db.orm.public.Participant.orderBy((p) => p.twtUser.asc()).all(),
+    db.orm.public.MatchRunRemoval
+      .where({ matchRunId: runId })
+      .orderBy((r) => r.removedAt.desc())
+      .all(),
   ]);
   if (!run) notFound();
 
@@ -66,8 +71,24 @@ export default async function ReshufflePage({
 
   const giverIds = new Set(run.matches.map((m) => m.giverId));
   const receiverIds = new Set(run.matches.map((m) => m.receiverId));
-  const noReceiver = participants.filter((p) => !giverIds.has(p.id)).map(toForceOption);
-  const noGiver = participants.filter((p) => !receiverIds.has(p.id)).map(toForceOption);
+  const removedIds = new Set(removals.map((r) => r.participantId));
+  const noReceiver = participants
+    .filter((p) => !giverIds.has(p.id) && !removedIds.has(p.id))
+    .map(toForceOption);
+  const noGiver = participants
+    .filter((p) => !receiverIds.has(p.id) && !removedIds.has(p.id))
+    .map(toForceOption);
+
+  const twtOf = new Map(participants.map((p) => [p.id, p.twtUser]));
+  const removed = removals
+    .filter((r) => twtOf.has(r.participantId))
+    .map((r) => ({
+      participantId: r.participantId,
+      twtUser: twtOf.get(r.participantId)!,
+      removedAt: r.removedAt.toLocaleString(),
+      formerReceiverTwt: r.formerReceiverId ? (twtOf.get(r.formerReceiverId) ?? null) : null,
+      formerGiverTwt: r.formerGiverId ? (twtOf.get(r.formerGiverId) ?? null) : null,
+    }));
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10">
@@ -93,6 +114,10 @@ export default async function ReshufflePage({
           rows={data.rows}
           ruleBreakingMatchIds={ruleBreakingMatchIds}
         />
+      </div>
+
+      <div className="mt-10">
+        <RemovedParticipants runId={runId} removed={removed} />
       </div>
 
       <h2 className="mt-10 text-lg font-medium text-gray-800">

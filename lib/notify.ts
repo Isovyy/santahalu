@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { generateConfirmToken } from "@/lib/confirmToken";
+import { confirmRoundOf, reassignedGiverTwts, type ConfirmRound } from "@/lib/confirmRound";
 
 export interface NotifyRow {
   matchId: string;
@@ -25,6 +26,7 @@ export interface NotifyRow {
   extensionDays: number | null;
   extensionRequestedAt: string | null;
   extensionReason: string | null;
+  confirmRound: ConfirmRound;
 }
 
 export async function getNotifyRows(
@@ -34,6 +36,7 @@ export async function getNotifyRows(
     .include("matches", (m) => m.include("giver").include("receiver"))
     .first({ id: runId });
   if (!run) return null;
+  const reassigned = await reassignedGiverTwts(runId);
 
   const rows: NotifyRow[] = run.matches
     .map((m) => ({
@@ -60,6 +63,7 @@ export async function getNotifyRows(
       extensionDays: m.extensionDays,
       extensionRequestedAt: m.extensionRequestedAt ? m.extensionRequestedAt.toString() : null,
       extensionReason: m.extensionReason,
+      confirmRound: confirmRoundOf(m.giver.twtUser, reassigned),
     }))
     .sort((a, b) => a.giverTwt.localeCompare(b.giverTwt, "en", { sensitivity: "base" }));
 

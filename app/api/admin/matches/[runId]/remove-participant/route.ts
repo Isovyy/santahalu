@@ -52,10 +52,23 @@ export async function POST(
     matchedPairs: Math.max(0, run.matchedPairs - rowsToDelete.length),
   });
 
-  const formerReceiverTwt =
-    rowsToDelete.find((m) => m.giverId === participantId)?.receiver.twtUser ?? null;
-  const formerGiverTwt =
-    rowsToDelete.find((m) => m.receiverId === participantId)?.giver.twtUser ?? null;
+  const givingRow = rowsToDelete.find((m) => m.giverId === participantId);
+  const receivingRow = rowsToDelete.find((m) => m.receiverId === participantId);
+  const formerReceiverTwt = givingRow?.receiver.twtUser ?? null;
+  const formerGiverTwt = receivingRow?.giver.twtUser ?? null;
+
+  // Remembered so the admin can put them back later (restore route), and so
+  // they're kept out of force-match / auto-solve in the meantime.
+  await db.orm.public.MatchRunRemoval
+    .where({ matchRunId: runId })
+    .where({ participantId })
+    .delete();
+  await db.orm.public.MatchRunRemoval.create({
+    matchRunId: runId,
+    participantId,
+    formerReceiverId: givingRow?.receiverId ?? null,
+    formerGiverId: receivingRow?.giverId ?? null,
+  });
 
   return NextResponse.json({
     ok: true,

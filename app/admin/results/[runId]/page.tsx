@@ -5,6 +5,7 @@ import { formatAvoidList } from "@/lib/avoidList";
 import MatchedPairsTable from "./MatchedPairsTable";
 import DeleteMatchRun from "./DeleteMatchRun";
 import CloseConfirmation from "./CloseConfirmation";
+import { confirmRoundOf, reassignedGiverTwts } from "@/lib/confirmRound";
 
 export const dynamic = "force-dynamic";
 
@@ -17,8 +18,14 @@ export default async function ResultsPage({
   const results = await getMatchRunResults(runId);
   if (!results) notFound();
 
-  const { run, rows, noGiver, noReceiver, totalCurrentParticipants } = results;
+  const { run, rows, noGiver, noReceiver, removed, totalCurrentParticipants } = results;
   const matchedRows = rows.filter((r) => r.giver_twt_user && r.receiver_twt_user);
+
+  const reassigned = await reassignedGiverTwts(run.id);
+  const round2Count = run.matches.filter(
+    (m) => confirmRoundOf(m.giver.twtUser, reassigned) === 2,
+  ).length;
+  const round1Count = run.matches.length - round2Count;
 
   return (
     <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10">
@@ -30,12 +37,13 @@ export default async function ResultsPage({
         Results: {run.createdAt.toLocaleString()}
       </h1>
 
-      <section className="mt-6 grid grid-cols-3 gap-4 sm:grid-cols-5">
+      <section className="mt-6 grid grid-cols-3 gap-4 sm:grid-cols-6">
         <Stat label="Participants (run)" value={run.totalParticipants} />
         <Stat label="Participants (now)" value={totalCurrentParticipants} />
         <Stat label="Matched pairs" value={run.matchedPairs} />
         <Stat label="No giver" value={noGiver.length} />
         <Stat label="No receiver" value={noReceiver.length} />
+        <Stat label="Dihapus" value={removed.length} />
       </section>
       {run.seed !== null && (
         <p className="mt-2 text-sm text-gray-400">Seed: {run.seed}</p>
@@ -54,9 +62,28 @@ export default async function ResultsPage({
         >
           Reshuffle pasangan
         </Link>
-        <CloseConfirmation runId={run.id} initialClosed={Boolean(run.confirmationClosedAt)} />
         <DeleteMatchRun runId={run.id} />
       </div>
+
+      <section className="mt-4 space-y-2 rounded-2xl border border-teal-100 bg-white p-4 shadow-sm">
+        <CloseConfirmation
+          runId={run.id}
+          round={1}
+          pairCount={round1Count}
+          initialClosed={Boolean(run.confirmationClosedAt)}
+        />
+        <CloseConfirmation
+          runId={run.id}
+          round={2}
+          pairCount={round2Count}
+          initialClosed={Boolean(run.confirmation2ClosedAt)}
+        />
+        <p className="text-xs text-gray-400">
+          #1 = pasangan dari matching awal yang belum pernah diubah. #2 = pasangan yang dibuat atau
+          diubah lewat reshuffle, solusi otomatis, pasangkan manual, atau dikembalikan. Setiap
+          ronde bisa dibuka/ditutup sendiri.
+        </p>
+      </section>
 
       <h2 className="mt-10 text-lg font-medium text-gray-800">Matched pairs</h2>
       <p className="mt-1 text-xs text-gray-400">
@@ -97,6 +124,18 @@ export default async function ResultsPage({
       <div className="mt-3">
         <UnmatchedTable participants={noReceiver} />
       </div>
+
+      {removed.length > 0 && (
+        <>
+          <h2 className="mt-10 text-lg font-medium text-gray-800">Dihapus ({removed.length})</h2>
+          <p className="mt-1 text-xs text-gray-400">
+            Dikeluarkan dari matching ini oleh admin. Bisa dikembalikan dari halaman Reshuffle.
+          </p>
+          <div className="mt-3">
+            <UnmatchedTable participants={removed} />
+          </div>
+        </>
+      )}
     </main>
   );
 }

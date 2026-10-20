@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
+import { confirmRoundOf, isRoundClosed, reassignedGiverTwts } from "@/lib/confirmRound";
 import ConfirmActions from "./ConfirmActions";
 
 export const dynamic = "force-dynamic";
@@ -13,23 +14,25 @@ export default async function ConfirmPage({
 
   const match = await db.orm.public.Match
     .include("receiver")
+    .include("giver")
     .include("matchRun")
     .first({ confirmToken: token });
   if (!match) notFound();
 
-  const closed = Boolean(match.matchRun.confirmationClosedAt);
+  const round = confirmRoundOf(match.giver.twtUser, await reassignedGiverTwts(match.matchRunId));
+  const closed = isRoundClosed(match.matchRun, round);
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col justify-center px-4 py-10">
       <div className="rounded-2xl border border-teal-100 bg-white p-6 shadow-sm">
-        <h1 className="text-2xl font-bold text-teal-500">Konfirmasi Pasangan</h1>
+        <h1 className="text-2xl font-bold text-teal-500">Konfirmasi Pasangan #{round}</h1>
         <p className="mt-2 text-sm text-gray-600">
           Kamu akan membuatkan hadiah untuk fandom <strong>{match.receiver.fandomYume}</strong>,
           oshi <strong>{match.receiver.oshiName}</strong>.
         </p>
         {closed ? (
           <p className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700">
-            Konfirmasi untuk matching ini sudah ditutup. Kalau masih ada masalah, hubungi admin
+            Konfirmasi #{round} sudah ditutup. Kalau masih ada masalah, hubungi admin
             langsung.
           </p>
         ) : (

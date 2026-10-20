@@ -46,7 +46,14 @@ export async function POST(
     return NextResponse.json({ error: "Match run not found" }, { status: 404 });
   }
 
-  const participants = await db.orm.public.Participant.all();
+  // People removed from this run must not be pulled back in as a chain's
+  // "free receiver" (or rerouted giver).
+  const [allParticipants, removals] = await Promise.all([
+    db.orm.public.Participant.all(),
+    db.orm.public.MatchRunRemoval.where({ matchRunId: runId }).all(),
+  ]);
+  const removedIds = new Set(removals.map((r) => r.participantId));
+  const participants = allParticipants.filter((p) => !removedIds.has(p.id));
   const byId = new Map(participants.map((p) => [p.id, p]));
 
   // Current full matching state for this run, as the chain search's starting

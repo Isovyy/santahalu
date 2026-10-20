@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Temporal } from "temporal-polyfill";
 import { db } from "@/lib/db";
+import { confirmRoundOf, isRoundClosed, reassignedGiverTwts } from "@/lib/confirmRound";
 
 export async function POST(
   req: NextRequest,
@@ -15,15 +16,16 @@ export async function POST(
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
-  const match = await db.orm.public.Match.first({ confirmToken: token });
+  const match = await db.orm.public.Match.include("giver").first({ confirmToken: token });
   if (!match) {
     return NextResponse.json({ error: "Link tidak valid." }, { status: 404 });
   }
 
   const run = await db.orm.public.MatchRun.first({ id: match.matchRunId });
-  if (run?.confirmationClosedAt) {
+  const round = confirmRoundOf(match.giver.twtUser, await reassignedGiverTwts(match.matchRunId));
+  if (!run || isRoundClosed(run, round)) {
     return NextResponse.json(
-      { error: "Konfirmasi untuk matching ini sudah ditutup." },
+      { error: `Konfirmasi #${round} sudah ditutup.` },
       { status: 403 },
     );
   }

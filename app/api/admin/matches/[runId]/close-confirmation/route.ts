@@ -8,7 +8,7 @@ export async function POST(
 ) {
   const { runId } = await params;
 
-  let body: { closed?: unknown };
+  let body: { closed?: unknown; round?: unknown };
   try {
     body = await req.json();
   } catch {
@@ -16,15 +16,17 @@ export async function POST(
   }
 
   const closed = body.closed === true;
+  const round = body.round === 2 ? 2 : 1;
 
   const run = await db.orm.public.MatchRun.first({ id: runId });
   if (!run) {
     return NextResponse.json({ error: "Match run not found" }, { status: 404 });
   }
 
-  await db.orm.public.MatchRun.where({ id: runId }).update({
-    confirmationClosedAt: closed ? Temporal.Now.instant() : null,
-  });
+  const closedAt = closed ? Temporal.Now.instant() : null;
+  await db.orm.public.MatchRun.where({ id: runId }).update(
+    round === 2 ? { confirmation2ClosedAt: closedAt } : { confirmationClosedAt: closedAt },
+  );
 
-  return NextResponse.json({ ok: true, closed });
+  return NextResponse.json({ ok: true, round, closed });
 }

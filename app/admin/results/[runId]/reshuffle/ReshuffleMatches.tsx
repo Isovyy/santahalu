@@ -419,6 +419,7 @@ export default function ReshuffleMatches({
                 {row.receiverFandomYume} &middot; {row.receiverOshiName}
               </p>
               <p className="mt-1">
+                <RoundBadge round={row.confirmRound} />
                 <StatusBadge row={row} />
                 {ruleBreaking.has(row.matchId) && <RuleBreakingBadge />}
               </p>
@@ -473,6 +474,7 @@ export default function ReshuffleMatches({
                   {row.receiverFandomYume} &middot; {row.receiverOshiName}
                 </td>
                 <td className="px-4 py-2">
+                  <RoundBadge round={row.confirmRound} />
                   <StatusBadge row={row} />
                   {ruleBreaking.has(row.matchId) && <RuleBreakingBadge />}
                 </td>
@@ -500,6 +502,21 @@ export default function ReshuffleMatches({
         </table>
       </div>
     </div>
+  );
+}
+
+// Which /confirm link round this pair's email link belongs to (see
+// lib/confirmRound.ts).
+function RoundBadge({ round }: { round: 1 | 2 }) {
+  return (
+    <span
+      title={`Link konfirmasi #${round}`}
+      className={`mr-2 whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-semibold ${
+        round === 2 ? "bg-violet-100 text-violet-700" : "bg-gray-100 text-gray-600"
+      }`}
+    >
+      #{round}
+    </span>
   );
 }
 

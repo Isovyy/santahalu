@@ -49,10 +49,16 @@ model MatchRun {
   matchedPairs      Int
   matches           Match[]
   reshuffleLogs     MatchReshuffleLog[]
+  removals          MatchRunRemoval[]
 
-  // Manually set by an admin to close /confirm/[token] for every match in
-  // this run (no more confirms or reports accepted). Null means still open.
-  confirmationClosedAt DateTime?
+  // Manually set by an admin to close /confirm/[token] links (no more
+  // confirms or reports accepted). Null means still open. Two rounds:
+  // #1 covers pairs untouched since the original matching, #2 covers pairs
+  // (re)assigned later by a reshuffle, force-match or restore — so round #1
+  // can close on time while reshuffled pairs still get to confirm. See
+  // lib/confirmRound.ts for how a pair's round is decided.
+  confirmationClosedAt  DateTime?
+  confirmation2ClosedAt DateTime?
 
   // Marks the one run admins are currently working from, since several runs
   // accumulate over time (reshuffle testing, re-runs). At most one run has
@@ -128,6 +134,23 @@ model MatchReshuffleLog {
   newReceiverFandomYume      String
 
   @@map("MatchReshuffleLog")
+}
+
+// A participant an admin pulled out of a run (e.g. never confirmed in time),
+// kept so they can be put back later. Their former partners are remembered
+// so a restore can recreate those pairs if the slots are still free. Plain
+// ids rather than FKs to Participant, like RejectedPair.
+model MatchRunRemoval {
+  id               String   @id @default(cuid(2))
+  matchRunId       String
+  matchRun         MatchRun @relation(fields: [matchRunId], references: [id], onDelete: Cascade)
+  removedAt        temporal.createdAt()
+  participantId    String
+  formerReceiverId String?
+  formerGiverId    String?
+
+  @@unique([matchRunId, participantId])
+  @@map("MatchRunRemoval")
 }
 
 // Every giver → receiver pairing that was ever reported, in any run. A report

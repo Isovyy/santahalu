@@ -116,7 +116,11 @@ export async function getMatchRunResults(runId: string) {
     .first({ id: runId });
   if (!run) return null;
 
-  const participants = await db.orm.public.Participant.orderBy((p) => p.twtUser.asc()).all();
+  const [participants, removals] = await Promise.all([
+    db.orm.public.Participant.orderBy((p) => p.twtUser.asc()).all(),
+    db.orm.public.MatchRunRemoval.where({ matchRunId: runId }).all(),
+  ]);
+  const removedIds = new Set(removals.map((r) => r.participantId));
 
   const receiverToGiver = new Map<string, (typeof run.matches)[number]["giver"]>();
   run.matches.forEach((m) => receiverToGiver.set(m.receiverId, m.giver));
@@ -163,8 +167,11 @@ export async function getMatchRunResults(runId: string) {
   // "appears anywhere" count reports both as fully fine.
   const giverIds = new Set(run.matches.map((m) => m.giverId));
   const receiverIds = new Set(run.matches.map((m) => m.receiverId));
-  const noReceiver = participants.filter((p) => !giverIds.has(p.id));
-  const noGiver = participants.filter((p) => !receiverIds.has(p.id));
+  // People an admin removed from this run are listed on their own, not as
+  // gaps waiting to be filled.
+  const noReceiver = participants.filter((p) => !giverIds.has(p.id) && !removedIds.has(p.id));
+  const noGiver = participants.filter((p) => !receiverIds.has(p.id) && !removedIds.has(p.id));
+  const removed = participants.filter((p) => removedIds.has(p.id));
 
-  return { run, rows, noGiver, noReceiver, totalCurrentParticipants: participants.length };
+  return { run, rows, noGiver, noReceiver, removed, totalCurrentParticipants: participants.length };
 }

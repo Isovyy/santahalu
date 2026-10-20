@@ -5,9 +5,13 @@ import { useRouter } from "next/navigation";
 
 export default function CloseConfirmation({
   runId,
+  round,
+  pairCount,
   initialClosed,
 }: {
   runId: string;
+  round: 1 | 2;
+  pairCount: number;
   initialClosed: boolean;
 }) {
   const router = useRouter();
@@ -23,7 +27,7 @@ export default function CloseConfirmation({
       const res = await fetch(`/api/admin/matches/${runId}/close-confirmation`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ closed: next }),
+        body: JSON.stringify({ closed: next, round }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -40,16 +44,29 @@ export default function CloseConfirmation({
     }
   }
 
+  const label = (
+    <span className="text-sm text-gray-700">
+      Link konfirmasi #{round}{" "}
+      <span className="text-gray-400">({pairCount} pasangan)</span>:{" "}
+      {closed ? (
+        <span className="font-medium text-red-600">Ditutup</span>
+      ) : (
+        <span className="font-medium text-teal-600">Terbuka</span>
+      )}
+    </span>
+  );
+
   if (closed) {
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
+        {label}
         <button
           type="button"
           onClick={() => toggle(false)}
           disabled={saving}
           className="rounded-lg border border-teal-200 px-4 py-2 text-sm text-gray-700 hover:bg-teal-50 disabled:opacity-50"
         >
-          {saving ? "Membuka..." : "Buka lagi konfirmasi"}
+          {saving ? "Membuka..." : `Buka lagi #${round}`}
         </button>
         {error && <span className="text-sm text-red-500">{error}</span>}
       </div>
@@ -60,8 +77,8 @@ export default function CloseConfirmation({
     return (
       <div className="flex flex-wrap items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm">
         <span className="text-red-700">
-          Tutup konfirmasi? Peserta tidak bisa lagi konfirmasi atau lapor masalah lewat link di
-          email mereka.
+          Tutup konfirmasi #{round}? {pairCount} pasangan di ronde ini tidak bisa lagi konfirmasi
+          atau lapor masalah lewat link di email mereka.
         </span>
         <button
           type="button"
@@ -85,12 +102,15 @@ export default function CloseConfirmation({
   }
 
   return (
-    <button
-      type="button"
-      onClick={() => setConfirming(true)}
-      className="rounded-lg border border-teal-200 px-4 py-2 text-sm text-gray-700 hover:bg-teal-50"
-    >
-      Tutup konfirmasi
-    </button>
+    <div className="flex flex-wrap items-center gap-2">
+      {label}
+      <button
+        type="button"
+        onClick={() => setConfirming(true)}
+        className="rounded-lg border border-teal-200 px-4 py-2 text-sm text-gray-700 hover:bg-teal-50"
+      >
+        Tutup #{round}
+      </button>
+    </div>
   );
 }

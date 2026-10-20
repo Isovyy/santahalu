@@ -49,6 +49,14 @@ export async function POST(
     return NextResponse.json({ error: "Receiver ini sudah punya giver." }, { status: 409 });
   }
 
+  const removed = await db.orm.public.MatchRunRemoval.where({ matchRunId: runId }).all();
+  if (removed.some((r) => r.participantId === giverId || r.participantId === receiverId)) {
+    return NextResponse.json(
+      { error: "Peserta ini sedang dihapus dari matching. Kembalikan dulu." },
+      { status: 409 },
+    );
+  }
+
   const [giver, receiver] = await Promise.all([
     db.orm.public.Participant.first({ id: giverId }),
     db.orm.public.Participant.first({ id: receiverId }),
