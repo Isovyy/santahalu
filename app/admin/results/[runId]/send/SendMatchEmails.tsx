@@ -25,6 +25,7 @@ export default function SendMatchEmails({
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastResults, setLastResults] = useState<Record<string, string> | null>(null);
+  const [unmarkingId, setUnmarkingId] = useState<string | null>(null);
 
   const eligibleIds = useMemo(
     () => rows.filter((r) => !sentState[r.matchId]).map((r) => r.matchId),
@@ -78,6 +79,28 @@ export default function SendMatchEmails({
       setError("Network error, coba lagi.");
     } finally {
       setSending(false);
+    }
+  }
+
+  async function markUnsent(matchId: string) {
+    setUnmarkingId(matchId);
+    setError(null);
+    try {
+      const res = await fetch(`/api/admin/matches/${runId}/mark-unsent`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ matchId }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Gagal mengubah status.");
+        return;
+      }
+      setSentState((prev) => ({ ...prev, [matchId]: null }));
+    } catch {
+      setError("Network error, coba lagi.");
+    } finally {
+      setUnmarkingId(null);
     }
   }
 
@@ -145,7 +168,17 @@ export default function SendMatchEmails({
                   <td className="px-4 py-2">{row.receiverRelationshipType}</td>
                   <td className="px-4 py-2">
                     {sent ? (
-                      <span className="text-teal-600">Terkirim {formatSentAt(sent)}</span>
+                      <div className="space-y-0.5">
+                        <span className="text-teal-600">Terkirim {formatSentAt(sent)}</span>
+                        <button
+                          type="button"
+                          onClick={() => markUnsent(row.matchId)}
+                          disabled={unmarkingId !== null}
+                          className="block text-xs text-gray-500 hover:text-teal-600 hover:underline disabled:opacity-50"
+                        >
+                          {unmarkingId === row.matchId ? "Mengubah..." : "Tandai belum dikirim"}
+                        </button>
+                      </div>
                     ) : result === "failed" ? (
                       <span className="text-red-500">Gagal, coba lagi</span>
                     ) : (
