@@ -62,12 +62,6 @@ export default async function ResultsPage({
         >
           Reshuffle pasangan
         </Link>
-        <Link
-          href={`/admin/results/${run.id}/playground`}
-          className="rounded-lg border border-violet-200 px-4 py-2 text-sm text-violet-700 hover:bg-violet-50"
-        >
-          Playground
-        </Link>
         <DeleteMatchRun runId={run.id} />
       </div>
 
@@ -84,11 +78,6 @@ export default async function ResultsPage({
           pairCount={round2Count}
           initialClosed={Boolean(run.confirmation2ClosedAt)}
         />
-        <p className="text-xs text-gray-400">
-          #1 = pasangan dari matching awal yang belum pernah diubah. #2 = pasangan yang dibuat atau
-          diubah lewat reshuffle, solusi otomatis, pasangkan manual, atau dikembalikan. Setiap
-          ronde bisa dibuka/ditutup sendiri.
-        </p>
       </section>
 
       <h2 className="mt-10 text-lg font-medium text-gray-800">Matched pairs</h2>
