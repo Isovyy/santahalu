@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { canGiveTo, type MatchParticipant } from "@/lib/matching";
+import { ruleViolations, type MatchParticipant } from "@/lib/matching";
 
 export interface ForceOption extends MatchParticipant {
   twtUser: string;
@@ -32,14 +32,15 @@ export default function ForceMatch({
   const giver = givers.find((g) => g.id === giverId);
   const receiver = receivers.find((r) => r.id === receiverId);
   const samePerson = giver && receiver && giver.id === receiver.id;
-  const followsRules = giver && receiver && !samePerson ? canGiveTo(giver, receiver) : null;
+  const violations = giver && receiver && !samePerson ? ruleViolations(giver, receiver) : [];
+  const followsRules = giver && receiver && !samePerson ? violations.length === 0 : null;
 
   async function save() {
     if (!giver || !receiver || samePerson) return;
     if (
       !followsRules &&
       !window.confirm(
-        `${giver.twtUser} → ${receiver.twtUser} melanggar aturan matching. Tetap pasangkan?`,
+        `${giver.twtUser} → ${receiver.twtUser} melanggar aturan matching:\n- ${violations.join("\n- ")}\n\nTetap pasangkan?`,
       )
     ) {
       return;
@@ -138,7 +139,7 @@ export default function ForceMatch({
             <p className="font-medium text-teal-600">✓ Sesuai aturan matching.</p>
           ) : (
             <p className="font-medium text-red-600">
-              ⚠ Melanggar aturan matching (fandom, bahasa, tipe yume, oshi sama, atau avoid list).
+              ⚠ Melanggar aturan: {violations.join(", ")}.
             </p>
           )}
         </div>

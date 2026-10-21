@@ -78,24 +78,35 @@ function isAvoided(giver: MatchParticipant, receiver: MatchParticipant): boolean
 }
 
 export function canGiveTo(giver: MatchParticipant, receiver: MatchParticipant): boolean {
+  return ruleViolations(giver, receiver).length === 0;
+}
+
+// Every matching rule this pairing breaks, as short admin-facing labels
+// (empty = allowed). canGiveTo is just "no violations", so the two can never
+// disagree about what counts as a valid pair.
+export function ruleViolations(giver: MatchParticipant, receiver: MatchParticipant): string[] {
+  const violations: string[] = [];
   const giverOshi = normalize(giver.oshiName);
   const recvOshi = normalize(receiver.oshiName);
 
   // Rule 1: no same-oshi pairing
   if (giverOshi && recvOshi && giverOshi === recvOshi) {
-    return false;
+    violations.push("Oshi sama");
   }
 
   // Rule 2: never assign a character the giver asked to avoid
   if (isAvoided(giver, receiver)) {
-    return false;
+    violations.push("Ada di avoid list giver");
   }
 
   let fandomGive = parseMulti(giver.fandomGive);
   if (fandomGive.length === 0) fandomGive = ["apa saja"];
 
   const fandomRecv = parseMulti(receiver.fandomYume);
-  if (fandomRecv.length === 0) return false;
+  if (fandomRecv.length === 0) {
+    violations.push("Receiver tidak punya fandom");
+    return violations;
+  }
 
   let langGive = parseMulti(giver.languageGive);
   if (langGive.length === 0) langGive = ["apa saja"];
@@ -178,7 +189,10 @@ export function canGiveTo(giver: MatchParticipant, receiver: MatchParticipant): 
     }
   }
 
-  return fandomOk && langOk && yumeOk;
+  if (!fandomOk) violations.push("Fandom tidak sesuai");
+  if (!langOk) violations.push("Bahasa tidak sesuai");
+  if (!yumeOk) violations.push("Tipe yume tidak sesuai");
+  return violations;
 }
 
 function seedRandom(seed: number): () => number {

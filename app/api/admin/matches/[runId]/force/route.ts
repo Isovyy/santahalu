@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Temporal } from "temporal-polyfill";
 import { db } from "@/lib/db";
-import { canGiveTo } from "@/lib/matching";
+import { ruleViolations } from "@/lib/matching";
 
 // Manually pairs a giver who currently has no receiver with a receiver who
 // currently has no giver, even when the pair breaks the matching rules
@@ -92,6 +92,6 @@ export async function POST(
     ok: true,
     giverTwt: giver.twtUser,
     receiverTwt: receiver.twtUser,
-    followsRules: canGiveTo(giver, receiver),
+    violations: ruleViolations(giver, receiver),
   });
 }

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getNotifyRows } from "@/lib/notify";
 import { db } from "@/lib/db";
-import { canGiveTo } from "@/lib/matching";
+import { ruleViolations } from "@/lib/matching";
 import ReshuffleMatches from "./ReshuffleMatches";
 import ForceMatch, { type ForceOption } from "./ForceMatch";
 import RemovedParticipants from "./RemovedParticipants";
@@ -65,9 +65,11 @@ export default async function ReshufflePage({
   // Pairs that break the matching rules against everyone's *current* answers:
   // forced pairs, or valid pairs that went stale after someone edited their
   // entry. Flagged in the table so they can be ticked into a reshuffle.
-  const ruleBreakingMatchIds = run.matches
-    .filter((m) => !canGiveTo(m.giver, m.receiver))
-    .map((m) => m.id);
+  const ruleBreaking: Record<string, string[]> = {};
+  for (const m of run.matches) {
+    const reasons = ruleViolations(m.giver, m.receiver);
+    if (reasons.length > 0) ruleBreaking[m.id] = reasons;
+  }
 
   const giverIds = new Set(run.matches.map((m) => m.giverId));
   const receiverIds = new Set(run.matches.map((m) => m.receiverId));
@@ -112,7 +114,7 @@ export default async function ReshufflePage({
         <ReshuffleMatches
           runId={runId}
           rows={data.rows}
-          ruleBreakingMatchIds={ruleBreakingMatchIds}
+          ruleBreaking={ruleBreaking}
           participants={participants.filter((p) => !removedIds.has(p.id)).map(toForceOption)}
         />
       </div>

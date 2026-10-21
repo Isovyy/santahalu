@@ -16,7 +16,10 @@ import { db } from "@/lib/db";
 // Pairs are matched by twitter handle as well as by participant id: someone
 // who registered twice gets two Participant rows with the same twtUser, and
 // rejecting one of them is rejecting that person, not just that row.
-export async function loadRejectedPairs(): Promise<Set<string>> {
+//
+// `persist: false` skips writing anything (for read-only pages like the
+// playground) — the result is the same set either way.
+export async function loadRejectedPairs({ persist = true } = {}): Promise<Set<string>> {
   const stored = await db.orm.public.RejectedPair.all();
   const pairs = stored.map((p) => ({ giverId: p.giverId, receiverId: p.receiverId }));
   const storedKeys = new Set(stored.map((p) => `${p.matchRunId}:${p.giverId}:${p.receiverId}`));
@@ -24,13 +27,14 @@ export async function loadRejectedPairs(): Promise<Set<string>> {
   const reported = await db.orm.public.Match.where((m) => m.reportedAt.isNotNull()).all();
   for (const m of reported) {
     if (storedKeys.has(`${m.matchRunId}:${m.giverId}:${m.receiverId}`)) continue;
+    pairs.push({ giverId: m.giverId, receiverId: m.receiverId });
+    if (!persist) continue;
     await db.orm.public.RejectedPair.create({
       matchRunId: m.matchRunId,
       giverId: m.giverId,
       receiverId: m.receiverId,
       note: m.reportNote,
     });
-    pairs.push({ giverId: m.giverId, receiverId: m.receiverId });
   }
 
   const participants = await db.orm.public.Participant.all();

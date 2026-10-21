@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   canGiveTo,
+  ruleViolations,
   matchParticipants,
   matchBipartite,
   findMinimalBreakChain,
@@ -382,5 +383,33 @@ describe("findMinimalBreakChain", () => {
       { giverId: "g", previousReceiverId: null, newReceiverId: "r1" },
       { giverId: "g1", previousReceiverId: "r1", newReceiverId: "f2" },
     ]);
+  });
+});
+
+describe("ruleViolations", () => {
+  it("is empty for a valid pair", () => {
+    expect(ruleViolations(participant({ id: "g" }), participant({ id: "r" }))).toEqual([]);
+  });
+
+  it("names every rule a pair breaks, not just the first", () => {
+    const giver = participant({
+      id: "g",
+      oshiName: "Same",
+      fandomGive: "Fandom B",
+      languageGive: "Indonesia",
+      yumeTypeGive: "BL",
+    });
+    const receiver = participant({ id: "r", oshiName: "Same" });
+    expect(ruleViolations(giver, receiver)).toEqual([
+      "Oshi sama",
+      "Fandom tidak sesuai",
+      "Bahasa tidak sesuai",
+      "Tipe yume tidak sesuai",
+    ]);
+  });
+
+  it("reports the giver's avoid list", () => {
+    const giver = participant({ id: "g", avoidList: "Oshi-r | Fandom A" });
+    expect(ruleViolations(giver, participant({ id: "r" }))).toEqual(["Ada di avoid list giver"]);
   });
 });

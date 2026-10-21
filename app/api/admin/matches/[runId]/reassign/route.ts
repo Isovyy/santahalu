@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Temporal } from "temporal-polyfill";
 import { db } from "@/lib/db";
-import { canGiveTo } from "@/lib/matching";
+import { ruleViolations } from "@/lib/matching";
 import { loadRejectedPairs } from "@/lib/rejectedPairs";
 
 // Manual rearranging from the reshuffle page: points one pair's giver at a
@@ -122,7 +122,7 @@ export async function POST(
       giverTwt: c.giver.twtUser,
       previousReceiverTwt: c.previous.twtUser,
       newReceiverTwt: c.next.twtUser,
-      followsRules: canGiveTo(c.giver, c.next),
+      violations: ruleViolations(c.giver, c.next),
       previouslyRejected: rejected.has(`${c.giver.id}:${c.next.id}`),
     })),
     // Moving to a free receiver leaves the old one without a giver.

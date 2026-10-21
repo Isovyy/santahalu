@@ -57,15 +57,15 @@ interface AutoResult {
 export default function ReshuffleMatches({
   runId,
   rows,
-  ruleBreakingMatchIds,
+  ruleBreaking,
   participants,
 }: {
   runId: string;
   rows: NotifyRow[];
-  ruleBreakingMatchIds: string[];
+  // matchId -> rules that pair breaks (only pairs that break any).
+  ruleBreaking: Record<string, string[]>;
   participants: ForceOption[];
 }) {
-  const ruleBreaking = new Set(ruleBreakingMatchIds);
   const [query, setQuery] = useState("");
   const q = query.trim().toLowerCase();
   // Filtering only hides rows; ticked pairs stay selected while hidden.
@@ -425,7 +425,7 @@ export default function ReshuffleMatches({
               <p className="mt-1">
                 <RoundBadge round={row.confirmRound} />
                 <StatusBadge row={row} />
-                {ruleBreaking.has(row.matchId) && <RuleBreakingBadge />}
+                {ruleBreaking[row.matchId] && <RuleBreakingBadge reasons={ruleBreaking[row.matchId]} />}
               </p>
               {row.reportNote && (
                 <p className="mt-1 break-words text-gray-500">Catatan: {row.reportNote}</p>
@@ -481,7 +481,7 @@ export default function ReshuffleMatches({
                 <td className="px-4 py-2">
                   <RoundBadge round={row.confirmRound} />
                   <StatusBadge row={row} />
-                  {ruleBreaking.has(row.matchId) && <RuleBreakingBadge />}
+                  {ruleBreaking[row.matchId] && <RuleBreakingBadge reasons={ruleBreaking[row.matchId]} />}
                 </td>
                 <td className="max-w-[16rem] break-words px-4 py-2 text-gray-500">
                   {row.reportNote || "-"}
@@ -528,10 +528,10 @@ function RoundBadge({ round }: { round: 1 | 2 }) {
 
 // Pair doesn't satisfy the matching rules against current answers: forced by
 // hand, or broken by an edit after matching.
-function RuleBreakingBadge() {
+function RuleBreakingBadge({ reasons }: { reasons: string[] }) {
   return (
-    <span className="ml-2 whitespace-nowrap rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700">
-      ⚠ Melanggar aturan
+    <span className="ml-2 inline-block rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700">
+      ⚠ {reasons.join(", ")}
     </span>
   );
 }

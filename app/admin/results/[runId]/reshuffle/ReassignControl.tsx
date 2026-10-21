@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { canGiveTo } from "@/lib/matching";
+import { ruleViolations } from "@/lib/matching";
 import type { NotifyRow } from "@/lib/notify";
 import type { ForceOption } from "./ForceMatch";
 
@@ -12,7 +12,7 @@ interface ReassignResult {
     giverTwt: string;
     previousReceiverTwt: string;
     newReceiverTwt: string;
-    followsRules: boolean;
+    violations: string[];
     previouslyRejected: boolean;
   }[];
   nowWithoutGiverTwt: string | null;
@@ -48,17 +48,21 @@ export default function ReassignControl({
 
   const options = participants.filter((p) => p.id !== row.giverId && p.id !== row.receiverId);
 
-  const preview: { label: string; ok: boolean }[] = [];
+  const preview: { label: string; ok: boolean; reasons: string[] }[] = [];
   if (giver && newReceiver) {
+    const reasons = ruleViolations(giver, newReceiver);
     preview.push({
       label: `${giver.twtUser} → ${newReceiver.twtUser}`,
-      ok: canGiveTo(giver, newReceiver),
+      ok: reasons.length === 0,
+      reasons,
     });
   }
-  if (otherGiver && oldReceiver) {
+  if (otherGiver && oldReceiver && otherGiver.id !== oldReceiver.id) {
+    const reasons = ruleViolations(otherGiver, oldReceiver);
     preview.push({
       label: `${otherGiver.twtUser} → ${oldReceiver.twtUser} (tukar)`,
-      ok: otherGiver.id !== oldReceiver.id && canGiveTo(otherGiver, oldReceiver),
+      ok: reasons.length === 0,
+      reasons,
     });
   }
   const selfSwap = Boolean(otherGiver && oldReceiver && otherGiver.id === oldReceiver.id);
@@ -71,7 +75,9 @@ export default function ReassignControl({
     if (
       broken.length > 0 &&
       !window.confirm(
-        `Melanggar aturan matching:\n${broken.map((b) => b.label).join("\n")}\n\nTetap simpan?`,
+        `Melanggar aturan matching:\n${broken
+          .map((b) => `${b.label}: ${b.reasons.join(", ")}`)
+          .join("\n")}\n\nTetap simpan?`,
       )
     ) {
       return;
@@ -127,7 +133,9 @@ export default function ReassignControl({
             {result.pairs.map((p, i) => (
               <p key={i}>
                 ✓ {p.giverTwt} → {p.newReceiverTwt}
-                {!p.followsRules && <span className="text-red-600"> (melanggar aturan)</span>}
+                {p.violations.length > 0 && (
+                  <span className="text-red-600"> ({p.violations.join(", ")})</span>
+                )}
                 {p.previouslyRejected && (
                   <span className="text-red-600"> (pernah dilaporkan!)</span>
                 )}
@@ -164,7 +172,7 @@ export default function ReassignControl({
       {preview.map((p, i) => (
         <p key={i} className={p.ok ? "text-teal-700" : "font-medium text-red-600"}>
           {p.ok ? "✓" : "⚠"} {p.label}
-          {!p.ok && " — melanggar aturan"}
+          {!p.ok && ` — ${p.reasons.join(", ")}`}
         </p>
       ))}
       {newReceiver && !other && oldReceiver && (

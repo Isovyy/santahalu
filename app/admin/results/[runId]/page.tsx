@@ -62,6 +62,12 @@ export default async function ResultsPage({
         >
           Reshuffle pasangan
         </Link>
+        <Link
+          href={`/admin/results/${run.id}/playground`}
+          className="rounded-lg border border-violet-200 px-4 py-2 text-sm text-violet-700 hover:bg-violet-50"
+        >
+          Playground
+        </Link>
         <DeleteMatchRun runId={run.id} />
       </div>
 
