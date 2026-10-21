@@ -1,7 +1,7 @@
 import type { NotifyRow } from "@/lib/notify";
 import { escapeHtml, ADMIN_CONTACT_HANDLE } from "@/lib/emailHtml";
 
-export const MATCH_EMAIL_SUBJECT = "RESHUFFLE #3: Your Santahalu26 Match!";
+export const MATCH_EMAIL_SUBJECT = "RESHUFFLE #2: Your Santahalu26 Match!";
 
 export function matchEmailHtml(row: NotifyRow, confirmUrl: string, extendUrl: string): string {
   return `
