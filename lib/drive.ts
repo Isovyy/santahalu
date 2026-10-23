@@ -47,10 +47,13 @@ function getDrive() {
 // and returns its shareable view link. The parent must already be shared with the
 // service account (Editor access) so the folder lands inside the real owner's Drive.
 export async function createDriveFolder(name: string): Promise<string> {
-  const parentId = process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID;
-  if (!parentId) {
+  const rawParent = process.env.GOOGLE_DRIVE_PARENT_FOLDER_ID?.trim();
+  if (!rawParent) {
     throw new Error("GOOGLE_DRIVE_PARENT_FOLDER_ID is not set. Add it to .env before creating folders.");
   }
+  // Accept a pasted folder URL (".../drive/u/2/folders/<id>?usp=...") as
+  // well as the bare id.
+  const parentId = rawParent.match(/\/folders\/([\w-]+)/)?.[1] ?? rawParent;
 
   const res = await getDrive().files.create({
     requestBody: {
