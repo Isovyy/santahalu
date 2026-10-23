@@ -41,6 +41,10 @@ export async function createDriveFolder(name: string): Promise<string> {
       parents: [parentId],
     },
     fields: "id, webViewLink",
+    // Needed when the parent folder lives in a Shared Drive (service accounts
+    // have no storage of their own, so a Shared Drive is the reliable home
+    // for these folders). Harmless for a regular My Drive folder.
+    supportsAllDrives: true,
   });
 
   if (!res.data.webViewLink) {
@@ -66,11 +70,21 @@ export async function shareFolder(folderLink: string, email: string): Promise<vo
   const fileId = folderIdFromLink(folderLink);
   const requestBody = { type: "user", role: "writer", emailAddress: email };
   try {
-    await getDrive().permissions.create({ fileId, requestBody, sendNotificationEmail: false });
+    await getDrive().permissions.create({
+      fileId,
+      requestBody,
+      sendNotificationEmail: false,
+      supportsAllDrives: true,
+    });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     if (!/notif/i.test(message)) throw err;
-    await getDrive().permissions.create({ fileId, requestBody, sendNotificationEmail: true });
+    await getDrive().permissions.create({
+      fileId,
+      requestBody,
+      sendNotificationEmail: true,
+      supportsAllDrives: true,
+    });
   }
 }
 
@@ -82,10 +96,11 @@ export async function unshareFolder(folderLink: string, email: string): Promise<
   const res = await drive.permissions.list({
     fileId,
     fields: "permissions(id,emailAddress,role)",
+    supportsAllDrives: true,
   });
   const target = email.trim().toLowerCase();
   for (const p of res.data.permissions ?? []) {
     if (p.role === "owner" || p.emailAddress?.toLowerCase() !== target || !p.id) continue;
-    await drive.permissions.delete({ fileId, permissionId: p.id });
+    await drive.permissions.delete({ fileId, permissionId: p.id, supportsAllDrives: true });
   }
 }
