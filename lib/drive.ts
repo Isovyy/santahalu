@@ -2,6 +2,25 @@ import { google } from "googleapis";
 
 let auth: InstanceType<typeof google.auth.JWT> | null = null;
 
+// The key gets mangled in different ways depending on where it was pasted
+// (.env vs the Vercel dashboard): surrounding quotes, literal "\n" instead of
+// line breaks, both at once, "\r\n". Any of those makes OpenSSL fail with
+// "DECODER routines::unsupported". Rebuild a clean PEM from just the base64
+// body so the paste format stops mattering.
+function normalizePrivateKey(raw: string): string {
+  const text = raw.trim().replace(/^["']|["']$/g, "").replace(/\\r|\\n/g, "\n");
+  const match = text.match(/-----BEGIN ([A-Z ]+)-----([\s\S]*?)-----END \1-----/);
+  if (!match) {
+    throw new Error(
+      "GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY tidak valid: harus berisi -----BEGIN PRIVATE KEY----- ... -----END PRIVATE KEY----- dari file JSON service account.",
+    );
+  }
+  const [, label, body] = match;
+  const base64 = body.replace(/[^A-Za-z0-9+/=]/g, "");
+  const lines = base64.match(/.{1,64}/g) ?? [];
+  return `-----BEGIN ${label}-----\n${lines.join("\n")}\n-----END ${label}-----\n`;
+}
+
 function getAuth() {
   const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
   const key = process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY;
@@ -13,8 +32,7 @@ function getAuth() {
   if (!auth) {
     auth = new google.auth.JWT({
       email,
-      // .env stores the key with literal "\n" sequences, restore real newlines.
-      key: key.replace(/\\n/g, "\n"),
+      key: normalizePrivateKey(key),
       scopes: ["https://www.googleapis.com/auth/drive"],
     });
   }
