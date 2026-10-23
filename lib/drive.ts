@@ -71,6 +71,23 @@ export async function createDriveFolder(name: string): Promise<string> {
   return res.data.webViewLink;
 }
 
+// Moves a folder the app created to the trash (recoverable for ~30 days from
+// the service account's Drive). A folder that's already gone is fine.
+export async function trashDriveFolder(folderLink: string): Promise<void> {
+  const fileId = folderIdFromLink(folderLink);
+  try {
+    await getDrive().files.update({
+      fileId,
+      requestBody: { trashed: true },
+      supportsAllDrives: true,
+    });
+  } catch (err) {
+    const code = (err as { code?: number }).code;
+    if (code === 404) return;
+    throw err;
+  }
+}
+
 // Folder links are stored as webViewLinks (".../drive/folders/<id>?usp=..."),
 // the permissions API wants the bare id.
 function folderIdFromLink(link: string): string {

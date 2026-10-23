@@ -140,6 +140,8 @@ export default function CreateReceiverFolders({
 
       {error && <p className="text-sm text-red-500">{error}</p>}
 
+      <ResetAllFolders onDone={() => router.refresh()} />
+
       <div className="overflow-x-auto rounded-2xl border border-teal-100 bg-white shadow-sm">
         <table className="min-w-full divide-y divide-teal-100 text-sm">
           <thead className="bg-teal-50 text-teal-600">
@@ -226,6 +228,85 @@ export default function CreateReceiverFolders({
           </tbody>
         </table>
       </div>
+    </div>
+  );
+}
+
+// Starts every receiver folder over (all participants, not just this tab's
+// rows): trashes the old folders and forgets their links, so "Buat folder"
+// makes fresh ones in the current parent folder. Runs in small batches until
+// nothing is left, for the same time-limit reason as folder creation.
+function ResetAllFolders({ onDone }: { onDone: () => void }) {
+  const [running, setRunning] = useState(false);
+  const [status, setStatus] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function run() {
+    if (
+      !window.confirm(
+        "Hapus SEMUA folder receiver yang sudah dibuat dan reset link-nya?\n\n" +
+          "- Folder lama dipindah ke trash (Drive service account, bisa dipulihkan ~30 hari).\n" +
+          "- Giver kehilangan akses ke folder lama.\n" +
+          "- Status 'email folder terkirim' direset, jadi email folder perlu dikirim ulang.\n\n" +
+          "Setelah ini klik 'Buat folder' untuk membuat folder baru di parent folder yang sekarang.",
+      )
+    ) {
+      return;
+    }
+    setRunning(true);
+    setError(null);
+    let done = 0;
+    const failed: string[] = [];
+    try {
+      for (;;) {
+        const res = await fetch("/api/admin/folders/reset", { method: "POST" });
+        const text = await res.text();
+        let data: { error?: string; processed?: number; remaining?: number; failed?: string[] } = {};
+        try {
+          data = JSON.parse(text);
+        } catch {
+          // not JSON, reported below
+        }
+        if (!res.ok) {
+          setError(
+            `Gagal reset (HTTP ${res.status}) setelah ${done} folder: ${data.error || text.slice(0, 200) || "tanpa keterangan"}. Klik lagi untuk melanjutkan.`,
+          );
+          break;
+        }
+        done += data.processed ?? 0;
+        failed.push(...(data.failed ?? []));
+        setStatus(`Mereset... ${done} folder, sisa ${data.remaining ?? 0}`);
+        if (!data.remaining || !data.processed) break;
+      }
+      setStatus(
+        `${done} folder direset.` +
+          (failed.length
+            ? ` ${failed.length} tidak bisa dihapus dari Drive (link tetap dilupakan): ${failed.join(", ")}.`
+            : ""),
+      );
+    } catch {
+      setError(`Network error setelah ${done} folder. Klik lagi untuk melanjutkan.`);
+    } finally {
+      setRunning(false);
+      onDone();
+    }
+  }
+
+  return (
+    <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm">
+      <button
+        type="button"
+        onClick={run}
+        disabled={running}
+        className="rounded-lg border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-100 disabled:opacity-50"
+      >
+        {running ? "Mereset..." : "Hapus & reset semua folder"}
+      </button>
+      <span className="text-xs text-red-700">
+        Untuk mulai ulang folder di parent folder baru. Semua peserta, bukan cuma tabel ini.
+      </span>
+      {status && <span className="w-full text-red-700">{status}</span>}
+      {error && <span className="w-full text-red-600">{error}</span>}
     </div>
   );
 }
