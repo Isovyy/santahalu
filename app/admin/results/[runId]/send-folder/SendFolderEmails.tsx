@@ -3,6 +3,10 @@
 import { useMemo, useState } from "react";
 import type { NotifyRow } from "@/lib/notify";
 
+// Emails per request: each send is an SMTP round-trip, so a big selection in
+// one request can run past Vercel's function time limit (HTTP 504).
+const SEND_BATCH_SIZE = 5;
+
 function formatSentAt(iso: string): string {
   return new Intl.DateTimeFormat("en-GB", {
     dateStyle: "medium",
@@ -25,6 +29,7 @@ export default function SendFolderEmails({
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastResults, setLastResults] = useState<Record<string, string> | null>(null);
+  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
 
   const eligibleIds = useMemo(
     () => rows.filter((r) => r.receiverFolderLink && !sentState[r.matchId]).map((r) => r.matchId),
@@ -51,33 +56,56 @@ export default function SendFolderEmails({
     setError(null);
     setLastResults(null);
 
-    try {
-      const res = await fetch(`/api/admin/matches/${runId}/notify-folder`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ matchIds: Array.from(selected) }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error || "Gagal mengirim email.");
-        setSending(false);
-        return;
-      }
-      const results: Record<string, string> = data.results;
-      setLastResults(results);
+    const ids = Array.from(selected);
+    const results: Record<string, string> = {};
+    setProgress({ done: 0, total: ids.length });
+
+    // Marks whatever was sent so far, so a failure in a later batch never
+    // makes already-emailed people look unsent (and get a second email).
+    function recordSent(batchResults: Record<string, string>) {
+      Object.assign(results, batchResults);
       setSentState((prev) => {
         const next = { ...prev };
         const now = new Date().toISOString();
-        for (const [id, outcome] of Object.entries(results)) {
+        for (const [id, outcome] of Object.entries(batchResults)) {
           if (outcome === "sent") next[id] = now;
         }
         return next;
       });
+    }
+
+    try {
+      for (let i = 0; i < ids.length; i += SEND_BATCH_SIZE) {
+        const batch = ids.slice(i, i + SEND_BATCH_SIZE);
+        const res = await fetch(`/api/admin/matches/${runId}/notify-folder`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ matchIds: batch }),
+        });
+        const text = await res.text();
+        let data: { error?: string; results?: Record<string, string> } = {};
+        try {
+          data = JSON.parse(text);
+        } catch {
+          // not JSON (crash/timeout page), reported below
+        }
+        if (!res.ok) {
+          setError(
+            `Gagal mengirim (HTTP ${res.status}) setelah ${i} dari ${ids.length}: ${data.error || text.slice(0, 200) || "tanpa keterangan"}. Yang sudah terkirim tetap tercatat, klik lagi untuk melanjutkan.`,
+          );
+          break;
+        }
+        recordSent(data.results ?? {});
+        setProgress({ done: Math.min(i + batch.length, ids.length), total: ids.length });
+      }
+      setLastResults({ ...results });
       setSelected(new Set());
     } catch {
-      setError("Network error, coba lagi.");
+      setLastResults({ ...results });
+      setError("Network error, coba lagi. Yang sudah terkirim tetap tercatat.");
     } finally {
       setSending(false);
+      setProgress(null);
     }
   }
 
@@ -95,7 +123,9 @@ export default function SendFolderEmails({
           disabled={sending || selected.size === 0}
           className="rounded-lg bg-teal-400 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-500 disabled:opacity-50"
         >
-          {sending ? "Mengirim..." : `Kirim ke ${selected.size} peserta terpilih`}
+          {sending
+            ? `Mengirim ${progress?.done ?? 0}/${progress?.total ?? selected.size}...`
+            : `Kirim ke ${selected.size} peserta terpilih`}
         </button>
       </div>
 

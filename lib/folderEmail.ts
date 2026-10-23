@@ -1,7 +1,7 @@
 import type { NotifyRow } from "@/lib/notify";
 import { escapeHtml, ADMIN_CONTACT_HANDLE } from "@/lib/emailHtml";
 
-export const FOLDER_EMAIL_SUBJECT = "SANTAHALU26 START!!!";
+export const FOLDER_EMAIL_SUBJECT = "SANTAHALU26 FINAL MATCH & START!!!";
 
 export function folderEmailHtml(row: NotifyRow, submitUrl: string): string {
   // "Romantic - HL": the receiver's relationship type plus their yumeship
@@ -14,6 +14,7 @@ export function folderEmailHtml(row: NotifyRow, submitUrl: string): string {
   return `
 <p>Hello ${escapeHtml(row.giverTwt)},<br>
 Pembuatan hadiah dapat dimulai.</p>
+
 <p>Sebagai rekap, inilah penerima hadiah anda untuk SantaHalu26!</p>
 <p>Receiver's details:<br>
 &bull; Fandom: ${escapeHtml(row.receiverFandomYume)}<br>
@@ -32,14 +33,13 @@ link/akses drive, atau jika ada kesalahan pada info penerima mohon DM ${admin}</
 1. Jika mengganti username atau email, mohon kontak ${admin}<br>
 2. Jika menghadapi kendala hingga tidak bisa memenuhi kewajiban memberi hadiah, mohon kontak ${admin}<br>
 3. Jika ada yang perlu ditanyakan ke penerima, mohon kontak ${admin}<br>
-4. Kegagalan dalam memenuhi kewajiban memberi hadiah tanpa kabar akan di-block oleh yumefess,
+4. Kegagalan dalam memenuhi kewajiban memberi hadiah TERMASUK tidak memenuhi minimum hadiah tanpa kabar akan di-block oleh yumefess,
 di-blacklist dari event-event selanjutnya, dan @ kalian akan dipajang di @mlytfess</p>
 <p>Sebagai referensi berikut adalah timeline dari event SantaHalu25:<br>
 Timeline:<br>
 10 Oktober: Pendaftaran<br>
 17 - 24 Oktober: Sorting<br>
-25 Oktober - 1 November: Pengumuman penerima, konfirmasi, reshuffling<br>
-2 November - 15 Desember: Pengerjaan Hadiah<br>
+25 Oktober - 15 Desember: Pengerjaan Hadiah<br>
 16 - 22 Desember: Sorting Hadiah<br>
 23-24 Desember: Pengiriman Hadiah<br>
 25 Desember: Posting bersama dengan tag #SantaHalu26</p>

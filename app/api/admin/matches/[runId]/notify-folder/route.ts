@@ -5,6 +5,9 @@ import { getNotifyRows, ensureConfirmToken } from "@/lib/notify";
 import { sendEmail } from "@/lib/email";
 import { FOLDER_EMAIL_SUBJECT, folderEmailHtml } from "@/lib/folderEmail";
 
+// The admin page sends small batches; this gives each one headroom.
+export const maxDuration = 60;
+
 type SendOutcome = "sent" | "no_folder_link" | "not_found" | "failed";
 
 export async function POST(
