@@ -30,6 +30,7 @@ export default function SendFolderEmails({
   const [error, setError] = useState<string | null>(null);
   const [lastResults, setLastResults] = useState<Record<string, string> | null>(null);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
+  const [rowErrors, setRowErrors] = useState<Record<string, string>>({});
 
   const eligibleIds = useMemo(
     () => rows.filter((r) => r.receiverFolderLink && !sentState[r.matchId]).map((r) => r.matchId),
@@ -55,6 +56,7 @@ export default function SendFolderEmails({
     setSending(true);
     setError(null);
     setLastResults(null);
+    setRowErrors({});
 
     const ids = Array.from(selected);
     const results: Record<string, string> = {};
@@ -83,7 +85,7 @@ export default function SendFolderEmails({
           body: JSON.stringify({ matchIds: batch }),
         });
         const text = await res.text();
-        let data: { error?: string; results?: Record<string, string> } = {};
+        let data: { error?: string; results?: Record<string, string>; errors?: Record<string, string> } = {};
         try {
           data = JSON.parse(text);
         } catch {
@@ -96,6 +98,7 @@ export default function SendFolderEmails({
           break;
         }
         recordSent(data.results ?? {});
+        setRowErrors((prev) => ({ ...prev, ...(data.errors ?? {}) }));
         setProgress({ done: Math.min(i + batch.length, ids.length), total: ids.length });
       }
       setLastResults({ ...results });
@@ -187,7 +190,14 @@ export default function SendFolderEmails({
                     {sent ? (
                       <span className="text-teal-600">Terkirim {formatSentAt(sent)}</span>
                     ) : result === "failed" ? (
-                      <span className="text-red-500">Gagal, coba lagi</span>
+                      <span className="text-red-500">
+                        Gagal, coba lagi
+                        {rowErrors[row.matchId] && (
+                          <span className="block max-w-xs break-words text-xs">
+                            {rowErrors[row.matchId]}
+                          </span>
+                        )}
+                      </span>
                     ) : (
                       <span className="text-gray-400">Belum dikirim</span>
                     )}

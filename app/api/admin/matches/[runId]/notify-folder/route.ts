@@ -38,6 +38,8 @@ export async function POST(
   const byId = new Map(notifyData.rows.map((r) => [r.matchId, r]));
 
   const results: Record<string, SendOutcome> = {};
+  // Why a "failed" row failed (e.g. Gmail's daily quota), shown on the page.
+  const errors: Record<string, string> = {};
 
   for (const matchId of matchIds) {
     const row = byId.get(matchId);
@@ -64,8 +66,9 @@ export async function POST(
     } catch (err) {
       console.error("notify-folder send failed", matchId, err);
       results[matchId] = "failed";
+      errors[matchId] = err instanceof Error ? err.message : String(err);
     }
   }
 
-  return NextResponse.json({ ok: true, results });
+  return NextResponse.json({ ok: true, results, errors });
 }

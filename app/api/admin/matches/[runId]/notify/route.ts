@@ -5,6 +5,9 @@ import { getNotifyRows, ensureConfirmToken } from "@/lib/notify";
 import { sendEmail } from "@/lib/email";
 import { MATCH_EMAIL_SUBJECT, matchEmailHtml } from "@/lib/matchEmail";
 
+// The admin page sends small batches; this gives each one headroom.
+export const maxDuration = 60;
+
 type SendOutcome = "sent" | "not_found" | "failed";
 
 export async function POST(
@@ -35,6 +38,8 @@ export async function POST(
   const byId = new Map(notifyData.rows.map((r) => [r.matchId, r]));
 
   const results: Record<string, SendOutcome> = {};
+  // Why a "failed" row failed (e.g. Gmail's daily quota), shown on the page.
+  const errors: Record<string, string> = {};
 
   for (const matchId of matchIds) {
     const row = byId.get(matchId);
@@ -58,8 +63,9 @@ export async function POST(
     } catch (err) {
       console.error("notify send failed", matchId, err);
       results[matchId] = "failed";
+      errors[matchId] = err instanceof Error ? err.message : String(err);
     }
   }
 
-  return NextResponse.json({ ok: true, results });
+  return NextResponse.json({ ok: true, results, errors });
 }

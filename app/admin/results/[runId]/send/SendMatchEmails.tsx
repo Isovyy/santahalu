@@ -3,6 +3,8 @@
 import { useMemo, useState } from "react";
 import type { NotifyRow } from "@/lib/notify";
 
+const SEND_BATCH_SIZE = 5;
+
 function formatSentAt(iso: string): string {
   return new Intl.DateTimeFormat("en-GB", {
     dateStyle: "medium",
@@ -26,6 +28,8 @@ export default function SendMatchEmails({
   const [error, setError] = useState<string | null>(null);
   const [lastResults, setLastResults] = useState<Record<string, string> | null>(null);
   const [unmarkingId, setUnmarkingId] = useState<string | null>(null);
+  const [rowErrors, setRowErrors] = useState<Record<string, string>>({});
+  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
 
   const eligibleIds = useMemo(
     () => rows.filter((r) => !sentState[r.matchId]).map((r) => r.matchId),
@@ -52,33 +56,57 @@ export default function SendMatchEmails({
     setError(null);
     setLastResults(null);
 
+    // Small batches, one after another: each email is an SMTP round-trip and
+    // one big request can run past Vercel's function time limit (HTTP 504).
+    // Sent marks are recorded per batch, so a later failure never makes
+    // already-emailed people look unsent (and get a second email).
+    const ids = Array.from(selected);
+    const results: Record<string, string> = {};
+    const errors: Record<string, string> = {};
+    setProgress({ done: 0, total: ids.length });
+
     try {
-      const res = await fetch(`/api/admin/matches/${runId}/notify`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ matchIds: Array.from(selected) }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error || "Gagal mengirim email.");
-        setSending(false);
-        return;
-      }
-      const results: Record<string, string> = data.results;
-      setLastResults(results);
-      setSentState((prev) => {
-        const next = { ...prev };
-        const now = new Date().toISOString();
-        for (const [id, outcome] of Object.entries(results)) {
-          if (outcome === "sent") next[id] = now;
+      for (let i = 0; i < ids.length; i += SEND_BATCH_SIZE) {
+        const batch = ids.slice(i, i + SEND_BATCH_SIZE);
+        const res = await fetch(`/api/admin/matches/${runId}/notify`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ matchIds: batch }),
+        });
+        const text = await res.text();
+        let data: { error?: string; results?: Record<string, string>; errors?: Record<string, string> } = {};
+        try {
+          data = JSON.parse(text);
+        } catch {
+          // not JSON (crash/timeout page), reported below
         }
-        return next;
-      });
+        if (!res.ok) {
+          setError(
+            `Gagal mengirim (HTTP ${res.status}) setelah ${i} dari ${ids.length}: ${data.error || text.slice(0, 200) || "tanpa keterangan"}. Yang sudah terkirim tetap tercatat, klik lagi untuk melanjutkan.`,
+          );
+          break;
+        }
+        const batchResults = data.results ?? {};
+        Object.assign(results, batchResults);
+        Object.assign(errors, data.errors ?? {});
+        setSentState((prev) => {
+          const next = { ...prev };
+          const now = new Date().toISOString();
+          for (const [id, outcome] of Object.entries(batchResults)) {
+            if (outcome === "sent") next[id] = now;
+          }
+          return next;
+        });
+        setProgress({ done: Math.min(i + batch.length, ids.length), total: ids.length });
+      }
       setSelected(new Set());
     } catch {
-      setError("Network error, coba lagi.");
+      setError("Network error, coba lagi. Yang sudah terkirim tetap tercatat.");
     } finally {
+      setLastResults({ ...results });
+      setRowErrors({ ...errors });
       setSending(false);
+      setProgress(null);
     }
   }
 
@@ -118,7 +146,9 @@ export default function SendMatchEmails({
           disabled={sending || selected.size === 0}
           className="rounded-lg bg-teal-400 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-500 disabled:opacity-50"
         >
-          {sending ? "Mengirim..." : `Kirim ke ${selected.size} peserta terpilih`}
+          {sending
+            ? `Mengirim ${progress?.done ?? 0}/${progress?.total ?? selected.size}...`
+            : `Kirim ke ${selected.size} peserta terpilih`}
         </button>
       </div>
 
@@ -180,7 +210,14 @@ export default function SendMatchEmails({
                         </button>
                       </div>
                     ) : result === "failed" ? (
-                      <span className="text-red-500">Gagal, coba lagi</span>
+                      <span className="text-red-500">
+                        Gagal, coba lagi
+                        {rowErrors[row.matchId] && (
+                          <span className="block max-w-xs break-words text-xs">
+                            {rowErrors[row.matchId]}
+                          </span>
+                        )}
+                      </span>
                     ) : (
                       <span className="text-gray-400">Belum dikirim</span>
                     )}
