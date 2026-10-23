@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { createDriveFolder, shareFolder, unshareFolder } from "@/lib/drive";
 
+// Each pair is several Drive API calls; the admin page sends small batches,
+// this just gives each batch headroom over the platform's default limit.
+export const maxDuration = 60;
+
 // "created": new folder made (and shared). "shared": folder already existed,
 // access granted to the current giver (and taken from an old one, if any).
 // "already_done": folder exists and is already shared with the current giver.

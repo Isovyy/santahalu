@@ -4,6 +4,9 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { NotifyRow } from "@/lib/notify";
 
+// Pairs per request — small enough to finish well inside the time limit.
+const FOLDER_BATCH_SIZE = 5;
+
 // Done = folder exists AND the current giver is the one with access to it.
 // A folder shared with someone else is left over from before a reshuffle.
 function accessState(row: NotifyRow): "none" | "current" | "old_giver" {
@@ -32,6 +35,7 @@ export default function CreateReceiverFolders({
   const [error, setError] = useState<string | null>(null);
   const [lastResults, setLastResults] = useState<Record<string, string> | null>(null);
   const [rowErrors, setRowErrors] = useState<Record<string, string>>({});
+  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
 
   const eligibleIds = useMemo(() => rows.filter(needsAction).map((r) => r.matchId), [rows]);
   const allEligibleSelected = eligibleIds.length > 0 && eligibleIds.every((id) => selected.has(id));
@@ -55,35 +59,54 @@ export default function CreateReceiverFolders({
     setError(null);
     setLastResults(null);
 
+    // Each folder means several Drive API calls, so a big selection in one
+    // request runs past Vercel's function time limit (HTTP 504). Send small
+    // batches one after another instead; whatever finished is kept even if a
+    // later batch fails.
+    const ids = Array.from(selected);
+    const results: Record<string, string> = {};
+    const errors: Record<string, string> = {};
+    setProgress({ done: 0, total: ids.length });
+
     try {
-      const res = await fetch(`/api/admin/matches/${runId}/create-receiver-folders`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ matchIds: Array.from(selected) }),
-      });
-      // Read as text first: a crashed or timed-out request comes back as an
-      // HTML/plain-text error page, not JSON, and its body is the only clue.
-      const text = await res.text();
-      let data: { error?: string; results?: Record<string, string>; errors?: Record<string, string> } = {};
-      try {
-        data = JSON.parse(text);
-      } catch {
-        // not JSON, fall through with the raw text below
+      for (let i = 0; i < ids.length; i += FOLDER_BATCH_SIZE) {
+        const batch = ids.slice(i, i + FOLDER_BATCH_SIZE);
+        const res = await fetch(`/api/admin/matches/${runId}/create-receiver-folders`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ matchIds: batch }),
+        });
+        // Read as text first: a crashed or timed-out request comes back as an
+        // HTML/plain-text error page, not JSON, and its body is the only clue.
+        const text = await res.text();
+        let data: { error?: string; results?: Record<string, string>; errors?: Record<string, string> } = {};
+        try {
+          data = JSON.parse(text);
+        } catch {
+          // not JSON, fall through with the raw text below
+        }
+        if (!res.ok) {
+          setError(
+            `Gagal membuat folder (HTTP ${res.status}) setelah ${i} dari ${ids.length}: ${data.error || text.slice(0, 200) || "tanpa keterangan"}. Yang sudah selesai tetap tersimpan, klik lagi untuk melanjutkan.`,
+          );
+          break;
+        }
+        Object.assign(results, data.results ?? {});
+        Object.assign(errors, data.errors ?? {});
+        setProgress({ done: Math.min(i + batch.length, ids.length), total: ids.length });
       }
-      if (!res.ok) {
-        setError(
-          `Gagal membuat folder (HTTP ${res.status}): ${data.error || text.slice(0, 200) || "tanpa keterangan"}`,
-        );
-        return;
-      }
-      setLastResults(data.results ?? {});
-      setRowErrors(data.errors ?? {});
+      setLastResults(results);
+      setRowErrors(errors);
       setSelected(new Set());
       router.refresh();
     } catch {
-      setError("Network error, coba lagi.");
+      setError("Network error, coba lagi. Yang sudah selesai tetap tersimpan.");
+      setLastResults(results);
+      setRowErrors(errors);
+      router.refresh();
     } finally {
       setCreating(false);
+      setProgress(null);
     }
   }
 
@@ -109,7 +132,9 @@ export default function CreateReceiverFolders({
           disabled={creating || selected.size === 0}
           className="rounded-lg bg-teal-400 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-500 disabled:opacity-50"
         >
-          {creating ? "Memproses..." : `Buat folder & bagikan akses (${selected.size})`}
+          {creating
+            ? `Memproses ${progress?.done ?? 0}/${progress?.total ?? selected.size}...`
+            : `Buat folder & bagikan akses (${selected.size})`}
         </button>
       </div>
 
