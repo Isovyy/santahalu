@@ -28,10 +28,10 @@ export default async function SubmitPage({
           <ol className="mt-2 list-decimal space-y-1 pl-5">
             <li>Karya bertema musim dingin/natal/tahun baru.</li>
             <li>
-              Art minimal colored sketch. Minimal bust up untuk non-chibi dan half body untuk
+              Art MINIMAL colored sketch. Minimal bust up couple untuk non-chibi dan half body couple untuk
               chibi.
             </li>
-            <li>Writing minimal 1000 kata.</li>
+            <li>Writing MINIMAL 1000 kata.</li>
           </ol>
           <p className="mt-3 text-amber-700">
             Kegagalan memenuhi kriteria minimum di atas tanpa komunikasi ke admin dapat
